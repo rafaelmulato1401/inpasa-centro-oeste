@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Operações Logística</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── PALETA AZUL MARINHO + DOURADO (padrão Inpasa) ── */
+  :root {
+    --blue:       #1a3a6b;
+    --blue-dark:  #0d2044;
+    --blue-mid:   #2456a4;
+    --blue-light: #e8eef8;
+    --blue-pale:  #f4f7fd;
+    --gold:       #f0a500;
+    --gold-light: #ffd166;
+    --bg:         #f4f7fd;
+    --bg2:        #ffffff;
+    --bg3:        #e8eef8;
+    --border:     #cdd5e8;
+    --accent:     #1a3a6b;
+    --accent2:    #1a6b35;
+    --accent3:    #f0a500;
+    --danger:     #b91c1c;
+    --warn:       #f0a500;
+    --text:       #1a2340;
+    --text2:      #6b7a99;
+    --text3:      #9aa3bb;
+    --ferro:      #f0a500;
+    --teciap:     #1a3a6b;
+    --ultra:      #0e6674;
+    --centro:     #5b2d8e;
+    --surface:    #f4f7fd;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Barlow',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:13px; }
+
+  /* ── NAV ── */
+  .nav {
+    background:var(--blue); border-bottom:2px solid var(--gold);
+    display:flex; align-items:center; padding:0 20px; height:54px; gap:0;
+    position:sticky; top:0; z-index:100;
+    box-shadow:0 2px 12px rgba(10,20,60,.25);
+  }
+  .nav-logo { font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:18px; letter-spacing:1px; color:#fff; margin-right:32px; white-space:nowrap; }
+  .nav-logo span { color:var(--gold); font-weight:400; }
+  .nav-tabs { display:flex; gap:2px; }
+  .nav-tab { padding:6px 18px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; letter-spacing:.5px; color:rgba(255,255,255,.65); border:1px solid transparent; transition:all .2s; text-transform:uppercase; }
+  .nav-tab:hover { color:#fff; background:rgba(255,255,255,.12); }
+  .nav-tab.active { color:var(--gold); background:rgba(240,165,0,.15); border-color:rgba(240,165,0,.4); }
+  .nav-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .last-update { font-size:11px; color:rgba(255,255,255,.55); }
+  .last-update span { color:var(--gold-light); }
+  .btn-upload-nav { background:var(--gold); color:var(--blue-dark); border:none; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; transition:all .2s; }
+  .btn-upload-nav:hover { background:var(--gold-light); }
+
+  /* ── FILTRO MÊS ── */
+  .month-filter-bar {
+    display:flex; align-items:center; gap:12px; padding:10px 20px;
+    background:var(--blue-dark); border-bottom:1px solid rgba(255,255,255,.1);
+  }
+  .month-filter-label { font-size:11px; font-weight:700; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.5px; }
+  .month-select {
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); border-radius:7px;
+    padding:6px 14px; color:#fff; font-size:13px; font-family:'Barlow Condensed',sans-serif;
+    font-weight:600; cursor:pointer; letter-spacing:.4px; min-width:160px;
+  }
+  .month-select option { background:var(--blue-dark); color:#fff; font-size:13px; }
+  .btn-clear-data {
+    background:rgba(185,28,28,.15); border:1px solid rgba(185,28,28,.4); border-radius:6px;
+    padding:5px 12px; font-size:11px; font-weight:700; color:#ef4444; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.4px; transition:all .18s;
+  }
+  .btn-clear-data:hover { background:rgba(185,28,28,.3); }
+  .btn-clear-all {
+    background:rgba(185,28,28,.9); border:none; border-radius:7px;
+    padding:8px 18px; font-size:12px; font-weight:700; color:#fff; cursor:pointer;
+    text-transform:uppercase; letter-spacing:.5px; transition:all .18s;
+  }
+  .btn-clear-all:hover { background:#b91c1c; }
+
+  /* ── PAGES ── */
+  .page { display:none; padding:20px; }
+  .page.active { display:block; animation:fadeIn .2s ease; }
+
+  /* ── TERMINAL TABS ── */
+  .terminal-tabs { display:flex; gap:6px; margin-bottom:20px; }
+  .terminal-tab {
+    padding:8px 22px; border-radius:8px; cursor:pointer;
+    font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:.5px;
+    border:1.5px solid var(--border); color:var(--text2); background:var(--bg2);
+    transition:all .2s; text-transform:uppercase;
+  }
+  .terminal-tab:hover { color:var(--text); border-color:var(--blue-mid); }
+  .terminal-tab[data-t="teciap"].active  { color:var(--teciap); border-color:var(--teciap); background:rgba(26,58,107,.08); }
+  .terminal-tab[data-t="ultra"].active   { color:var(--ultra);  border-color:var(--ultra);  background:rgba(14,102,116,.08); }
+  .terminal-tab[data-t="centro"].active  { color:var(--centro); border-color:var(--centro); background:rgba(91,45,142,.08); }
+
+  /* ── KPI ROW ── */
+  .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px; }
+  .kpi {
+    background:var(--bg2); border:1px solid var(--border); border-radius:10px;
+    padding:14px 16px; position:relative; overflow:hidden;
+    box-shadow:0 1px 4px rgba(10,20,60,.06);
+  }
+  .kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--kpi-color,var(--blue)); }
+  .kpi-label { font-size:10px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; line-height:1.3; }
+  .kpi-value { font-family:'Barlow Condensed',sans-serif; font-size:26px; font-weight:700; color:var(--text); line-height:1; }
+  .kpi-value.negative { color:var(--danger); }
+  .kpi-value.positive { color:var(--accent2); }
+  .kpi-sub { font-size:10px; color:var(--text3); margin-top:4px; }
+
+  /* ── CHARTS + TABLES GRID ── */
+  .main-grid { display:grid; grid-template-columns:1fr 360px; gap:16px; margin-bottom:16px; }
+  .charts-col { display:flex; flex-direction:column; gap:16px; }
+  .tables-col { display:flex; flex-direction:column; gap:12px; }
+
+  .card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px; box-shadow:0 1px 4px rgba(10,20,60,.05); }
+  .card-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--blue); margin-bottom:12px; }
+  .card-title span { color:var(--gold); }
+  .chart-wrap { position:relative; height:150px; }
+
+  /* ── TABLES ── */
+  .mini-table { width:100%; border-collapse:collapse; font-size:11px; }
+  .mini-table th { background:var(--blue); color:#fff; font-weight:600; text-transform:uppercase; font-size:10px; letter-spacing:.4px; padding:6px 8px; text-align:right; }
+  .mini-table th:first-child { text-align:left; }
+  .mini-table td { padding:5px 8px; border-bottom:1px solid var(--border); text-align:right; }
+  .mini-table td:first-child { text-align:left; color:var(--text2); }
+  .mini-table tr:last-child td { border-bottom:none; font-weight:700; color:var(--text); background:var(--bg3); }
+  .mini-table tr.today td { background:rgba(26,58,107,.06); }
+  .mini-table tr.atrasado td { background:rgba(185,28,28,.06); color:var(--danger); }
+  .table-section-title { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--blue-mid); padding:6px 0 4px; border-bottom:2px solid var(--border); margin-bottom:4px; }
+  .table-section-title.red  { color:var(--danger); border-color:rgba(185,28,28,.3); }
+  .table-section-title.warn { color:var(--gold);   border-color:rgba(240,165,0,.3); }
+  .quebra-row { display:grid; grid-template-columns:90px 1fr 1fr 1fr; gap:6px; padding:5px 8px; font-size:11px; border-bottom:1px solid var(--border); }
+  .quebra-row.header { background:var(--blue); color:#fff; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; border-radius:4px 4px 0 0; }
+  .quebra-row:last-child { border-bottom:none; font-weight:700; background:var(--bg3); }
+
+  /* ── FERROVIA PAGE ── */
+  .ferro-kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:20px; }
+  .ferro-daily { width:100%; border-collapse:collapse; font-size:11px; }
+  .ferro-daily th { background:var(--blue); color:#fff; padding:6px 10px; text-align:right; font-size:10px; text-transform:uppercase; letter-spacing:.3px; position:sticky; top:0; }
+  .ferro-daily th:first-child { text-align:left; }
+  .ferro-daily td { padding:5px 10px; border-bottom:1px solid var(--border); text-align:right; }
+  .ferro-daily td:first-child { text-align:left; font-weight:600; }
+  .ferro-daily tr.total-row td { font-weight:700; background:var(--bg3); }
+  .ferro-daily-wrap { max-height:380px; overflow-y:auto; }
+
+  /* ── TAKE OR PAY TABLE ── */
+  .top-table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:20px; }
+  .top-table th { background:var(--blue); color:#fff; padding:8px 12px; text-align:right; font-size:10px; text-transform:uppercase; letter-spacing:.4px; font-weight:600; }
+  .top-table th:first-child { text-align:left; }
+  .top-table td { padding:7px 12px; border-bottom:1px solid var(--border); text-align:right; }
+  .top-table td:first-child { text-align:left; color:var(--text2); }
+  .top-table tr.total td { font-weight:700; background:var(--bg3); color:var(--text); }
+  .top-table tr.highlight td { background:rgba(26,58,107,.05); }
+  .pct-good { color:var(--accent2); font-weight:700; }
+  .pct-warn { color:var(--gold); font-weight:700; }
+  .pct-bad  { color:var(--danger); font-weight:700; }
+  .faturado-val { color:var(--blue); font-weight:700; }
+
+  /* ── UPLOAD PAGE ── */
+  .upload-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; max-width:900px; }
+  .upload-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:28px 24px; box-shadow:0 1px 4px rgba(10,20,60,.05); }
+  .upload-card-title { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; letter-spacing:1px; margin-bottom:6px; }
+  .upload-card-desc { font-size:12px; color:var(--text2); margin-bottom:20px; line-height:1.5; }
+  /* FIX: drop-zone com label para garantir clique funcionando em toda área */
+  .drop-zone {
+    border:2px dashed var(--border); border-radius:8px; padding:28px 20px;
+    text-align:center; cursor:pointer; transition:all .2s; position:relative;
+    background:var(--bg3);
+  }
+  .drop-zone:hover, .drop-zone.drag { border-color:var(--blue); background:rgba(26,58,107,.06); }
+  .drop-zone label {
+    position:absolute; inset:0; cursor:pointer; display:block;
+  }
+  .drop-zone input[type=file] {
+    position:absolute; inset:0; width:100%; height:100%;
+    opacity:0; cursor:pointer; z-index:2;
+  }
+  .drop-icon { font-size:28px; margin-bottom:8px; position:relative; z-index:1; pointer-events:none; }
+  .drop-text { font-size:12px; color:var(--text2); position:relative; z-index:1; pointer-events:none; }
+  .drop-text strong { color:var(--blue); }
+  .upload-status { margin-top:12px; font-size:11px; padding:8px 12px; border-radius:6px; display:none; }
+  .upload-status.success { background:rgba(26,107,53,.1);  border:1px solid rgba(26,107,53,.3);  color:var(--accent2); display:block; }
+  .upload-status.error   { background:rgba(185,28,28,.1);  border:1px solid rgba(185,28,28,.3);  color:var(--danger);  display:block; }
+  .upload-status.info    { background:rgba(26,58,107,.1);  border:1px solid rgba(26,58,107,.3);  color:var(--blue);    display:block; }
+  .data-log { max-height:140px; overflow-y:auto; margin-top:8px; border:1px solid var(--border); border-radius:6px; }
+  .data-log-row { display:flex; justify-content:space-between; padding:4px 8px; font-size:10px; border-bottom:1px solid var(--border); color:var(--text2); }
+  .data-log-row:nth-child(even) { background:var(--bg3); }
+  .data-log-row:last-child { border-bottom:none; color:var(--text3); justify-content:center; font-style:italic; }
+
+  /* ── CONFIG PAGE ── */
+  .config-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; max-width:1100px; }
+  .config-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 1px 4px rgba(10,20,60,.05); }
+  .config-card-title { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.5px; margin-bottom:16px; display:flex; align-items:center; gap:8px; color:var(--blue); }
+  .config-dot { width:8px; height:8px; border-radius:50%; }
+  .field-group { margin-bottom:14px; }
+  .field-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text2); margin-bottom:5px; display:block; }
+  .field-input { width:100%; background:var(--bg3); border:1.5px solid var(--border); border-radius:6px; padding:8px 12px; color:var(--text); font-size:13px; font-family:'Barlow',sans-serif; transition:border .2s; }
+  .field-input:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,58,107,.1); }
+  .btn-save { background:var(--blue); color:#fff; border:none; padding:9px 20px; border-radius:7px; cursor:pointer; font-size:12px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; transition:all .2s; margin-top:4px; }
+  .btn-save:hover { background:var(--blue-dark); }
+  .config-preview { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:16px; }
+  .preview-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; }
+  .preview-row:last-child { border-bottom:none; }
+  .preview-label { color:var(--text2); }
+  .preview-value { font-weight:700; color:var(--blue); font-family:'Barlow Condensed',sans-serif; font-size:15px; }
+  .preview-value.cost { color:var(--gold); }
+
+  /* ── MODAL ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(10,20,50,.55); z-index:1000; display:none; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--bg2); border:2px solid var(--blue); border-radius:14px; overflow:hidden; width:400px; box-shadow:0 20px 60px rgba(10,20,60,.3); }
+  .modal-head { background:var(--blue); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .modal-head h3 { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:#fff; }
+  .modal-head::before { content:'📦'; margin-right:8px; }
+  .modal-body { padding:24px; }
+  .modal-desc { font-size:12px; color:var(--text2); margin-bottom:20px; line-height:1.5; }
+  .modal-field { margin-bottom:14px; }
+  .modal-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text2); margin-bottom:5px; display:block; }
+  .modal-select, .modal-input { width:100%; background:var(--bg3); border:1.5px solid var(--border); border-radius:7px; padding:10px 12px; color:var(--text); font-size:14px; font-family:'Barlow',sans-serif; }
+  .modal-select:focus, .modal-input:focus { outline:none; border-color:var(--blue); }
+  .modal-actions { display:flex; gap:10px; padding:14px 20px; background:var(--bg3); border-top:1px solid var(--border); }
+  .btn-confirm { flex:1; background:var(--blue); color:#fff; border:none; padding:10px; border-radius:7px; cursor:pointer; font-size:13px; font-weight:700; }
+  .btn-confirm:hover { background:var(--blue-dark); }
+  .btn-cancel-m { flex:1; background:var(--bg2); color:var(--text2); border:1.5px solid var(--border); padding:10px; border-radius:7px; cursor:pointer; font-size:13px; }
+
+  /* ── SECTION HEADER ── */
+  .section-header { display:flex; align-items:baseline; gap:10px; margin-bottom:16px; }
+  .section-title { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--blue); }
+  .section-title .gold-accent { color:var(--gold); }
+  .gold-bar { width:40px; height:3px; background:var(--gold); border-radius:2px; margin-bottom:16px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--text3); }
+
+  .divider { height:1px; background:var(--border); margin:12px 0; }
+  .text-danger { color:var(--danger); }
+  .text-gold { color:var(--gold); }
+  .mt8 { margin-top:8px; }
+
+  @keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">OPERAÇÕES <span>LOGÍSTICA</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('terminals')">Terminais</div>
+    <div class="nav-tab" onclick="showPage('ferrovia')">Ferrovia</div>
+    <div class="nav-tab" onclick="showPage('takeorpay')">Take or Pay</div>
+    <div class="nav-tab" onclick="showPage('config')">Configurações</div>
+  </div>
+  <div class="nav-right">
+    <div class="last-update">Última atualização: <span id="lastUpdate">—</span></div>
+    <button class="btn-upload-nav" onclick="showPage('upload')">↑ Upload Dados</button>
+  </div>
+</nav>
+
+<!-- FILTRO MÊS -->
+<div class="month-filter-bar" id="monthFilterBar">
+  <span class="month-filter-label">Filtro Mês:</span>
+  <div id="monthBtns" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+</div>
+
+<!-- PAGE: TERMINALS -->
+<div class="page active" id="page-terminals">
+  <div class="terminal-tabs">
+    <div class="terminal-tab active" data-t="teciap" onclick="selectTerminal('teciap',this)">Teciap</div>
+    <div class="terminal-tab" data-t="ultra" onclick="selectTerminal('ultra',this)">Ultracargo RO</div>
+    <div class="terminal-tab" data-t="centro" onclick="selectTerminal('centro',this)">Centroeste</div>
+  </div>
+  <div class="kpi-row" id="kpiRow"></div>
+  <div class="main-grid">
+    <div class="charts-col">
+      <div class="card">
+        <div class="card-title">Descarga <span>Rodoviária</span></div>
+        <div class="chart-wrap"><canvas id="chartDescarga"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Carregamentos — <span id="chartCarregLabel">Rodo / Ferro / Transf</span></div>
+        <div class="chart-wrap"><canvas id="chartCarreg"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Abertura de <span>Estoque</span></div>
+        <div class="chart-wrap"><canvas id="chartEstoque"></canvas></div>
+      </div>
+    </div>
+    <div class="tables-col">
+      <div class="card">
+        <div class="table-section-title">Carregamento Usina</div>
+        <table class="mini-table">
+          <thead><tr><th></th><th>Data</th><th>Sinop</th><th>N.Mutum</th><th>Total</th></tr></thead>
+          <tbody id="tbodyTransitoDesc"></tbody>
+        </table>
+        <div class="divider"></div>
+        <div class="table-section-title warn">Data Prevista</div>
+        <table class="mini-table">
+          <thead><tr><th></th><th>Data</th><th>Sinop</th><th>N.Mutum</th><th>Total</th></tr></thead>
+          <tbody id="tbodyTransitoFut"></tbody>
+        </table>
+        <div class="divider"></div>
+        <div class="table-section-title red">Atrasado</div>
+        <table class="mini-table">
+          <thead><tr><th></th><th>Data</th><th>Sinop</th><th>N.Mutum</th><th>Total</th></tr></thead>
+          <tbody id="tbodyAtrasado"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="table-section-title">Quebra Mensal</div>
+        <div class="quebra-row header"><div>Filial</div><div>Entrada</div><div>Quebra</div><div>Índice</div></div>
+        <div id="quebraRows"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: FERROVIA -->
+<div class="page" id="page-ferrovia">
+  <div class="section-title">Monitoramento <span class="gold-accent">Ferrovia</span></div>
+  <div class="gold-bar"></div>
+  <div class="ferro-kpi-row" id="ferroKpiRow"></div>
+  <div style="display:grid;grid-template-columns:1fr 420px;gap:16px">
+    <div class="charts-col">
+      <div class="card">
+        <div class="card-title">Carregamento Ferroviário — <span>Teciap / Ultracargo</span></div>
+        <div class="chart-wrap"><canvas id="chartFerroCarreg"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Descarga Ferroviária — <span>Terminais</span></div>
+        <div id="ferroDescNotice" style="display:none;background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.4);border-radius:7px;padding:8px 12px;font-size:11px;color:#b87800;margin-bottom:10px">
+          ⚠️ Dados de descargas precisam ser recarregados para exibir este gráfico.<br>
+          Vá em <strong>Upload Dados → 🗑️ Limpar Descargas</strong> e suba o arquivo novamente.
+        </div>
+        <div class="chart-wrap"><canvas id="chartFerroDesc"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Carregamento por <span>Destino</span></div>
+      <div class="ferro-daily-wrap">
+        <table class="ferro-daily" id="ferroDailyTable">
+          <thead id="ferroDailyHead"><tr><th>Data</th><th>Total</th></tr></thead>
+          <tbody id="ferroDailyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: TAKE OR PAY -->
+<div class="page" id="page-takeorpay">
+  <div class="section-title">Take or Pay — <span class="gold-accent">Ferrovia</span></div>
+  <div class="gold-bar"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <div class="card-title" style="margin-bottom:10px">Anual</div>
+      <table class="top-table"><thead><tr><th>Mês</th><th>Faturado</th><th>Mín. Contratual</th><th>Índice</th><th>Contrato</th><th>Índice</th></tr></thead><tbody id="topAnualBody"></tbody></table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div>
+        <div class="card-title" style="margin-bottom:8px">1º Trimestre</div>
+        <table class="top-table"><thead><tr><th>Mês</th><th>Faturado</th><th>Mín. Contratual</th><th>Índice</th><th>Contrato</th><th>Índice</th></tr></thead><tbody id="topQ1Body"></tbody></table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:8px">2º Trimestre</div>
+        <table class="top-table"><thead><tr><th>Mês</th><th>Faturado</th><th>Mín. Contratual</th><th>Índice</th><th>Contrato</th><th>Índice</th></tr></thead><tbody id="topQ2Body"></tbody></table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:8px">3º Trimestre</div>
+        <table class="top-table"><thead><tr><th>Mês</th><th>Faturado</th><th>Mín. Contratual</th><th>Índice</th><th>Contrato</th><th>Índice</th></tr></thead><tbody id="topQ3Body"></tbody></table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:8px">4º Trimestre</div>
+        <table class="top-table"><thead><tr><th>Mês</th><th>Faturado</th><th>Mín. Contratual</th><th>Índice</th><th>Contrato</th><th>Índice</th></tr></thead><tbody id="topQ4Body"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: CONFIG -->
+<div class="page" id="page-config">
+  <div class="section-title">Configurações</div>
+  <div class="gold-bar"></div>
+  <div class="config-grid">
+    <div class="config-card">
+      <div class="config-card-title"><div class="config-dot" style="background:var(--teciap)"></div>Teciap</div>
+      <div class="field-group"><label class="field-label">Take or Pay / Mês (m³)</label><input class="field-input" id="cfg_teciap_top" type="number" placeholder="35000"></div>
+      <div class="field-group"><label class="field-label">Estática Contratada — Hidratado (m³)</label><input class="field-input" id="cfg_teciap_estat_hid" type="number" placeholder="6000"></div>
+      <div class="field-group"><label class="field-label">Estática Contratada — Anidro (m³)</label><input class="field-input" id="cfg_teciap_estat_ani" type="number" placeholder="1000"></div>
+      <div class="field-group"><label class="field-label">Tarifa Terminal (R$/m³)</label><input class="field-input" id="cfg_teciap_tarifa" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="field-group"><label class="field-label">Volume Atual Contratado (m³)</label><input class="field-input" id="cfg_teciap_vol" type="number" placeholder="0"></div>
+      <div class="field-group"><label class="field-label">Valor Atual Contrato (R$)</label><input class="field-input" id="cfg_teciap_valor" type="number" step="0.01" placeholder="0.00"></div>
+      <button class="btn-save" onclick="saveConfig('teciap')">Salvar Teciap</button>
+    </div>
+    <div class="config-card">
+      <div class="config-card-title"><div class="config-dot" style="background:var(--ultra)"></div>Ultracargo RO</div>
+      <div class="field-group"><label class="field-label">Take or Pay / Mês (m³)</label><input class="field-input" id="cfg_ultra_top" type="number" placeholder="25000"></div>
+      <div class="field-group"><label class="field-label">Estática Contratada — Hidratado (m³)</label><input class="field-input" id="cfg_ultra_estat_hid" type="number" placeholder="5000"></div>
+      <div class="field-group"><label class="field-label">Tarifa Terminal (R$/m³)</label><input class="field-input" id="cfg_ultra_tarifa" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="field-group"><label class="field-label">Volume Atual Contratado (m³)</label><input class="field-input" id="cfg_ultra_vol" type="number" placeholder="0"></div>
+      <div class="field-group"><label class="field-label">Valor Atual Contrato (R$)</label><input class="field-input" id="cfg_ultra_valor" type="number" step="0.01" placeholder="0.00"></div>
+      <button class="btn-save" onclick="saveConfig('ultra')">Salvar Ultracargo</button>
+    </div>
+    <div class="config-card">
+      <div class="config-card-title"><div class="config-dot" style="background:var(--centro)"></div>Centroeste</div>
+      <div class="field-group"><label class="field-label">Take or Pay / Mês (m³)</label><input class="field-input" id="cfg_centro_top" type="number" placeholder="0"></div>
+      <div class="field-group"><label class="field-label">Estática Contratada — Hidratado (m³)</label><input class="field-input" id="cfg_centro_estat_hid" type="number" placeholder="0"></div>
+      <div class="field-group"><label class="field-label">Tarifa Terminal (R$/m³)</label><input class="field-input" id="cfg_centro_tarifa" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="field-group"><label class="field-label">Volume Atual Contratado (m³)</label><input class="field-input" id="cfg_centro_vol" type="number" placeholder="0"></div>
+      <div class="field-group"><label class="field-label">Valor Atual Contrato (R$)</label><input class="field-input" id="cfg_centro_valor" type="number" step="0.01" placeholder="0.00"></div>
+      <button class="btn-save" onclick="saveConfig('centro')">Salvar Centroeste</button>
+    </div>
+    <div class="config-card">
+      <div class="config-card-title"><div class="config-dot" style="background:var(--gold)"></div>Ferrovia (Rumo)</div>
+      <div class="field-group"><label class="field-label">Contrato Transporte / Mês (m³)</label><input class="field-input" id="cfg_ferro_contrato" type="number" placeholder="88350"></div>
+      <div class="field-group"><label class="field-label">Mínimo Contratual / Mês (m³)</label><input class="field-input" id="cfg_ferro_minimo" type="number" placeholder="83933"></div>
+      <div class="field-group"><label class="field-label">Tarifa Ferrovia (R$/m³)</label><input class="field-input" id="cfg_ferro_tarifa" type="number" step="0.01" placeholder="0.00"></div>
+      <div class="field-group"><label class="field-label">Volume Carregado Mês Atual (m³)</label><input class="field-input" id="cfg_ferro_vol_mes" type="number" placeholder="0"></div>
+      <div class="field-group"><label class="field-label">Valor Pago Mês Atual (R$)</label><input class="field-input" id="cfg_ferro_valor_mes" type="number" step="0.01" placeholder="0.00"></div>
+      <button class="btn-save" onclick="saveConfig('ferro')">Salvar Ferrovia</button>
+    </div>
+    <div class="config-card" style="grid-column:1/-1">
+      <div class="config-card-title">💰 Previsão de Custos — Mês Selecionado</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px" id="costPreview"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: UPLOAD -->
+<div class="page" id="page-upload">
+  <div class="section-title">Upload de <span class="gold-accent">Dados</span></div>
+  <div class="gold-bar"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <p style="font-size:12px;color:var(--text2)">Apenas registros novos são adicionados — duplicatas são ignoradas automaticamente.</p>
+    <button class="btn-clear-all" onclick="clearAllData()">🗑️ Limpar Todos os Dados</button>
+  </div>
+  <div class="upload-grid">
+    <!-- DESCARGAS -->
+    <div class="upload-card">
+      <div class="upload-card-title" style="color:var(--blue)">📦 Descargas</div>
+      <div class="upload-card-desc">Planilha de movimentação de descargas. Apenas registros com Peso Destino preenchido e sem mesclagem são considerados.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="btn-clear-data" onclick="clearData('descargas')">🗑️ Limpar Descargas</button>
+      </div>
+      <div class="drop-zone" id="dz-descargas"
+           ondragover="dzDrag(event,'descargas')" ondragleave="dzLeave('descargas')" ondrop="dzDrop(event,'descargas')">
+        <input type="file" id="file-descargas" accept=".xlsx,.xls" onchange="handleFile(event,'descargas')">
+        <div class="drop-icon">📊</div>
+        <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><br>Movimentação_-_Descargas.xlsx</div>
+      </div>
+      <div class="upload-status" id="status-descargas"></div>
+      <div class="data-log" id="log-descargas"></div>
+    </div>
+    <!-- TRANSITO -->
+    <div class="upload-card">
+      <div class="upload-card-title" style="color:var(--ultra)">🚛 Trânsito</div>
+      <div class="upload-card-desc">Planilha de notas em trânsito. Transit time: Sinop +2 dias, Nova Mutum +1 dia. Apenas notas sem Data Chegada são consideradas.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="btn-clear-data" onclick="clearData('transito')">🗑️ Limpar Trânsito</button>
+      </div>
+      <div class="drop-zone" id="dz-transito"
+           ondragover="dzDrag(event,'transito')" ondragleave="dzLeave('transito')" ondrop="dzDrop(event,'transito')">
+        <input type="file" id="file-transito" accept=".xlsx,.xls" onchange="handleFile(event,'transito')">
+        <div class="drop-icon">🗂️</div>
+        <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><br>Movimentação_-_Transito.xlsx</div>
+      </div>
+      <div class="upload-status" id="status-transito"></div>
+      <div class="data-log" id="log-transito"></div>
+    </div>
+    <!-- NOTAS -->
+    <div class="upload-card">
+      <div class="upload-card-title" style="color:var(--centro)">🧾 Notas Fiscais</div>
+      <div class="upload-card-desc">Planilha de notas fiscais emitidas pelos terminais. Classifica automaticamente: Ferroviário, Rodoviário e Transferência em Tanque.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="btn-clear-data" onclick="clearData('notas')">🗑️ Limpar Notas Fiscais</button>
+      </div>
+      <div class="drop-zone" id="dz-notas"
+           ondragover="dzDrag(event,'notas')" ondragleave="dzLeave('notas')" ondrop="dzDrop(event,'notas')">
+        <input type="file" id="file-notas" accept=".xlsx,.xls" onchange="handleFile(event,'notas')">
+        <div class="drop-icon">📋</div>
+        <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><br>Notas_Fiscais.xlsx</div>
+      </div>
+      <div class="upload-status" id="status-notas"></div>
+      <div class="data-log" id="log-notas"></div>
+    </div>
+    <!-- ESTOQUE -->
+    <div class="upload-card">
+      <div class="upload-card-title" style="color:var(--gold)">🏭 Estoque</div>
+      <div class="upload-card-desc">Arquivo de saldo dos depósitos. Ao selecionar, informe o <strong>produto</strong> e a <strong>data</strong> do relatório para construir o histórico diário.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="btn-clear-data" onclick="clearData('estoque')">🗑️ Limpar Estoque</button>
+      </div>
+      <!-- FIX: botão separado do input para garantir disparo do modal -->
+      <div class="drop-zone" id="dz-estoque"
+           ondragover="dzDrag(event,'estoque')" ondragleave="dzLeave('estoque')" ondrop="dzDrop(event,'estoque')"
+           onclick="triggerEstoqueModal(event)">
+        <div class="drop-icon">🗃️</div>
+        <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><br>Arquivo CSV / XLS de Estoque</div>
+      </div>
+      <input type="file" id="file-estoque" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileEstoque(event)">
+      <div class="upload-status" id="status-estoque"></div>
+      <div class="data-log" id="log-estoque"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Estoque -->
+<div class="modal-overlay" id="modalEstoque">
+  <div class="modal">
+    <div class="modal-head"><h3>Informações do Estoque</h3></div>
+    <div class="modal-body">
+      <div class="modal-desc">Informe o produto e a data de referência deste relatório antes de selecionar o arquivo.</div>
+      <div class="modal-field">
+        <label class="modal-label">Produto</label>
+        <select class="modal-select" id="modalProduto">
+          <option value="">— Selecione —</option>
+          <option value="Hidratado">Álcool Etílico Hidratado (AEHC)</option>
+          <option value="Anidro">Álcool Etílico Anidro (AEAC)</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Data do Relatório</label>
+        <input class="modal-input" type="date" id="modalData">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel-m" onclick="closeModal()">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmEstoqueModal()">Confirmar e Selecionar Arquivo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const DB_KEYS = { descargas:'op_descargas', transito:'op_transito', notas:'op_notas', estoque:'op_estoque', config:'op_config' };
+const TERMINAL_MAP = {
+  teciap: {cod:[3490],   dep:[17],          name:'Teciap',        color:'#1a3a6b'},
+  ultra:  {cod:[83868],  dep:[0.35,0.34],   name:'Ultracargo RO', color:'#0e6674'},
+  centro: {cod:[23184],  dep:[0.21,0.07],   name:'Centroeste',    color:'#5b2d8e'}
+};
+const FILIAL_MAP = {1:'Sinop',3:'Nova Mutum',2:'Dourados',4:'Fueling',6:'Sidrolândia',8:'Balsas',10:'Rio Verde',14:'Rondonópolis'};
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ============================================================
+// STATE
+// ============================================================
+let db = { descargas:[], transito:[], notas:[], estoque:[], config:{} };
+let currentTerminal = 'teciap';
+let pendingEstoqueMeta = null; // {produto, data}
+let charts = {};
+let selectedMonth = null; // null = mês atual, 'YYYY-MM' = mês filtrado
+
+// ============================================================
+// DB
+// ============================================================
+function loadDB() {
+  ['descargas','transito','notas','estoque'].forEach(k => {
+    try { db[k] = JSON.parse(localStorage.getItem(DB_KEYS[k])||'[]'); } catch(e){ db[k]=[]; }
+  });
+  try { db.config = JSON.parse(localStorage.getItem(DB_KEYS.config)||'{}'); } catch(e){ db.config={}; }
+  const lu = localStorage.getItem('op_lastupdate');
+  if(lu) document.getElementById('lastUpdate').textContent = lu;
+}
+function saveDB(key) {
+  localStorage.setItem(DB_KEYS[key], JSON.stringify(db[key]));
+  const now = new Date().toLocaleString('pt-BR');
+  localStorage.setItem('op_lastupdate', now);
+  document.getElementById('lastUpdate').textContent = now;
+}
+
+// ============================================================
+// MONTH FILTER
+// ============================================================
+function getAvailableMonths() {
+  const months = new Set();
+  const validYM = s => s && /^\d{4}-\d{2}$/.test(s);
+  const all = [...db.descargas, ...db.notas, ...db.estoque];
+  all.forEach(r => { const ym=r.data?r.data.substring(0,7):''; if(validYM(ym)) months.add(ym); });
+  db.transito.forEach(r => { const ym=r.dtEmissao?r.dtEmissao.substring(0,7):''; if(validYM(ym)) months.add(ym); });
+  return Array.from(months).sort();
+}
+
+function buildMonthFilter() {
+  const months = getAvailableMonths();
+  const now = new Date().toISOString().substring(0,7);
+  if(!selectedMonth || !months.includes(selectedMonth))
+    selectedMonth = months.includes(now) ? now : (months[months.length-1] || now);
+
+  const container = document.getElementById('monthBtns');
+  // Criar/atualizar select
+  let sel = document.getElementById('monthSelect');
+  if(!sel) {
+    sel = document.createElement('select');
+    sel.id = 'monthSelect';
+    sel.className = 'month-select';
+    sel.onchange = () => { selectedMonth=sel.value; refreshCurrentPage(); };
+    container.appendChild(sel);
+  }
+  sel.innerHTML = '';
+  if(!months.length) {
+    const opt = document.createElement('option');
+    opt.value = now;
+    const [y,mo] = now.split('-');
+    opt.textContent = MONTHS[parseInt(mo)-1]+' '+y;
+    sel.appendChild(opt);
+    selectedMonth = now;
+  } else {
+    months.forEach(m => {
+      const [y,mo] = m.split('-');
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = MONTHS[parseInt(mo)-1]+' / '+y;
+      opt.selected = m===selectedMonth;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function getCurMonth() { return selectedMonth || new Date().toISOString().substring(0,7); }
+
+function refreshCurrentPage() {
+  const active = document.querySelector('.page.active');
+  if(!active) return;
+  const id = active.id.replace('page-','');
+  if(id==='terminals') renderTerminal(currentTerminal);
+  else if(id==='ferrovia') renderFerrovia();
+  else if(id==='takeorpay') renderTakeOrPay();
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  // Nav tab highlight
+  const tabMap = {terminals:0,ferrovia:1,takeorpay:2,config:3};
+  const tabs = document.querySelectorAll('.nav-tab');
+  if(tabMap[p]!==undefined) tabs[tabMap[p]].classList.add('active');
+  // Show/hide month filter
+  document.getElementById('monthFilterBar').style.display =
+    ['terminals','ferrovia','takeorpay'].includes(p) ? 'flex' : 'none';
+  if(p==='terminals') renderTerminal(currentTerminal);
+  if(p==='ferrovia')  renderFerrovia();
+  if(p==='takeorpay') renderTakeOrPay();
+  if(p==='config')    renderConfig();
+  if(p==='upload')    renderLogs();
+}
+
+function selectTerminal(t, el) {
+  currentTerminal = t;
+  document.querySelectorAll('.terminal-tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderTerminal(t);
+}
+
+// ============================================================
+// DATE PARSER — FIX: trata todos os formatos possíveis
+// ============================================================
+function parseExcelDate(v) {
+  if(v === null || v === undefined || v === '') return null;
+  // JS Date object (cellDates:true) — usa hora LOCAL para evitar shift UTC-3
+  if(v instanceof Date) {
+    if(isNaN(v.getTime())) return null;
+    const yr = v.getFullYear();
+    const mo = String(v.getMonth()+1).padStart(2,'0');
+    const dy = String(v.getDate()).padStart(2,'0');
+    return yr+'-'+mo+'-'+dy;
+  }
+  const s = String(v).trim();
+  if(!s || s === 'NaT') return null;
+  // ISO: 2026-04-14 ou 2026-04-14T... ou 2026-04-14 00:00:00
+  if(s.match(/^\d{4}-\d{2}-\d{2}/)) return s.substring(0,10);
+  // BR formato: 14/04/2026
+  if(s.match(/^\d{2}\/\d{2}\/\d{4}/)) {
+    const p=s.split('/');
+    return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');
+  }
+  // US formato: 4/22/2026 ou 4/22/26 (XLSX.js raw:false US locale)
+  if(s.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) {
+    const p=s.split('/');
+    const yr = p[2].length===2 ? '20'+p[2] : p[2];
+    return yr+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0');
+  }
+  // Serial Excel numérico (days since 1900-01-01) — hora local
+  const n = parseFloat(s);
+  if(!isNaN(n) && n > 40000 && n < 100000) {
+    const d = new Date(Math.round((n - 25569) * 86400000));
+    const yr = d.getFullYear();
+    const mo = String(d.getMonth()+1).padStart(2,'0');
+    const dy = String(d.getDate()).padStart(2,'0');
+    return yr+'-'+mo+'-'+dy;
+  }
+  return null;
+}
+
+function isDateFilled(v) {
+  if(v instanceof Date) return !isNaN(v.getTime());
+  if(!v || String(v).trim()==='' || String(v).trim()==='NaT') return false;
+  const d = parseExcelDate(v);
+  return d !== null;
+}
+
+// ============================================================
+// FILE HANDLING
+// ============================================================
+function handleFile(e, type) {
+  const file = e.target.files[0]; if(!file) return;
+  e.target.value = ''; // reset so same file can be re-uploaded
+  processFile(file, type);
+}
+
+// FIX: Estoque tem fluxo separado — modal primeiro, arquivo depois
+function triggerEstoqueModal(e) {
+  e.stopPropagation();
+  document.getElementById('modalProduto').value = '';
+  document.getElementById('modalData').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modalEstoque').classList.add('open');
+}
+function handleFileEstoque(e) {
+  const file = e.target.files[0]; if(!file) return;
+  e.target.value = '';
+  if(!pendingEstoqueMeta) return;
+  processEstoque(file, pendingEstoqueMeta.produto, pendingEstoqueMeta.data);
+  pendingEstoqueMeta = null;
+}
+function confirmEstoqueModal() {
+  const produto = document.getElementById('modalProduto').value;
+  const data    = document.getElementById('modalData').value;
+  if(!produto) { alert('Selecione o produto!'); return; }
+  if(!data)    { alert('Informe a data!');      return; }
+  pendingEstoqueMeta = {produto, data};
+  closeModal();
+  document.getElementById('file-estoque').click(); // abre seletor de arquivo
+}
+function closeModal() { document.getElementById('modalEstoque').classList.remove('open'); }
+
+function dzDrag(e,t){e.preventDefault();document.getElementById('dz-'+t).classList.add('drag');}
+function dzLeave(t){document.getElementById('dz-'+t).classList.remove('drag');}
+function dzDrop(e,t){
+  e.preventDefault(); dzLeave(t);
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  if(t==='estoque') {
+    // drag-drop no estoque: abre modal primeiro
+    triggerEstoqueModal(e);
+    // guarda o arquivo para usar após confirmação
+    pendingEstoqueMeta = null;
+    // sobrescreve confirmEstoqueModal temporariamente para usar o arquivo arrastado
+    window._droppedEstoqueFile = f;
+  } else {
+    processFile(f, t);
+  }
+}
+
+// confirmEstoqueModal definida abaixo
+
+function processFile(file, type) {
+  setStatus(type,'info','⏳ Processando arquivo...');
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = new Uint8Array(ev.target.result);
+      const wb = XLSX.read(data, {type:'array', cellDates:true});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:''});
+      let added=0, skipped=0;
+      if(type==='descargas') ({added,skipped}=processDescargas(rows));
+      else if(type==='transito') ({added,skipped}=processTransito(rows));
+      else if(type==='notas') ({added,skipped}=processNotas(rows));
+      saveDB(type);
+      buildMonthFilter();
+      setStatus(type,'success',`✅ ${added} registros adicionados, ${skipped} duplicatas ignoradas.`);
+      renderLogs();
+      if(document.getElementById('page-terminals').classList.contains('active')) renderTerminal(currentTerminal);
+    } catch(err) { setStatus(type,'error','❌ Erro: '+err.message); console.error(err); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ============================================================
+// PROCESS DESCARGAS — FIX: parseExcelDate robusto
+// ============================================================
+function processDescargas(rows) {
+  const hdr = rows[1] || rows[0];
+  const cols = {}; hdr.forEach((c,i)=>{ if(c) cols[String(c).trim()]=i; });
+  const gIdx=cols['G']??0, clienteIdx=cols['Cliente'], nfIdx=cols['Nº Nota'], fIdx=cols['F'];
+  const pesoLiqIdx=cols['Peso Líquido'], pesoDstIdx=cols['Peso Destino'];
+  const placaIdx=cols['Placa'], motoristaIdx=cols['Nome Motorista'];
+  const chegadaIdx=cols['Data Chegada'], saidaIdx=cols['Data Saída'];
+  const allCods=[3490,23184,83868];
+  let added=0, skipped=0;
+  const existing = new Set(db.descargas.map(r=>r.nf+'_'+r.cliente));
+  for(let i=2;i<rows.length;i++){
+    const r=rows[i];
+    // FIX: verificar mescla — linha de mescla tem G vazio ou não numérico
+    const gRaw = r[gIdx];
+    if(gRaw === undefined || gRaw === null || gRaw === '') continue;
+    const gVal = String(gRaw).trim();
+    if(!gVal || isNaN(parseFloat(gVal))) continue;
+    const clienteRaw=r[clienteIdx];
+    const cliente=typeof clienteRaw==='number'?clienteRaw:parseFloat(String(clienteRaw||'0'));
+    if(!allCods.includes(cliente)) continue;
+    const pesoDstRaw=r[pesoDstIdx];
+    const pesoDst=typeof pesoDstRaw==='number'?pesoDstRaw:parseFloat(String(pesoDstRaw||'0').replace(/\./g,'').replace(',','.'));
+    if(!pesoDst||pesoDst===0) continue;
+    const nfRaw=r[nfIdx];const nf=nfRaw?String(nfRaw).trim():'';
+    const key=nf+'_'+cliente;
+    if(existing.has(key)){skipped++;continue;}
+    existing.add(key);
+    const pesoLiqRaw=r[pesoLiqIdx];
+    const pesoLiq=typeof pesoLiqRaw==='number'?pesoLiqRaw:parseFloat(String(pesoLiqRaw||'0').replace(/\./g,'').replace(',','.'));
+    const f=parseInt(r[fIdx])||1;
+    const filial=FILIAL_MAP[f]||'Sinop';
+    const terminal=Object.keys(TERMINAL_MAP).find(t=>TERMINAL_MAP[t].cod.includes(cliente))||'teciap';
+    const quebra=pesoDst-pesoLiq;
+    const indice=pesoLiq?quebra/pesoLiq*100:0;
+    // FIX: usar parseExcelDate para Data Chegada/Saída
+    const dtRef=parseExcelDate(r[chegadaIdx])||parseExcelDate(r[saidaIdx])||'';
+    const nomeTransp = String(r[17]||'').trim().toUpperCase(); // col 17 = transportador nome
+    db.descargas.push({nf,cliente,terminal,filial,pesoLiq,pesoDst,quebra,indice,
+      placa:String(r[placaIdx]||'').trim(),motorista:String(r[motoristaIdx]||'').trim(),
+      data:dtRef, nomeTransp});
+    added++;
+  }
+  return {added,skipped};
+}
+
+// ============================================================
+// PROCESS TRANSITO — FIX: verificação de chegada robusta
+// ============================================================
+function processTransito(rows) {
+  const hdr=rows[1]||rows[0];
+  const cols={}; hdr.forEach((c,i)=>{if(c)cols[String(c).trim()]=i;});
+  const gIdx=cols['G']??0, fIdx=cols['F'], nfIdx=cols['Nº Nota'], clienteIdx=cols['Cliente'];
+  const emissaoIdx=cols['Dt. Emissão'], pesoLiqIdx=cols['Peso Líquido'], chegadaIdx=cols['Data Chegada'];
+  const allCods=[3490,23184,83868];
+  let added=0,skipped=0;
+  const existing=new Set(db.transito.map(r=>r.nf));
+  for(let i=2;i<rows.length;i++){
+    const r=rows[i];
+    const gRaw=r[gIdx];
+    if(gRaw===undefined||gRaw===null||gRaw==='') continue;
+    const gVal=String(gRaw).trim();
+    if(!gVal||isNaN(parseFloat(gVal))) continue;
+    const clienteRaw=r[clienteIdx];
+    const cliente=typeof clienteRaw==='number'?clienteRaw:parseFloat(String(clienteRaw||'0'));
+    if(!allCods.includes(cliente)) continue;
+    // FIX: usa isDateFilled para verificar se já chegou
+    if(isDateFilled(r[chegadaIdx])) continue;
+    const nfRaw=r[nfIdx];const nf=nfRaw?String(nfRaw).trim():'';
+    if(!nf||existing.has(nf)){if(nf)skipped++;continue;}
+    existing.add(nf);
+    const fRaw=r[fIdx];const f=typeof fRaw==='number'?fRaw:parseInt(fRaw)||1;
+    const filial=FILIAL_MAP[f]||'Sinop';
+    const transit=f===3?1:2;
+    const dtEmissao=parseExcelDate(r[emissaoIdx]);
+    let prevChegada=null;
+    if(dtEmissao){const d=new Date(dtEmissao+'T12:00:00');d.setDate(d.getDate()+transit);prevChegada=d.toISOString().split('T')[0];}
+    const plRaw=r[pesoLiqIdx];const pesoLiq=typeof plRaw==='number'?plRaw:parseFloat(String(plRaw||'0').replace(/\./g,'').replace(',','.'));
+    const terminal=Object.keys(TERMINAL_MAP).find(t=>TERMINAL_MAP[t].cod.includes(cliente))||'teciap';
+    db.transito.push({nf,cliente,terminal,filial,pesoLiq,dtEmissao,prevChegada});
+    added++;
+  }
+  return {added,skipped};
+}
+
+// ============================================================
+// PROCESS NOTAS — FIX: depósito como float/string
+// ============================================================
+function processNotas(rows) {
+  const hdr=rows[1]||rows[0];
+  const cols={}; hdr.forEach((c,i)=>{if(c)cols[String(c).trim()]=i;});
+  const gefIdx=cols['GEF'], nfIdx=cols['Nr. NF'], emissaoIdx=cols['Data Emissão'];
+  const rotIdx=cols['Nome Rotina'], transpIdx=cols['Razão Transportadora'];
+  const placaIdx=cols['Placas'], clienteNomeIdx=cols['Nome Cliente'];
+  const depIdx=cols['Cód. Depósito'], qtdeIdx=cols['Qtde'];
+  // FIX: mapa de depósito aceita tanto float quanto string formatada
+  const depMap={'17':'teciap','0.21':'centro','0.07':'centro','0.35':'ultra','0.34':'ultra'};
+  let added=0,skipped=0;
+  const existing=new Set(db.notas.map(r=>r.nf));
+  for(let i=2;i<rows.length;i++){
+    const r=rows[i];
+    const depRaw=r[depIdx];
+    const dep=parseFloat(String(depRaw||'0').replace(',','.'));
+    const depKey=String(dep);
+    const terminal=depMap[depKey];
+    if(!terminal) continue;
+    const nf=String(r[nfIdx]||'').trim();
+    if(!nf||existing.has(nf)){if(nf)skipped++;continue;}
+    existing.add(nf);
+    const transp=String(r[transpIdx]||'').trim().toUpperCase();
+    const placa=String(r[placaIdx]||'').trim();
+     const nomeClienteRaw=String(r[clienteNomeIdx]||'').trim();
+     const nomeCliente=nomeClienteRaw.toUpperCase();
+    const rotina=String(r[rotIdx]||'').trim();
+    const modal=classifyModal(transp,placa,nomeCliente,terminal);
+    const gef=String(r[gefIdx]||'');
+    const fPart=gef.split('-').map(s=>s.trim());
+    const fNum=parseInt(fPart[2])||1;
+    const filial=FILIAL_MAP[fNum]||'Sinop';
+     const qtdeRaw=r[qtdeIdx];
+    const qtde=typeof qtdeRaw==='number'?qtdeRaw:(parseFloat(String(qtdeRaw||'0').replace(/\./g,'').replace(',','.'))||0);
+    const data=parseExcelDate(r[emissaoIdx]);
+     db.notas.push({nf,terminal,filial,modal,rotina,qtde,data,dep:depKey,nomeCliente:nomeClienteRaw});
+    added++;
+  }
+  return {added,skipped};
+}
+
+// ============================================================
+// PROCESS ESTOQUE — FIX: r[0] pode ser número (OLE parse)
+// ============================================================
+function processEstoque(file, produto, data) {
+  setStatus('estoque','info','⏳ Processando estoque...');
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    try{
+      const d=new Uint8Array(ev.target.result);
+      const wb=XLSX.read(d,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+      // FIX: depMap como string para match consistente
+      const depMap={'0.21':'centro','0.07':'centro','0.35':'ultra','0.34':'ultra','17':'teciap'};
+      let added=0,skipped=0;
+      const existingKey=new Set(db.estoque.map(r=>`${r.data}_${r.produto}_${r.terminal}_${r.dep}`));
+      for(let i=0;i<rows.length;i++){
+        const r=rows[i];
+        // FIX: coluna 0 pode ser '+', ou pode ser a linha de header com 'Cód. Depósito'
+        const col0=String(r[0]||'').trim();
+        if(col0!=='+') continue;
+        const depRaw=String(r[1]||'').trim().replace(',','.');
+        const dep=String(parseFloat(depRaw));
+        const terminal=depMap[dep];
+        if(!terminal) continue;
+        const key=`${data}_${produto}_${terminal}_${dep}`;
+        if(existingKey.has(key)){skipped++;continue;}
+        existingKey.add(key);
+        const pn=v=>{ if(typeof v==='number') return v; return parseFloat(String(v||'0').replace(/\./g,'').replace(',','.'))||0; };
+        db.estoque.push({
+          data,produto,terminal,dep,
+          descDep:String(r[2]||'').trim(),
+          gef:String(r[3]||'').trim(),
+          saldoAnt:pn(r[6]),entradas:pn(r[7]),saidas:pn(r[8]),saldoAtual:pn(r[9])
+        });
+        added++;
+      }
+      saveDB('estoque');
+      buildMonthFilter();
+      setStatus('estoque','success',`✅ ${added} registros adicionados, ${skipped} já existentes.`);
+      renderLogs();
+      if(document.getElementById('page-terminals').classList.contains('active')) renderTerminal(currentTerminal);
+    }catch(err){setStatus('estoque','error','❌ Erro: '+err.message);console.error(err);}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ============================================================
+// MODAL CLASSIFICATION
+// ============================================================
+function classifyModal(transp, placa, nomeCliente, terminal) {
+  if(!transp||transp==='NAN'||transp==='') return 'Outros';
+  if(transp.includes('RUMO MALHA')) return 'Ferroviário';
+  const cleanPlaca=placa.replace(/\s/g,'');
+  if(/^[A-Z]{3}\d{7}/i.test(cleanPlaca)) return 'Ferroviário';
+  const tNames={teciap:['TECIAP'],ultra:['ULTRACARGO'],centro:['CENTROESTE']};
+  const names=tNames[terminal]||[];
+  if(names.some(n=>transp.includes(n))) return 'Transferência em Tanque';
+  if(nomeCliente && transp===nomeCliente) return 'Transferência em Tanque';
+  return 'Rodoviário';
+}
+
+// ============================================================
+// RENDER TERMINAL
+// ============================================================
+function renderTerminal(t) {
+  const cfg      = db.config[t] || {};
+  const color    = TERMINAL_MAP[t].color;
+  const curMonth = getCurMonth();
+  const today    = new Date().toISOString().split('T')[0];
+  const [cy, cm] = curMonth.split('-').map(Number);
+  const diasMes  = new Date(cy, cm, 0).getDate();
+  const isCurrentMonth = curMonth === today.substring(0, 7);
+  // diaAtual: se mês corrente usa hoje, senão último dia do mês (mês fechado)
+  const diaAtual    = isCurrentMonth ? new Date().getDate() : diasMes;
+  const diaD1       = diaAtual - 1; // D-1
+  const diasRestantes = diasMes - diaAtual;
+
+  // ── DADOS BASE ──
+  // Descargas: filtrar pelo código de CLIENTE (chegadas no terminal)
+  const clienteCod = TERMINAL_MAP[t].cod[0];
+  const descAll  = db.descargas.filter(r => r.cliente === clienteCod || r.terminal === t);
+  const descMes  = descAll.filter(r => r.data && r.data.startsWith(curMonth));
+
+
+  // Notas: carregamentos saindo dos depósitos do terminal
+  const notas    = db.notas.filter(r => r.terminal === t);
+  const notasMes = notas.filter(r => r.data && r.data.startsWith(curMonth));
+
+  // Trânsito
+  const transitoAll = db.transito.filter(r => r.terminal === t);
+
+  // Estoque: TODAS as filiais do terminal (mesmo código de depósito, ex: 17 para Teciap)
+  const estHid    = db.estoque.filter(r => r.terminal === t && r.produto === 'Hidratado' && r.data && r.data.startsWith(curMonth));
+  const estAni    = db.estoque.filter(r => r.terminal === t && r.produto === 'Anidro'    && r.data && r.data.startsWith(curMonth));
+
+  // ── VOLUME RECEBIDO (total do mês) ──
+  const volRecebido = descMes.reduce((s, r) => s + r.pesoDst, 0) / 1000;
+
+  // ── VOLUME PROJETADO ──
+  // Média até D-1, multiplicado pela qtd de dias do mês
+  // Se mês fechado: projetado = recebido
+  let volProjetado;
+  if (!isCurrentMonth || diaD1 === 0) {
+    volProjetado = volRecebido;
+  } else {
+    const descAteD1 = descMes.filter(r => {
+      const d = new Date(r.data + 'T12:00:00').getDate();
+      return d <= diaD1;
+    }).reduce((s, r) => s + r.pesoDst, 0) / 1000;
+    const mediaD1 = diaD1 > 0 ? descAteD1 / diaD1 : 0;
+    volProjetado  = mediaD1 * diasMes;
+  }
+
+  // ── EXPEDIDOS ──
+  const expFerro = notasMes.filter(r => r.modal === 'Ferroviário').reduce((s, r) => s + r.qtde, 0) / 1000;
+  const expRodo  = notasMes.filter(r => r.modal === 'Rodoviário' || r.modal === 'Transferência em Tanque').reduce((s, r) => s + r.qtde, 0) / 1000;
+
+  // ── TAKE OR PAY / BACKLOG ──
+  const top      = cfg.top || 0;
+  const saldoTop = volRecebido - top;
+
+  // Backlog Recebimento acumulado dia a dia:
+  // Dia 1: descarga_dia1 - meta_diaria
+  // Dia N: descarga_diaN - meta_diaria + backlog_dia_anterior
+  const metaDiaria = top > 0 ? top / diasMes : 0;
+  let backlog = 0;
+  if(isCurrentMonth && diaD1 >= 1) {
+    for(let d = 1; d <= diaD1; d++) {
+      const descDia = descMes
+        .filter(r => new Date(r.data + 'T12:00:00').getDate() === d)
+        .reduce((s, r) => s + r.pesoDst, 0) / 1000;
+      backlog = descDia - metaDiaria + (d === 1 ? 0 : backlog);
+    }
+  }
+
+  // ── TRÂNSITO ──
+  const transitoVol = transitoAll.reduce((s, r) => s + r.pesoLiq, 0) / 1000;
+
+  // ── ESTOQUE ATUAL: soma de TODAS as filiais do terminal para a data mais recente ──
+  function estoqueAtualTerminal(rows) {
+    if (!rows.length) return 0;
+    // Pegar a data mais recente disponível no mês
+    const latestDate = rows.reduce((mx, r) => r.data > mx ? r.data : mx, '');
+    return rows.filter(r => r.data === latestDate).reduce((s, r) => s + r.saldoAtual, 0) / 1000;
+  }
+  const estoqueAtualHid = estoqueAtualTerminal(estHid);
+  const estoqueAtualAni = estoqueAtualTerminal(estAni);
+
+  // ── GIRO: volRecebido / estática contratada ──
+  const estatHid = cfg.estat_hid || 0;
+  const estatAni = cfg.estat_ani || 0;
+  const estatTotal = estatHid + estatAni;
+  const giro = estatTotal > 0 ? volRecebido / estatTotal : 0;
+
+  // ── KPIs ──
+  const backlogColor  = backlog >= 0 ? '#1a6b35' : '#b91c1c';
+  const backlogClass  = backlog >= 0 ? '' : 'negative';
+  const backlogLabel  = backlog >= 0 ? 'Acima do previsto' : 'Pendência';
+
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi" style="--kpi-color:${color}"><div class="kpi-label">Vol. Recebido Caminhões</div><div class="kpi-value">${fmt(volRecebido)}</div><div class="kpi-sub">m³ no mês</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Expedido Ferrovia</div><div class="kpi-value">${fmt(expFerro)}</div><div class="kpi-sub">m³ no mês</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Expedido Rodo/Transf</div><div class="kpi-value">${fmt(expRodo)}</div><div class="kpi-sub">m³ no mês</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Take or Pay / Mês</div><div class="kpi-value">${fmt(top)}</div><div class="kpi-sub">m³ contratado</div></div>
+    <div class="kpi" style="--kpi-color:${saldoTop<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Take or Pay</div><div class="kpi-value ${saldoTop<0?'negative':''}">${fmt(saldoTop)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${backlogColor}"><div class="kpi-label">Backlog Recebimento</div><div class="kpi-value ${backlogClass}">${fmt(Math.abs(backlog))}</div><div class="kpi-sub">${backlogLabel}</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Volume Projetado</div><div class="kpi-value">${fmt(volProjetado)}</div><div class="kpi-sub">m³ estimado mês</div></div>
+    <div class="kpi" style="--kpi-color:${color}"><div class="kpi-label">Trânsito Caminhões</div><div class="kpi-value">${fmt(transitoVol)}</div><div class="kpi-sub">m³ a chegar</div></div>
+    <div class="kpi" style="--kpi-color:#9aa3bb"><div class="kpi-label">Estática Hidratado</div><div class="kpi-value">${fmt(estatHid)}</div><div class="kpi-sub">m³ contratado</div></div>
+    <div class="kpi" style="--kpi-color:#9aa3bb"><div class="kpi-label">Estática Anidro</div><div class="kpi-value">${fmt(estatAni)}</div><div class="kpi-sub">m³ contratado</div></div>
+    <div class="kpi" style="--kpi-color:${color}"><div class="kpi-label">Estoque Atual Hidratado</div><div class="kpi-value">${fmt(estoqueAtualHid)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Estoque Atual Anidro</div><div class="kpi-value">${fmt(estoqueAtualAni)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Giro (×Estática)</div><div class="kpi-value">${giro.toFixed(2)}×</div><div class="kpi-sub">vezes a estática recebida</div></div>
+  `;
+
+  // ── GRÁFICOS ──
+  const days   = Array.from({length: diasMes}, (_, i) => i + 1);
+  const labels = days.map(d => `${d}/${String(cm).padStart(2,'0')}`);
+
+  // ── GRÁFICO 1: DESCARGA RODOVIÁRIA — stacked por filial de origem ──
+  const filiais = ['Sinop', 'Nova Mutum', 'Dourados', 'Balsas', 'Rio Verde', 'Sidrolândia', 'Rondonópolis'];
+  const filialColors = {
+    'Sinop':         color,
+    'Nova Mutum':    '#f0a500',
+    'Dourados':      '#1a6b35',
+    'Balsas':        '#5b2d8e',
+    'Rio Verde':     '#0e6674',
+    'Sidrolândia':   '#b91c1c',
+    'Rondonópolis':  '#7a5200',
+  };
+  // Verificar quais filiais têm dados neste mês
+  const filiaisComDados = filiais.filter(f => descMes.some(r => r.filial === f));
+  const descDatasets = filiaisComDados.map(f => ({
+    label: f,
+    data: days.map(d => {
+      const ds = descMes.filter(r => r.filial === f && new Date(r.data+'T12:00:00').getDate() === d);
+      return ds.reduce((s, r) => s + r.pesoDst, 0) / 1000 || null;
+    }),
+    backgroundColor: filialColors[f] + 'cc',
+    borderColor:     filialColors[f],
+    borderWidth: 1,
+    borderRadius: 3,
+    stack: 'desc',
+  }));
+  renderStackedBar('chartDescarga', labels, descDatasets, 'm³');
+
+  // ── GRÁFICO 2: CARREGAMENTOS ──
+  const notasByDay = days.map(d => {
+    const ns = notasMes.filter(r => r.data && new Date(r.data+'T12:00:00').getDate() === d);
+    return ns.reduce((s, r) => s + r.qtde, 0) / 1000 || null;
+  });
+  document.getElementById('chartCarregLabel').textContent = t === 'ultra' ? 'Ferro' : 'Rodo / Ferro / Transf';
+  renderBarWithLabels('chartCarreg', labels, notasByDay, t === 'ultra' ? '#f0a500' : color, 'm³');
+
+  // ── GRÁFICO 3: ABERTURA DE ESTOQUE — stacked Hidratado + Anidro ──
+  const estHidByDay = days.map(d => {
+    const rs = estHid.filter(r => r.data && new Date(r.data+'T12:00:00').getDate() === d);
+    return rs.length ? rs.reduce((s, r) => s + r.saldoAnt, 0) / 1000 : null;
+  });
+  const estAniByDay = days.map(d => {
+    const rs = estAni.filter(r => r.data && new Date(r.data+'T12:00:00').getDate() === d);
+    return rs.length ? rs.reduce((s, r) => s + r.saldoAnt, 0) / 1000 : null;
+  });
+  const estDatasets = [
+    { label:'Hidratado', data:estHidByDay, backgroundColor:color+'cc', borderColor:color, borderWidth:1, borderRadius:3, stack:'est' },
+    { label:'Anidro',    data:estAniByDay, backgroundColor:'#f0a500cc', borderColor:'#f0a500', borderWidth:1, borderRadius:3, stack:'est' },
+  ];
+  renderStackedBar('chartEstoque', labels, estDatasets, 'm³');
+
+  renderTransitoTables(t, today);
+  renderQuebraMensal(t, curMonth);
+}
+
+// ── STACKED BAR com rótulo fixo (soma) e tooltip por série ──
+function renderStackedBar(id, labels, datasets, unit) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: datasets.length > 1, position:'top', labels:{font:{size:10},boxWidth:10,color:'#6b7a99'} },
+        tooltip: {
+          callbacks: {
+            label: c => `${c.dataset.label}: ${c.parsed.y != null ? c.parsed.y.toLocaleString('pt-BR',{maximumFractionDigits:1}) : '-'} ${unit}`
+          }
+        },
+        datalabels: { display: false }
+      },
+      scales: {
+        x: { stacked:true, grid:{color:'rgba(200,210,230,.4)'}, ticks:{color:'#9aa3bb',font:{size:9},maxRotation:0} },
+        y: { stacked:true, grid:{color:'rgba(200,210,230,.4)'}, ticks:{color:'#9aa3bb',font:{size:9},callback:v=>v?v.toLocaleString('pt-BR',{maximumFractionDigits:0}):''} }
+      }
+    },
+    plugins: [{
+      id: 'stackedLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, data, scales:{x,y} } = chart;
+        // Calcular soma por coluna
+        const totals = labels.map((_, i) =>
+          datasets.reduce((s, ds) => s + (ds.data[i] || 0), 0)
+        );
+        ctx.save();
+        ctx.font = 'bold 9px Barlow, sans-serif';
+        ctx.fillStyle = '#1a2340';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        totals.forEach((tot, i) => {
+          if (!tot) return;
+          const xPos = x.getPixelForValue(i);
+          const yPos = y.getPixelForValue(tot);
+          ctx.fillText(tot.toLocaleString('pt-BR',{maximumFractionDigits:0}), xPos, yPos - 2);
+        });
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+// ── BAR simples com rótulo fixo no topo ──
+function renderBarWithLabels(id, labels, data, color, unit) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{
+      data,
+      backgroundColor: data.map(v => v && v > 0 ? color + 'bb' : 'transparent'),
+      borderColor:     data.map(v => v && v > 0 ? color : 'transparent'),
+      borderWidth: 1, borderRadius: 3
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => `${c.parsed.y != null ? c.parsed.y.toLocaleString('pt-BR',{maximumFractionDigits:1}) : '-'} ${unit}` } }
+      },
+      scales: {
+        x: { grid:{color:'rgba(200,210,230,.4)'}, ticks:{color:'#9aa3bb',font:{size:9},maxRotation:0} },
+        y: { grid:{color:'rgba(200,210,230,.4)'}, ticks:{color:'#9aa3bb',font:{size:9},callback:v=>v?v.toLocaleString('pt-BR',{maximumFractionDigits:0}):''} }
+      }
+    },
+    plugins: [{
+      id: 'barLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx, scales:{x,y} } = chart;
+        ctx.save();
+        ctx.font = 'bold 9px Barlow, sans-serif';
+        ctx.fillStyle = '#1a2340';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        data.forEach((v, i) => {
+          if (!v) return;
+          ctx.fillText(v.toLocaleString('pt-BR',{maximumFractionDigits:0}), x.getPixelForValue(i), y.getPixelForValue(v) - 2);
+        });
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+function renderTransitoTables(t, today) {
+  const transit = db.transito.filter(r => r.terminal === t);
+  const todayD  = new Date(today + 'T12:00:00');
+  const byDate  = {};
+  transit.forEach(r => {
+    if (!r.prevChegada) return;
+    if (!byDate[r.prevChegada]) byDate[r.prevChegada] = { Sinop:0, 'Nova Mutum':0 };
+    byDate[r.prevChegada][r.filial] = (byDate[r.prevChegada][r.filial] || 0) + r.pesoLiq / 1000;
+  });
+  const pastDays = [today, ...[-1,-2,-3].map(o => { const d=new Date(todayD); d.setDate(d.getDate()+o); return d.toISOString().split('T')[0]; })];
+  const futDays  = [[1,'D+1'],[2,'D+2']].map(([o,l]) => { const d=new Date(todayD); d.setDate(d.getDate()+o); return {date:d.toISOString().split('T')[0],label:l}; });
+
+  function buildRows(dates, labelsArr, bodyId) {
+    let rows='',ts=0,tm=0,tt=0;
+    dates.forEach((date,i) => {
+      const s=byDate[date]?.Sinop||0, m=byDate[date]?.['Nova Mutum']||0, tot=s+m;
+      ts+=s; tm+=m; tt+=tot;
+      rows += `<tr class="${i===0?'today':''}"><td>${labelsArr[i]}</td><td>${fmtDate(date)}</td><td>${s?fmt(s):'-'}</td><td>${m?fmt(m):'-'}</td><td>${tot?fmt(tot):'-'}</td></tr>`;
+    });
+    rows += `<tr><td>Total</td><td></td><td>${ts?fmt(ts):'-'}</td><td>${tm?fmt(tm):'-'}</td><td>${tt?fmt(tt):'-'}</td></tr>`;
+    document.getElementById(bodyId).innerHTML = rows;
+  }
+  buildRows(pastDays, ['D','D-1','D-2','D-3'], 'tbodyTransitoDesc');
+  buildRows(futDays.map(x=>x.date), futDays.map(x=>x.label), 'tbodyTransitoFut');
+
+  const atrasados = {};
+  transit.forEach(r => {
+    if (!r.prevChegada || r.prevChegada >= today) return;
+    const diff = Math.floor((todayD - new Date(r.prevChegada+'T12:00:00')) / 86400000);
+    const lbl  = diff===1?'D-1':diff===2?'D-2':diff===3?'D-3':'>D-3';
+    if (!atrasados[lbl]) atrasados[lbl] = { Sinop:0, 'Nova Mutum':0, date:r.prevChegada };
+    atrasados[lbl][r.filial] = (atrasados[lbl][r.filial]||0) + r.pesoLiq / 1000;
+    if (r.prevChegada < atrasados[lbl].date) atrasados[lbl].date = r.prevChegada;
+  });
+  let atRows='', at=[0,0,0];
+  ['D-1','D-2','D-3','>D-3'].forEach(l => {
+    const a=atrasados[l]||{Sinop:0,'Nova Mutum':0,date:''};
+    const s=a.Sinop, m=a['Nova Mutum'], tot=s+m;
+    at[0]+=s; at[1]+=m; at[2]+=tot;
+    atRows += `<tr class="${tot>0?'atrasado':''}"><td>${l}</td><td>${fmtDate(a.date)}</td><td>${s?fmt(s):'-'}</td><td>${m?fmt(m):'-'}</td><td>${tot?fmt(tot):'-'}</td></tr>`;
+  });
+  atRows += `<tr><td>Total</td><td></td><td>${at[0]?fmt(at[0]):'-'}</td><td>${at[1]?fmt(at[1]):'-'}</td><td>${at[2]?fmt(at[2]):'-'}</td></tr>`;
+  document.getElementById('tbodyAtrasado').innerHTML = atRows;
+}
+
+function renderQuebraMensal(t, curMonth) {
+  // Usa todos os registros de descarga do terminal no mês (todas as filiais de origem)
+  const clienteCod = TERMINAL_MAP[t].cod[0];
+  const desc = db.descargas.filter(r => (r.cliente===clienteCod||r.terminal===t) && r.data && r.data.startsWith(curMonth));
+  let html='', totE=0, totQ=0;
+  ['Sinop','Nova Mutum'].forEach(f => {
+    const sub = desc.filter(r => r.filial === f);
+    const ent = sub.reduce((s,r) => s+r.pesoDst,0) / 1000;
+    const qbr = sub.reduce((s,r) => s+r.quebra,0)  / 1000;
+    const idx = ent ? qbr/ent*100 : 0;
+    totE += ent; totQ += qbr;
+    html += `<div class="quebra-row"><div>${f}</div><div>${fmt(ent)}</div><div>${fmt(qbr)}</div><div>${idx.toFixed(2)}%</div></div>`;
+  });
+  const totIdx = totE ? totQ/totE*100 : 0;
+  html += `<div class="quebra-row"><div>Total</div><div>${fmt(totE)}</div><div>${fmt(totQ)}</div><div>${totIdx.toFixed(2)}%</div></div>`;
+  document.getElementById('quebraRows').innerHTML = html;
+}
+
+// ============================================================
+// RENDER FERROVIA
+// ============================================================
+function renderFerrovia() {
+  const curMonth = getCurMonth();
+  const today    = new Date().toISOString().split('T')[0];
+  const [cy, cm] = curMonth.split('-').map(Number);
+  const diasMes  = new Date(cy, cm, 0).getDate();
+  const isCurrentMonth = curMonth === today.substring(0,7);
+  const diaAtual = isCurrentMonth ? new Date().getDate() : diasMes;
+  const diaD1    = diaAtual - 1;
+  const diasRestantes = diasMes - diaAtual;
+
+  // ── Só Teciap e Ultracargo (não Centroeste) ──
+  const ferroNotas = db.notas.filter(r =>
+    r.modal === 'Ferroviário' &&
+    (r.terminal === 'teciap' || r.terminal === 'ultra') &&
+    r.data && r.data.startsWith(curMonth)
+  );
+  const volCarreg = ferroNotas.reduce((s,r) => s+r.qtde, 0) / 1000;
+
+  // ── Descarga ferroviária: da planilha de descargas onde transportadora = Rumo Malha Norte ──
+  // Inclui TODOS os terminais (Teciap, Ultra, Centroeste) pois Rumo carrega de todos
+  // Descarga ferroviária: transportadora = Rumo Malha Norte
+  // nomeTransp armazenado a partir da v3 — dados antigos não têm este campo
+  const descFerro = db.descargas.filter(r => {
+    if(!r.data || !r.data.startsWith(curMonth)) return false;
+    if(r.nomeTransp && r.nomeTransp.includes('RUMO MALHA')) return true;
+    // fallback: placa de vagão = 3 letras + 7 números (TCT0123456)
+    if(r.placa && /^[A-Za-z]{3}\d{7}/.test(r.placa.replace(/\s/g,''))) return true;
+    return false;
+  });
+  const volDescFerro = descFerro.reduce((s,r) => s+r.pesoDst, 0) / 1000;
+
+  const cfg      = db.config.ferro || {};
+  const contrato = cfg.contrato || 88350;
+  const minimo   = cfg.minimo   || 83933;
+  const saldo    = volCarreg - contrato;
+
+  // ── VOLUME PROJETADO ──
+  let projetado;
+  if (!isCurrentMonth || diaD1 === 0) {
+    projetado = volCarreg;
+  } else {
+    const carregAteD1 = ferroNotas.filter(r => new Date(r.data+'T12:00:00').getDate() <= diaD1)
+      .reduce((s,r) => s+r.qtde, 0) / 1000;
+    const mediaD1 = diaD1 > 0 ? carregAteD1 / diaD1 : 0;
+    projetado = mediaD1 * diasMes;
+  }
+
+  // ── BACKLOG FERROVIA ──
+  const metaDiaria = contrato / diasMes;
+  const metaAteD1  = metaDiaria * diaD1;
+  const carregD1   = ferroNotas.filter(r => new Date(r.data+'T12:00:00').getDate() <= diaD1)
+    .reduce((s,r) => s+r.qtde, 0) / 1000;
+  const backlogFerro = isCurrentMonth ? (carregD1 - metaAteD1) : 0;
+  const backlogFerroColor = backlogFerro >= 0 ? '#1a6b35' : '#b91c1c';
+  const backlogFerroLabel = backlogFerro >= 0 ? 'Acima do previsto' : 'Pendência';
+
+  const saldoMin  = volCarreg - minimo;
+  const metaMinDia = minimo / diasMes;
+  const metaMinD1  = metaMinDia * diaD1;
+  const backlogMin = isCurrentMonth ? (carregD1 - metaMinD1) : 0;
+  const media      = diaAtual > 0 ? volCarreg / diaAtual : 0;
+
+  document.getElementById('ferroKpiRow').innerHTML = `
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Vol. Carregado Teciap/Ultra</div><div class="kpi-value">${fmt(volCarreg)}</div><div class="kpi-sub">m³ no mês</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Vol. Descarregado Rumo</div><div class="kpi-value">${fmt(volDescFerro)}</div><div class="kpi-sub">m³ no mês</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Contrato Transporte/Mês</div><div class="kpi-value">${fmt(contrato)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${saldo<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Contrato/Mês</div><div class="kpi-value ${saldo<0?'negative':''}">${fmt(saldo)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${backlogFerroColor}"><div class="kpi-label">Backlog Carregamento</div><div class="kpi-value ${backlogFerro<0?'negative':''}">${fmt(Math.abs(backlogFerro))}</div><div class="kpi-sub">${backlogFerroLabel}</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Volume Projetado</div><div class="kpi-value">${fmt(projetado)}</div><div class="kpi-sub">m³ estimado mês</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Média Carregamento/dia</div><div class="kpi-value">${fmt(media)}</div><div class="kpi-sub">m³/dia</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Volume Mínimo Rumo</div><div class="kpi-value">${fmt(minimo)}</div><div class="kpi-sub">m³/mês</div></div>
+    <div class="kpi" style="--kpi-color:${saldoMin<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Volume Mínimo</div><div class="kpi-value ${saldoMin<0?'negative':''}">${fmt(saldoMin)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${backlogMin<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Backlog Mín. Rumo</div><div class="kpi-value ${backlogMin<0?'negative':''}">${fmt(Math.abs(backlogMin))}</div><div class="kpi-sub">${backlogMin>=0?'Acima do previsto':'Pendência'}</div></div>
+  `;
+
+  const days   = Array.from({length:diasMes},(_,i)=>i+1);
+  const labels = days.map(d=>`${d}/${String(cm).padStart(2,'0')}`);
+
+  // Gráfico 1: Carregamento ferroviário (Teciap + Ultra) por dia
+  const ferroByDay = days.map(d =>
+    ferroNotas.filter(r => new Date(r.data+'T12:00:00').getDate()===d).reduce((s,r)=>s+r.qtde,0)/1000 || null
+  );
+  renderBarWithLabels('chartFerroCarreg', labels, ferroByDay, '#f0a500', 'm³');
+
+  // Gráfico 2: Descarga ferroviária (da planilha descargas, placa vagão)
+  const descFerroByDay = days.map(d => {
+    const rs = descFerro.filter(r => new Date(r.data+'T12:00:00').getDate()===d);
+    return rs.reduce((s,r)=>s+r.pesoDst,0)/1000 || null;
+  });
+  renderBarWithLabels('chartFerroDesc', labels, descFerroByDay, '#1a3a6b', 'm³');
+
+  // ── TABELA DINÂMICA por cliente/destino ──
+  // Pegar todos os clientes únicos com volume no mês (das notas Teciap+Ultra ferro)
+  const clienteSet = new Set();
+  ferroNotas.forEach(r => { if(r.nomeCliente) clienteSet.add(r.nomeCliente); });
+  // Fallback: se não tiver nomeCliente, agrupar por dep como "Destino"
+  // Usar o campo que tiver - vamos verificar quais campos existem
+  // Agrupar por dia e por cliente
+  const clientesList = Array.from(clienteSet).sort();
+
+  // Se não há campo nomeCliente, mostrar apenas total
+  const hasCli = clientesList.length > 0;
+
+  let theadHtml = `<tr><th>Data</th>${hasCli ? clientesList.map(c=>`<th>${c}</th>`).join('') : ''}<th>Total</th></tr>`;
+  let tbodyHtml = '';
+  let colTotals = new Array(clientesList.length).fill(0);
+  let grandTotal = 0;
+
+  days.forEach(d => {
+    const date = `${cy}-${String(cm).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayNotas = ferroNotas.filter(r => r.data === date);
+    if (!dayNotas.length) return;
+    const dayTotal = dayNotas.reduce((s,r)=>s+r.qtde,0)/1000;
+    grandTotal += dayTotal;
+    let row = `<td>${d}/${String(cm).padStart(2,'0')}</td>`;
+    if (hasCli) {
+      clientesList.forEach((c,i) => {
+        const v = dayNotas.filter(r=>r.nomeCliente===c).reduce((s,r)=>s+r.qtde,0)/1000;
+        colTotals[i] += v;
+        row += `<td>${v?fmt(v):'-'}</td>`;
+      });
+    }
+    row += `<td>${dayTotal?fmt(dayTotal):'-'}</td>`;
+    tbodyHtml += `<tr>${row}</tr>`;
+  });
+
+  // Linha total
+  let totalRow = `<td>Total</td>`;
+  if (hasCli) totalRow += colTotals.map(v=>`<td>${v?fmt(v):'-'}</td>`).join('');
+  totalRow += `<td>${grandTotal?fmt(grandTotal):'-'}</td>`;
+  tbodyHtml += `<tr class="total-row">${totalRow}</tr>`;
+
+  // Atualizar cabeçalho da tabela dinamicamente
+  const ferroHead = document.getElementById('ferroDailyHead');
+  if (ferroHead) ferroHead.innerHTML = theadHtml;
+  document.getElementById('ferroDailyBody').innerHTML = tbodyHtml;
+}
+
+// ============================================================
+// RENDER TAKE OR PAY
+// ============================================================
+function renderTakeOrPay(){
+  const curYear=parseInt(getCurMonth().split('-')[0]);
+  const notas=db.notas.filter(r=>r.modal==='Ferroviário');
+  const monthlyVol=m=>{
+    const pad=String(m+1).padStart(2,'0');
+    return notas.filter(r=>r.data&&r.data.startsWith(`${curYear}-${pad}`)).reduce((s,r)=>s+r.qtde,0)/1000;
+  };
+  const minByMonth=[60183,83933,83933,83933,83933,107683,107683,107683,107683,107683,131433,131433];
+  const conByMonth=[63350,88350,88350,88350,88350,113350,113350,113350,113350,113350,138350,138350];
+  const curM=parseInt(getCurMonth().split('-')[1])-1;
+
+  function buildTopTable(months,bodyId){
+    let html='',tf=0,tMin=0,tCon=0;
+    months.forEach(m=>{
+      const fat=monthlyVol(m),mn=minByMonth[m],cn=conByMonth[m];
+      const im=mn?Math.round(fat/mn*100):0, ic=cn?Math.round(fat/cn*100):0;
+      tf+=fat;tMin+=mn;tCon+=cn;
+      const pc=im>=100?'pct-good':im>=80?'pct-warn':'pct-bad';
+      html+=`<tr class="${m===curM?'highlight':''}"><td>${MONTHS[m]}</td><td class="faturado-val">${fat?fmt(fat):'-'}</td><td>${fmt(mn)}</td><td class="${pc}">${fat?im+'%':'-'}</td><td>${fmt(cn)}</td><td class="${pc}">${fat?ic+'%':'-'}</td></tr>`;
+    });
+    if(months.length>1){
+      const ti=tMin?Math.round(tf/tMin*100):0,tc=tCon?Math.round(tf/tCon*100):0;
+      const pc=ti>=100?'pct-good':ti>=80?'pct-warn':'pct-bad';
+      html+=`<tr class="total"><td>Total</td><td class="faturado-val">${tf?fmt(tf):'-'}</td><td>${fmt(tMin)}</td><td class="${pc}">${tf?ti+'%':'-'}</td><td>${fmt(tCon)}</td><td class="${pc}">${tf?tc+'%':'-'}</td></tr>`;
+    }
+    document.getElementById(bodyId).innerHTML=html;
+  }
+  buildTopTable([0,1,2,3,4,5,6,7,8,9,10,11],'topAnualBody');
+  buildTopTable([0,1,2],'topQ1Body');
+  buildTopTable([3,4,5],'topQ2Body');
+  buildTopTable([6,7,8],'topQ3Body');
+  buildTopTable([9,10,11],'topQ4Body');
+}
+
+// ============================================================
+// RENDER CONFIG
+// ============================================================
+function saveConfig(t){
+  if(!db.config[t]) db.config[t]={};
+  ['top','estat_hid','estat_ani','tarifa','vol','valor','contrato','minimo','vol_mes','valor_mes'].forEach(f=>{
+    const el=document.getElementById(`cfg_${t}_${f}`);
+    if(el) db.config[t][f]=parseFloat(el.value)||0;
+  });
+  localStorage.setItem(DB_KEYS.config,JSON.stringify(db.config));
+  renderConfig();
+  alert('✅ Configurações salvas!');
+}
+function renderConfig(){
+  ['teciap','ultra','centro','ferro'].forEach(t=>{
+    const cfg=db.config[t]||{};
+    ['top','estat_hid','estat_ani','tarifa','vol','valor','contrato','minimo','vol_mes','valor_mes'].forEach(f=>{
+      const el=document.getElementById(`cfg_${t}_${f}`);
+      if(el&&cfg[f]!=null) el.value=cfg[f];
+    });
+  });
+  const terms=['teciap','ultra','centro'];
+  let html='';
+  terms.forEach(t=>{
+    const cfg=db.config[t]||{};
+    const vol=cfg.vol||0,tarifa=cfg.tarifa||0,custo=vol*tarifa,valor=cfg.valor||0;
+    html+=`<div class="config-preview">
+      <div class="preview-row"><span class="preview-label">${TERMINAL_MAP[t].name}</span></div>
+      <div class="preview-row"><span class="preview-label">Volume Contratado</span><span class="preview-value">${fmt(vol)} m³</span></div>
+      <div class="preview-row"><span class="preview-label">Tarifa</span><span class="preview-value">R$ ${(tarifa).toFixed(2)}/m³</span></div>
+      <div class="preview-row"><span class="preview-label">Previsão Custo</span><span class="preview-value cost">R$ ${custo.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="preview-row"><span class="preview-label">Valor Atual Contrato</span><span class="preview-value cost">R$ ${valor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+    </div>`;
+  });
+  const cfgF=db.config.ferro||{};
+  const custoF=(cfgF.vol_mes||0)*(cfgF.tarifa||0);
+  html+=`<div class="config-preview">
+    <div class="preview-row"><span class="preview-label">Ferrovia (Rumo)</span></div>
+    <div class="preview-row"><span class="preview-label">Vol. Carregado Mês</span><span class="preview-value">${fmt(cfgF.vol_mes||0)} m³</span></div>
+    <div class="preview-row"><span class="preview-label">Tarifa</span><span class="preview-value">R$ ${(cfgF.tarifa||0).toFixed(2)}/m³</span></div>
+    <div class="preview-row"><span class="preview-label">Previsão Custo</span><span class="preview-value cost">R$ ${custoF.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+    <div class="preview-row"><span class="preview-label">Valor Pago Mês</span><span class="preview-value cost">R$ ${(cfgF.valor_mes||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+  </div>`;
+  document.getElementById('costPreview').innerHTML=html;
+}
+
+// ============================================================
+// LOGS
+// ============================================================
+function renderLogs(){
+  renderLog('descargas',db.descargas,r=>`NF ${r.nf} | ${r.terminal} | ${r.filial} | ${fmt(r.pesoDst/1000)} m³`);
+  renderLog('transito',db.transito,r=>`NF ${r.nf} | ${r.terminal} | ${r.filial} | Prev: ${r.prevChegada||'-'}`);
+  renderLog('notas',db.notas,r=>`NF ${r.nf} | ${r.terminal} | ${r.modal} | ${fmt(r.qtde/1000)} m³`);
+  renderLog('estoque',db.estoque,r=>`${r.data} | ${r.produto} | ${r.terminal} | Saldo: ${fmt(r.saldoAtual/1000)} m³`);
+}
+function renderLog(type,data,fn){
+  const el=document.getElementById('log-'+type);
+  if(!el) return;
+  if(!data.length){el.innerHTML='';return;}
+  el.innerHTML=data.slice(-5).reverse().map(r=>`<div class="data-log-row"><span>${fn(r)}</span></div>`).join('')+
+    `<div class="data-log-row">${data.length} registros totais</div>`;
+}
+
+// ============================================================
+// CLEAR DATA
+// ============================================================
+function clearData(type) {
+  const labels = {descargas:'Descargas',transito:'Trânsito',notas:'Notas Fiscais',estoque:'Estoque'};
+  if(!confirm(`⚠️ Tem certeza que deseja apagar todos os dados de ${labels[type]}?\nEsta ação não pode ser desfeita.`)) return;
+  db[type] = [];
+  saveDB(type);
+  buildMonthFilter();
+  renderLogs();
+  setStatus(type,'info',`🗑️ Dados de ${labels[type]} apagados com sucesso.`);
+  if(document.getElementById('page-terminals').classList.contains('active')) renderTerminal(currentTerminal);
+}
+
+function clearAllData() {
+  if(!confirm('⚠️ Tem certeza que deseja apagar TODOS os dados lançados?\nDescargas, Trânsito, Notas e Estoque serão removidos.\nEsta ação não pode ser desfeita.')) return;
+  ['descargas','transito','notas','estoque'].forEach(k => {
+    db[k] = [];
+    localStorage.removeItem(DB_KEYS[k]);
+  });
+  localStorage.removeItem('op_lastupdate');
+  document.getElementById('lastUpdate').textContent = '—';
+  buildMonthFilter();
+  renderLogs();
+  ['descargas','transito','notas','estoque'].forEach(k => setStatus(k,'',''));
+  if(document.getElementById('page-terminals').classList.contains('active')) renderTerminal(currentTerminal);
+  alert('✅ Todos os dados foram apagados.');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function setStatus(type,cls,msg){const el=document.getElementById('status-'+type);el.className='upload-status '+cls;el.textContent=msg;}
+function fmt(v){if(v==null||isNaN(v)||v===0)return v===0?'0':'-';return v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function fmtDate(d){if(!d)return '-';const p=d.split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d;}
+
+// ============================================================
+// INIT
+// ============================================================
+loadDB();
+buildMonthFilter();
+renderTerminal('teciap');
+renderConfig();
+document.getElementById('monthFilterBar').style.display='flex';
+</script>
+</body>
+</html>

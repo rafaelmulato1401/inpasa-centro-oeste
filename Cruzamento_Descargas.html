@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descargas Inpasa X Ultracargo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── PALETA INPASA (azul marinho + dourado) ── */
+  :root {
+    --blue:        #1a3a6b;
+    --blue-dark:   #0d2044;
+    --blue-mid:    #2456a4;
+    --blue-light:  #e8eef8;
+    --blue-pale:   #f4f7fd;
+    --gold:        #f0a500;
+    --gold-light:  #ffd166;
+    --bg:          #f4f7fd;
+    --surface:     #ffffff;
+    --surface2:    #e8eef8;
+    --border:      #cdd5e8;
+    --border2:     #b0bcda;
+    --text:        #1a2340;
+    --text2:       #6b7a99;
+    --text3:       #9aa3bb;
+    --green:       #1a6b35;
+    --green-bg:    #e3f5e9;
+    --red:         #b91c1c;
+    --red-bg:      #fde8e8;
+    --amber:       #f0a500;
+    --amber-bg:    #fef3d7;
+    --purple:      #5b2d8e;
+    --purple-bg:   #ede8f8;
+    --ultra:       #0e6674;
+    --ultra-bg:    #e0f3f6;
+    --radius:      10px;
+    --radius-sm:   6px;
+  }
+
+  body { font-family:'Barlow',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:14px; line-height:1.5; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background:var(--blue); border-bottom:2px solid var(--gold);
+    padding:0 2rem; display:flex; align-items:center; gap:14px;
+    height:54px; position:sticky; top:0; z-index:10;
+    box-shadow:0 2px 12px rgba(10,20,60,.28);
+  }
+  .logo-mark {
+    width:30px; height:30px; border-radius:6px; flex-shrink:0;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .logo-mark svg { display:block; }
+  .topbar-title {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:17px; font-weight:800; letter-spacing:.6px;
+    color:#fff; text-transform:uppercase;
+  }
+  .topbar-title span { color:var(--gold); font-weight:400; }
+
+  .container { max-width:980px; margin:0 auto; padding:2rem 1.5rem; }
+  .page-title { font-family:'Barlow Condensed',sans-serif; font-size:26px; font-weight:700; color:var(--blue); letter-spacing:.3px; margin-bottom:4px; }
+  .page-sub { font-size:13px; color:var(--text2); margin-bottom:2rem; }
+
+  /* ── UPLOAD ── */
+  .upload-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem; }
+  .upload-zone { background:var(--surface); border:1.5px dashed var(--border2); border-radius:var(--radius); padding:1.5rem; transition:border-color .15s,background .15s; }
+  .upload-zone.drag { border-color:var(--blue-mid); background:var(--blue-light); }
+  .zone-badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:20px; margin-bottom:10px; }
+  .zone-badge.cs    { background:var(--amber-bg); color:#7a5200; border:1px solid rgba(240,165,0,.35); }
+  .zone-badge.ultra { background:var(--ultra-bg); color:var(--ultra); border:1px solid rgba(14,102,116,.25); }
+  .zone-title { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:var(--blue); margin-bottom:2px; letter-spacing:.2px; }
+  .zone-desc { font-size:12px; color:var(--text2); margin-bottom:1rem; }
+  .upload-btn { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:7px 14px; border:1px solid var(--border2); border-radius:var(--radius-sm); background:var(--surface); color:var(--blue); cursor:pointer; transition:background .1s,border-color .1s; }
+  .upload-btn:hover { background:var(--blue-light); border-color:var(--blue-mid); }
+  .file-list { margin-top:10px; display:flex; flex-direction:column; gap:5px; }
+  .file-tag { display:flex; align-items:center; gap:7px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:5px 10px; font-size:12px; }
+  .file-tag .fname { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text); font-weight:500; }
+  .file-tag .rm { background:none; border:none; cursor:pointer; color:var(--text3); font-size:16px; line-height:1; padding:0 2px; transition:color .1s; }
+  .file-tag .rm:hover { color:var(--red); }
+  .drop-hint { font-size:11px; color:var(--text3); margin-top:8px; text-align:center; }
+
+  /* ── BUTTONS ── */
+  .run-wrap { display:flex; gap:1rem; align-items:center; margin-bottom:2rem; }
+  .run-btn { flex:1; padding:12px; font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; background:var(--blue); color:#fff; border:none; border-radius:var(--radius); cursor:pointer; transition:background .15s,transform .1s; }
+  .run-btn:hover:not(:disabled) { background:var(--blue-mid); }
+  .run-btn:active:not(:disabled) { transform:scale(.99); }
+  .run-btn:disabled { opacity:.35; cursor:not-allowed; }
+  .reset-btn { padding:11px 20px; font-size:13px; font-weight:600; background:var(--surface); color:var(--text2); border:1px solid var(--border2); border-radius:var(--radius); cursor:pointer; transition:background .1s; display:none; }
+  .reset-btn:hover { background:var(--blue-light); color:var(--blue); border-color:var(--blue-mid); }
+  .reset-btn.show { display:block; }
+
+  /* ── STATS ── */
+  .stats-row { display:none; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:1.5rem; }
+  .stats-row.show { display:grid; }
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--blue); border-radius:var(--radius); padding:14px 16px; }
+  .stat-label { font-size:11px; color:var(--text2); margin-bottom:4px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+  .stat-num { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:700; color:var(--blue); }
+  .stat-num.green  { color:var(--green); }
+  .stat-num.amber  { color:var(--amber); }
+  .stat-num.purple { color:var(--purple); }
+  .stat-num.red    { color:var(--red); }
+
+  /* ── RESULTS ── */
+  .results { display:none; }
+  .results.show { display:block; }
+
+  /* ── TABS ── */
+  .tab-bar { display:flex; gap:2px; background:var(--blue-dark); border:1px solid var(--blue); border-radius:var(--radius); padding:4px; margin-bottom:1rem; }
+  .tab { flex:1; padding:8px 10px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; background:none; border:none; border-radius:7px; cursor:pointer; color:rgba(255,255,255,.55); transition:all .15s; white-space:nowrap; }
+  .tab:hover { color:#fff; background:rgba(255,255,255,.1); }
+  .tab.active { background:var(--gold); color:var(--blue-dark); }
+  .tab-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; border-radius:9px; font-size:10px; font-weight:700; padding:0 5px; margin-left:5px; background:rgba(255,255,255,.15); color:rgba(255,255,255,.8); }
+  .tab.active .tab-badge { background:rgba(26,32,64,.2); color:var(--blue-dark); }
+  .tab-badge.red    { background:var(--red-bg); color:var(--red); }
+  .tab-badge.green  { background:var(--green-bg); color:var(--green); }
+  .tab.active .tab-badge.red   { background:rgba(185,28,28,.2); color:#7a0e0e; }
+  .tab.active .tab-badge.green { background:rgba(26,107,53,.2); color:#0e4a22; }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+
+  /* ── SECTION HEADER ── */
+  .section-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:8px; flex-wrap:wrap; }
+  .section-label { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; color:var(--blue); letter-spacing:.2px; }
+  .count-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:var(--blue-light); color:var(--blue-mid); border:1px solid var(--border); }
+
+  /* ── LOG ── */
+  .log-desc { font-size:12px; color:var(--text2); margin-bottom:10px; line-height:1.6; }
+  .log-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; max-height:420px; overflow-y:auto; margin-bottom:1rem; }
+  .log-thead { display:grid; grid-template-columns:100px 155px 1fr 105px 105px 90px; padding:8px 14px; background:var(--blue-dark); border-bottom:1px solid var(--blue); font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:rgba(255,255,255,.55); position:sticky; top:0; z-index:1; }
+  .log-item { display:grid; grid-template-columns:100px 155px 1fr 105px 105px 90px; padding:9px 14px; border-bottom:1px solid var(--border); font-size:12px; align-items:center; }
+  .log-item:last-child { border-bottom:none; }
+  .log-item:nth-child(even) { background:var(--blue-light); }
+  .log-nf { font-weight:700; color:var(--blue); font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:.2px; }
+  .log-val { color:var(--text2); }
+  .status-pill { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; letter-spacing:.04em; white-space:nowrap; }
+  .sp-nao  { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
+  .sp-peso { background:var(--amber-bg); color:#7a5200; }
+  .sp-fil  { background:var(--purple-bg); color:var(--purple); }
+  .dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .dot-grey   { background:var(--text3); }
+  .dot-amber  { background:var(--amber); }
+  .dot-purple { background:var(--purple); }
+
+  /* ── TABLE ── */
+  .tbl-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1rem; }
+  .tbl-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
+  .tbl-wrap thead th { background:var(--blue-dark); font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:rgba(255,255,255,.65); padding:10px 14px; text-align:left; border-bottom:2px solid var(--gold); white-space:nowrap; }
+  .tbl-wrap tbody td { padding:8px 14px; border-bottom:1px solid var(--border); color:var(--text); white-space:nowrap; }
+  .tbl-wrap tbody tr:last-child td { border-bottom:none; }
+  .tbl-wrap tbody tr:nth-child(even) td { background:var(--blue-light); }
+  .tbl-wrap tbody tr:hover td { background:var(--blue-pale, #f0f4fb); }
+
+  /* ── DOWNLOAD BUTTONS ── */
+  .btn-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .dl-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; background:var(--surface); color:var(--text); border:1px solid var(--border2); border-radius:var(--radius); cursor:pointer; transition:all .15s; }
+  .dl-btn:hover:not(:disabled) { background:var(--blue-light); border-color:var(--blue-mid); color:var(--blue); }
+  .dl-btn:disabled { opacity:.35; cursor:not-allowed; }
+  .dl-btn.sinop   { border-color:var(--gold); color:#7a5200; background:var(--amber-bg); }
+  .dl-btn.sinop:hover:not(:disabled) { background:var(--gold); color:var(--blue-dark); }
+  .dl-btn.mutum   { border-color:var(--ultra); color:var(--ultra); background:var(--ultra-bg); }
+  .dl-btn.mutum:hover:not(:disabled) { background:var(--ultra); color:#fff; }
+  .dl-btn.log-err { border-color:var(--red); color:var(--red); background:var(--red-bg); }
+  .dl-btn.log-err:hover:not(:disabled) { background:var(--red); color:#fff; }
+
+  .empty { padding:3rem; text-align:center; color:var(--text3); font-size:13px; }
+  .empty-icon { font-size:20px; margin-bottom:8px; }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media(max-width:680px){ .upload-grid{grid-template-columns:1fr} .stats-row{grid-template-columns:repeat(2,1fr)} .log-thead,.log-item{grid-template-columns:90px 130px 1fr 70px} .log-val{display:none} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-mark">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="2" width="5" height="5" rx="1" fill="white"/>
+      <rect x="9" y="2" width="5" height="5" rx="1" fill="white" opacity="0.7"/>
+      <rect x="2" y="9" width="5" height="5" rx="1" fill="white" opacity="0.7"/>
+      <rect x="9" y="9" width="5" height="5" rx="1" fill="#f0a500"/>
+    </svg>
+  </div>
+  <span class="topbar-title">Descargas <span>Inpasa</span> × Ultracargo</span>
+</div>
+
+<div class="container">
+  <h1 class="page-title">Descargas Inpasa X Ultracargo</h1>
+  <p class="page-sub">Faça upload dos relatórios para cruzar NFs, identificar divergências e gerar os arquivos de descarga por filial.</p>
+
+  <div class="upload-grid">
+    <div class="upload-zone" id="zone-cs" ondragover="onDrag(event,'cs')" ondragleave="offDrag('cs')" ondrop="onDrop(event,'cs')">
+      <div class="zone-badge cs">Relatório CS</div>
+      <div class="zone-title">Movimentação — Descargas</div>
+      <div class="zone-desc">Arquivo único exportado do sistema CS (base para o cruzamento)</div>
+      <label class="upload-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 11V3M5 6l3-3 3 3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Selecionar arquivo
+        <input type="file" accept=".xlsx" id="inp-cs" style="display:none" onchange="addFiles('cs',this.files);this.value=''">
+      </label>
+      <div class="file-list" id="list-cs"></div>
+      <p class="drop-hint">ou arraste o arquivo aqui</p>
+    </div>
+
+    <div class="upload-zone" id="zone-ultra" ondragover="onDrag(event,'ultra')" ondragleave="offDrag('ultra')" ondrop="onDrop(event,'ultra')">
+      <div class="zone-badge ultra">Relatório Ultracargo</div>
+      <div class="zone-title">Movimentação de Carretas</div>
+      <div class="zone-desc">Múltiplos arquivos — selecione Sinop e Nova Mutum juntos</div>
+      <label class="upload-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 11V3M5 6l3-3 3 3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Selecionar arquivos
+        <input type="file" accept=".xlsx" multiple id="inp-ultra" style="display:none" onchange="addFiles('ultra',this.files);this.value=''">
+      </label>
+      <div class="file-list" id="list-ultra"></div>
+      <p class="drop-hint">ou arraste os arquivos aqui</p>
+    </div>
+  </div>
+
+  <div class="run-wrap">
+    <button class="run-btn" id="run-btn" onclick="run()" disabled>Cruzar informações</button>
+    <button class="reset-btn" id="reset-btn" onclick="resetAll()">Limpar</button>
+  </div>
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-label">NFs no CS (base)</div><div class="stat-num" id="s-cs">—</div></div>
+    <div class="stat-card"><div class="stat-label">NFs na Ultracargo</div><div class="stat-num" id="s-ultra">—</div></div>
+    <div class="stat-card"><div class="stat-label">Pesos corretos</div><div class="stat-num green" id="s-ok">—</div></div>
+    <div class="stat-card"><div class="stat-label">Filial incorreta</div><div class="stat-num purple" id="s-filial">—</div></div>
+    <div class="stat-card"><div class="stat-label">Peso incorreto</div><div class="stat-num amber" id="s-peso">—</div></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('log',this)">Divergências <span class="tab-badge red" id="badge-log">0</span></button>
+      <button class="tab" onclick="switchTab('sinop',this)">Descarga Sinop <span class="tab-badge green" id="badge-sinop">0</span></button>
+      <button class="tab" onclick="switchTab('mutum',this)">Descarga Nova Mutum <span class="tab-badge green" id="badge-mutum">0</span></button>
+    </div>
+
+    <div class="tab-pane active" id="pane-log">
+      <div class="section-row">
+        <span class="section-label">Log de divergências</span>
+        <span class="count-pill" id="count-log">0 itens</span>
+      </div>
+      <p class="log-desc">NFs com divergências identificadas pelo cruzamento CS × Ultracargo. Registros com erros <strong>não são exportados</strong> nas planilhas de descarga.</p>
+      <div class="log-box">
+        <div class="log-thead">
+          <span>Nº NF</span><span>Status</span><span>Detalhe</span>
+          <span>Peso CS</span><span>Qtd Ultra</span><span style="text-align:right">Diferença</span>
+        </div>
+        <div id="log-body"></div>
+      </div>
+      <div class="btn-row">
+        <button class="dl-btn log-err" id="dl-log" onclick="downloadLog()" disabled>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Exportar log de erros (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="pane-sinop">
+      <div class="section-row">
+        <span class="section-label">Descargas — Sinop (filial 1)</span>
+        <span class="count-pill" id="count-sinop">0 registros</span>
+      </div>
+      <div class="tbl-wrap" id="tbl-sinop"></div>
+      <div class="btn-row">
+        <button class="dl-btn sinop" id="dl-sinop" onclick="downloadXlsx('sinop')" disabled>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Baixar Descargas Sinop.xlsx
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="pane-mutum">
+      <div class="section-row">
+        <span class="section-label">Descargas — Nova Mutum (filial 3)</span>
+        <span class="count-pill" id="count-mutum">0 registros</span>
+      </div>
+      <div class="tbl-wrap" id="tbl-mutum"></div>
+      <div class="btn-row">
+        <button class="dl-btn mutum" id="dl-mutum" onclick="downloadXlsx('mutum')" disabled>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Baixar Descargas Nova Mutum.xlsx
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const state={cs:[],ultra:[],sinop:[],mutum:[],logs:[]};
+
+function onDrag(e,z){e.preventDefault();document.getElementById('zone-'+z).classList.add('drag');}
+function offDrag(z){document.getElementById('zone-'+z).classList.remove('drag');}
+function onDrop(e,z){e.preventDefault();offDrag(z);addFiles(z,e.dataTransfer.files);}
+
+function addFiles(z,files){
+  const arr=Array.from(files).filter(f=>f.name.toLowerCase().endsWith('.xlsx'));
+  if(!arr.length)return;
+  if(z==='cs')state.cs=[arr[0]];
+  else state.ultra=[...state.ultra,...arr];
+  renderList(z);checkReady();
+}
+function removeFile(z,i){
+  if(z==='cs')state.cs=[];else state.ultra.splice(i,1);
+  renderList(z);checkReady();
+}
+function renderList(z){
+  const list=z==='cs'?state.cs:state.ultra;
+  document.getElementById('list-'+z).innerHTML=list.map((f,i)=>`
+    <div class="file-tag">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="10" height="13" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="fname" title="${f.name}">${f.name}</span>
+      <button class="rm" onclick="removeFile('${z}',${i})">×</button>
+    </div>`).join('');
+}
+function checkReady(){document.getElementById('run-btn').disabled=!(state.cs.length&&state.ultra.length);}
+function switchTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pane-'+id).classList.add('active');
+}
+
+async function readXlsx(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=e=>res(XLSX.read(e.target.result,{type:'array',cellDates:true}));
+    fr.onerror=rej;fr.readAsArrayBuffer(file);
+  });
+}
+function norm(v){if(v===null||v===undefined)return '';return String(v).trim().replace(/^0+(\d)/,'$1');}
+function fmtDate(v){
+  if(!v)return '';
+  if(v instanceof Date)return v.toLocaleDateString('pt-BR');
+  if(typeof v==='string'){try{return new Date(v).toLocaleDateString('pt-BR');}catch(e){return v;}}
+  return String(v);
+}
+function numFmt(n){if(n===''||n===null||n===undefined)return '—';return Number(n).toLocaleString('pt-BR');}
+function filialDeCliente(s){const u=(s||'').toUpperCase();if(u.includes('SINOP'))return 1;if(u.includes('MUTUM'))return 3;return null;}
+function nomFilial(f){if(f==1)return 'Sinop';if(f==3)return 'Nova Mutum';return f?String(f):'—';}
+
+async function run(){
+  const btn=document.getElementById('run-btn');
+  btn.innerHTML='<span class="spinner"></span>Processando...';
+  btn.disabled=true;
+  await new Promise(r=>setTimeout(r,30));
+
+  try{
+    // CS
+    const csWb=await readXlsx(state.cs[0]);
+    const csSheet=csWb.Sheets[csWb.SheetNames[0]];
+    const csRaw=XLSX.utils.sheet_to_json(csSheet,{header:1,defval:null});
+    const csHdr=csRaw[1];
+    const csRows=csRaw.slice(2).filter(r=>r&&r.some(c=>c!==null&&c!==''));
+    const ci=h=>csHdr.indexOf(h);
+    const iF=2,iNF=ci('Nº Nota'),iSer=ci('Série'),iPesL=ci('Peso Líquido'),iPesD=ci('Peso Destino'),iCheg=ci('Data Chegada'),iSaid=ci('Data Saída');
+
+    // Ultra
+    let ultraRows=[];
+    for(const f of state.ultra){
+      const wb=await readXlsx(f);
+      const sh=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(sh,{header:1,defval:null,cellDates:true});
+      const hdr=raw[0];
+      const ui={cliente:hdr.indexOf('Cliente'),nf:hdr.indexOf('Nota Fiscal'),qtd:hdr.indexOf('Quantidade NF'),qtdReal:hdr.indexOf('Qtd. Realizada'),saida:hdr.indexOf('Dt. Saída Terminal'),entrada:hdr.indexOf('Dt. Entrada')};
+      raw.slice(1).filter(r=>r&&r[ui.nf]).forEach(r=>{
+        const c=String(r[ui.cliente]||'');
+        ultraRows.push({cliente:c,nf:norm(r[ui.nf]),qtd:Number(r[ui.qtd])||0,qtdRealizada:r[ui.qtdReal]!==null&&r[ui.qtdReal]!==undefined?r[ui.qtdReal]:'',dtSaida:r[ui.saida],dtEntrada:r[ui.entrada],filial:filialDeCliente(c)});
+      });
+    }
+
+    const ultraMap={};
+    ultraRows.forEach(r=>{ultraMap[r.nf]=r;});
+
+    const logs=[],sinop=[],mutum=[];
+
+    csRows.forEach(row=>{
+      const filialCS=row[iF];
+      const nfRaw=row[iNF];
+      if(!nfRaw)return;
+      const nf=norm(nfRaw),serie=row[iSer],pesL=Number(row[iPesL])||0,pesD=row[iPesD],cheg=row[iCheg],said=row[iSaid];
+      const u=ultraMap[nf];
+
+      if(!u){
+        logs.push({nf,status:'Não encontrada',cls:'sp-nao',dot:'dot-grey',detalhe:'NF não localizada nos relatórios Ultracargo',csVal:pesL,uVal:null,diff:null,filialCS:nomFilial(filialCS),filialUltra:'—'});
+        return;
+      }
+
+      const diff=pesL-u.qtd;
+      const pesoOk=Math.abs(diff)<1;
+      const filialOk=Number(filialCS)===Number(u.filial);
+
+      if(!filialOk){
+        logs.push({nf,status:'Filial incorreta',cls:'sp-fil',dot:'dot-purple',detalhe:`CS aponta ${nomFilial(filialCS)}, Ultra registra ${nomFilial(u.filial)}`,csVal:pesL,uVal:u.qtd,diff:pesoOk?null:diff,filialCS:nomFilial(filialCS),filialUltra:nomFilial(u.filial)});
+        return;
+      }
+
+      if(!pesoOk){
+        logs.push({nf,status:'Peso incorreto',cls:'sp-peso',dot:'dot-amber',detalhe:`Diferença de ${Math.abs(diff).toLocaleString('pt-BR')} kg`,csVal:pesL,uVal:u.qtd,diff,filialCS:nomFilial(filialCS),filialUltra:nomFilial(u.filial)});
+        return;
+      }
+
+      const rec={'NF':nf,'SERIE':serie!==null?serie:'','PESODESTINO':u.qtdRealizada!==''?u.qtdRealizada:'','DATASAIDA':fmtDate(said)||fmtDate(u.dtSaida),'DATACHEGADA':fmtDate(cheg)||fmtDate(u.dtEntrada)};
+      if(filialCS==1)sinop.push(rec);
+      else if(filialCS==3)mutum.push(rec);
+    });
+
+    state.sinop=sinop;state.mutum=mutum;state.logs=logs;
+
+    const nFilial=logs.filter(l=>l.status==='Filial incorreta').length;
+    const nPeso=logs.filter(l=>l.status==='Peso incorreto').length;
+
+    document.getElementById('s-cs').textContent=csRows.filter(r=>r[iNF]).length;
+    document.getElementById('s-ultra').textContent=ultraRows.length;
+    document.getElementById('s-ok').textContent=sinop.length+mutum.length;
+    document.getElementById('s-filial').textContent=nFilial;
+    document.getElementById('s-peso').textContent=nPeso;
+    document.getElementById('stats-row').classList.add('show');
+
+    document.getElementById('badge-log').textContent=logs.length;
+    document.getElementById('badge-sinop').textContent=sinop.length;
+    document.getElementById('badge-mutum').textContent=mutum.length;
+    document.getElementById('count-log').textContent=logs.length+' itens';
+    document.getElementById('count-sinop').textContent=sinop.length+' registros';
+    document.getElementById('count-mutum').textContent=mutum.length+' registros';
+
+    renderLog(logs);renderTable('sinop',sinop);renderTable('mutum',mutum);
+
+    document.getElementById('dl-log').disabled=!logs.length;
+    document.getElementById('dl-sinop').disabled=!sinop.length;
+    document.getElementById('dl-mutum').disabled=!mutum.length;
+    document.getElementById('results').classList.add('show');
+    document.getElementById('reset-btn').classList.add('show');
+
+  }catch(err){alert('Erro ao processar: '+err.message);console.error(err);}
+
+  btn.innerHTML='Cruzar informações';btn.disabled=false;checkReady();
+}
+
+function renderLog(logs){
+  const body=document.getElementById('log-body');
+  if(!logs.length){body.innerHTML='<div class="empty"><div class="empty-icon">✓</div>Nenhuma divergência encontrada — tudo conferido!</div>';return;}
+  body.innerHTML=logs.map(l=>{
+    const diffStr=(l.diff!==null&&l.diff!==undefined)
+      ?`<span style="font-weight:700;text-align:right;color:${l.diff>0?'var(--green)':'var(--red)'}">${l.diff>0?'+':''}${Number(l.diff).toLocaleString('pt-BR')}</span>`
+      :'<span style="color:var(--text3)">—</span>';
+    return `<div class="log-item">
+      <span class="log-nf">NF ${l.nf}</span>
+      <span><span class="status-pill ${l.cls}"><span class="dot ${l.dot}"></span>${l.status}</span></span>
+      <span style="color:var(--text2);font-size:11px;line-height:1.4">${l.detalhe}</span>
+      <span class="log-val">${l.csVal!==null?numFmt(l.csVal):'—'}</span>
+      <span class="log-val">${l.uVal!==null?numFmt(l.uVal):'—'}</span>
+      ${diffStr}
+    </div>`;
+  }).join('');
+}
+
+function renderTable(id,data){
+  const el=document.getElementById('tbl-'+id);
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">○</div>Sem registros para esta filial.</div>';return;}
+  const cols=['NF','SERIE','PESODESTINO','DATASAIDA','DATACHEGADA'];
+  const labels=['Nº NF','Série','Peso Destino','Data Saída','Data Chegada'];
+  el.innerHTML=`<table><thead><tr>${labels.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${data.map(r=>`<tr>${cols.map(c=>`<td>${r[c]!==null&&r[c]!==undefined?r[c]:''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+function downloadXlsx(id){
+  const data=id==='sinop'?state.sinop:state.mutum;
+  const fname=id==='sinop'?'Descargas Sinop':'Descargas Nova Mutum';
+  const ws=XLSX.utils.json_to_sheet(data,{header:['NF','SERIE','PESODESTINO','DATASAIDA','DATACHEGADA']});
+  ws['A1'].v='NF';ws['B1'].v='SERIE';ws['C1'].v='PESODESTINO';ws['D1'].v='DATASAIDA';ws['E1'].v='DATACHEGADA';
+  ws['!cols']=[{wch:16},{wch:8},{wch:14},{wch:14},{wch:14}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,fname);XLSX.writeFile(wb,fname+'.xlsx');
+}
+
+function downloadLog(){
+  const rows=state.logs.map(l=>({
+    'Nº NF':l.nf,'Status':l.status,'Detalhe':l.detalhe,
+    'Filial CS':l.filialCS,'Filial Ultra':l.filialUltra,
+    'Peso CS':l.csVal!==null?l.csVal:'',
+    'Qtd NF Ultra':l.uVal!==null?l.uVal:'',
+    'Diferença':(l.diff!==null&&l.diff!==undefined)?l.diff:''
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows,{header:['Nº NF','Status','Detalhe','Filial CS','Filial Ultra','Peso CS','Qtd NF Ultra','Diferença']});
+  ws['!cols']=[{wch:14},{wch:18},{wch:42},{wch:14},{wch:14},{wch:12},{wch:14},{wch:12}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Log de Erros');
+  XLSX.writeFile(wb,'Log de Erros — Descargas.xlsx');
+}
+
+function resetAll(){
+  state.cs=[];state.ultra=[];state.sinop=[];state.mutum=[];state.logs=[];
+  renderList('cs');renderList('ultra');
+  document.getElementById('stats-row').classList.remove('show');
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('reset-btn').classList.remove('show');
+  checkReady();
+}
+</script>
+</body>
+</html>
