@@ -336,10 +336,16 @@
         <div class="chart-wrap"><canvas id="chartFerroCarreg"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Descarga Ferroviária — <span>Terminais</span></div>
-        <div id="ferroDescNotice" style="display:none;background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.4);border-radius:7px;padding:8px 12px;font-size:11px;color:#b87800;margin-bottom:10px">
-          ⚠️ Dados de descargas precisam ser recarregados para exibir este gráfico.<br>
-          Vá em <strong>Upload Dados → 🗑️ Limpar Descargas</strong> e suba o arquivo novamente.
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0">Descarga Ferroviária — <span>Terminais</span></div>
+          <select id="ferroDestSelect" onchange="renderFerrovia()"
+            style="background:var(--bg3);border:1.5px solid var(--border);border-radius:7px;
+                   padding:5px 12px;font-size:12px;color:var(--text);font-family:'Barlow',sans-serif;cursor:pointer;min-width:220px;">
+            <option value="geral">🌐 Geral (todos)</option>
+            <option value="11966">Logum Logística SA (11966)</option>
+            <option value="7605">Terminal Paulínia SA (7605)</option>
+            <option value="3492">Destino 3492</option>
+          </select>
         </div>
         <div class="chart-wrap"><canvas id="chartFerroDesc"></canvas></div>
       </div>
@@ -444,10 +450,26 @@
     <button class="btn-clear-all" onclick="clearAllData()">🗑️ Limpar Todos os Dados</button>
   </div>
   <div class="upload-grid">
-    <!-- DESCARGAS -->
+    <!-- 1. NOTAS FISCAIS (deve ser importado PRIMEIRO) -->
     <div class="upload-card">
-      <div class="upload-card-title" style="color:var(--blue)">📦 Descargas</div>
-      <div class="upload-card-desc">Planilha de movimentação de descargas. Apenas registros com Peso Destino preenchido e sem mesclagem são considerados.</div>
+      <div class="upload-card-title" style="color:var(--centro)">① 🧾 Notas Fiscais</div>
+      <div class="upload-card-desc">⚠️ <strong>Importe primeiro.</strong> Gera o mapeamento Produto × NF usado pelas Descargas. Classifica automaticamente: Ferroviário, Rodoviário e Transferência em Tanque.</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="btn-clear-data" onclick="clearData('notas')">🗑️ Limpar Notas Fiscais</button>
+      </div>
+      <div class="drop-zone" id="dz-notas"
+           ondragover="dzDrag(event,'notas')" ondragleave="dzLeave('notas')" ondrop="dzDrop(event,'notas')">
+        <input type="file" id="file-notas" accept=".xlsx,.xls" onchange="handleFile(event,'notas')">
+        <div class="drop-icon">📋</div>
+        <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><br>Notas_Fiscais.xlsx</div>
+      </div>
+      <div class="upload-status" id="status-notas"></div>
+      <div class="data-log" id="log-notas"></div>
+    </div>
+    <!-- 2. DESCARGAS -->
+    <div class="upload-card">
+      <div class="upload-card-title" style="color:var(--blue)">② 📦 Descargas</div>
+      <div class="upload-card-desc">⚠️ <strong>Importe após as Notas.</strong> Planilha de movimentação de descargas. Apenas registros com Peso Destino preenchido e sem mesclagem são considerados.</div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
         <button class="btn-clear-data" onclick="clearData('descargas')">🗑️ Limpar Descargas</button>
       </div>
@@ -462,7 +484,7 @@
     </div>
     <!-- TRANSITO -->
     <div class="upload-card">
-      <div class="upload-card-title" style="color:var(--ultra)">🚛 Trânsito</div>
+      <div class="upload-card-title" style="color:var(--ultra)">③ 🚛 Trânsito</div>
       <div class="upload-card-desc">Planilha de notas em trânsito. Transit time: Sinop +2 dias, Nova Mutum +1 dia. Apenas notas sem Data Chegada são consideradas.</div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
         <button class="btn-clear-data" onclick="clearData('transito')">🗑️ Limpar Trânsito</button>
@@ -476,25 +498,10 @@
       <div class="upload-status" id="status-transito"></div>
       <div class="data-log" id="log-transito"></div>
     </div>
-    <!-- NOTAS -->
-    <div class="upload-card">
-      <div class="upload-card-title" style="color:var(--centro)">🧾 Notas Fiscais</div>
-      <div class="upload-card-desc">Planilha de notas fiscais emitidas pelos terminais. Classifica automaticamente: Ferroviário, Rodoviário e Transferência em Tanque.</div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-        <button class="btn-clear-data" onclick="clearData('notas')">🗑️ Limpar Notas Fiscais</button>
-      </div>
-      <div class="drop-zone" id="dz-notas"
-           ondragover="dzDrag(event,'notas')" ondragleave="dzLeave('notas')" ondrop="dzDrop(event,'notas')">
-        <input type="file" id="file-notas" accept=".xlsx,.xls" onchange="handleFile(event,'notas')">
-        <div class="drop-icon">📋</div>
-        <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><br>Notas_Fiscais.xlsx</div>
-      </div>
-      <div class="upload-status" id="status-notas"></div>
-      <div class="data-log" id="log-notas"></div>
-    </div>
+
     <!-- ESTOQUE -->
     <div class="upload-card">
-      <div class="upload-card-title" style="color:var(--gold)">🏭 Estoque</div>
+      <div class="upload-card-title" style="color:var(--gold)">④ 🏭 Estoque</div>
       <div class="upload-card-desc">Arquivo de saldo dos depósitos. Ao selecionar, informe o <strong>produto</strong> e a <strong>data</strong> do relatório para construir o histórico diário.</div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
         <button class="btn-clear-data" onclick="clearData('estoque')">🗑️ Limpar Estoque</button>
@@ -543,7 +550,7 @@
 // ============================================================
 // CONSTANTS
 // ============================================================
-const DB_KEYS = { descargas:'op_descargas', transito:'op_transito', notas:'op_notas', estoque:'op_estoque', config:'op_config' };
+const DB_KEYS = { descargas:'op_descargas', transito:'op_transito', notas:'op_notas', estoque:'op_estoque', config:'op_config', produtoMap:'op_produto_map', nfClienteMap:'op_nf_cliente_map' };
 const TERMINAL_MAP = {
   teciap: {cod:[3490],   dep:[17],          name:'Teciap',        color:'#1a3a6b'},
   ultra:  {cod:[83868],  dep:[0.35,0.34],   name:'Ultracargo RO', color:'#0e6674'},
@@ -556,7 +563,7 @@ const MONTHS_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out
 // ============================================================
 // STATE
 // ============================================================
-let db = { descargas:[], transito:[], notas:[], estoque:[], config:{} };
+let db = { descargas:[], transito:[], notas:[], estoque:[], config:{}, produtoMap:{}, nfClienteMap:{} };
 let currentTerminal = 'teciap';
 let pendingEstoqueMeta = null; // {produto, data}
 let charts = {};
@@ -569,6 +576,17 @@ function loadDB() {
   ['descargas','transito','notas','estoque'].forEach(k => {
     try { db[k] = JSON.parse(localStorage.getItem(DB_KEYS[k])||'[]'); } catch(e){ db[k]=[]; }
   });
+  try { db.produtoMap = JSON.parse(localStorage.getItem(DB_KEYS.produtoMap)||'{}'); } catch(e){ db.produtoMap={}; }
+  try { db.nfClienteMap = JSON.parse(localStorage.getItem(DB_KEYS.nfClienteMap)||'{}'); } catch(e){ db.nfClienteMap={}; }
+  // Rebuild nfClienteMap from db.notas if empty (handles data loaded before this feature)
+  if(Object.keys(db.nfClienteMap).length === 0 && db.notas.length > 0) {
+    db.notas.forEach(r => {
+      const cli = (r.nomeCliente||'').trim();
+      if(cli && r.nf && r.terminal) db.nfClienteMap[r.terminal+'_'+r.nf] = cli;
+    });
+    if(Object.keys(db.nfClienteMap).length > 0)
+      localStorage.setItem(DB_KEYS.nfClienteMap, JSON.stringify(db.nfClienteMap));
+  }
   try { db.config = JSON.parse(localStorage.getItem(DB_KEYS.config)||'{}'); } catch(e){ db.config={}; }
   const lu = localStorage.getItem('op_lastupdate');
   if(lu) document.getElementById('lastUpdate').textContent = lu;
@@ -781,6 +799,10 @@ function processFile(file, type) {
       else if(type==='transito') ({added,skipped}=processTransito(rows));
       else if(type==='notas') ({added,skipped}=processNotas(rows));
       saveDB(type);
+      if(type==='notas') {
+        localStorage.setItem(DB_KEYS.produtoMap, JSON.stringify(db.produtoMap));
+        localStorage.setItem(DB_KEYS.nfClienteMap, JSON.stringify(db.nfClienteMap));
+      }
       buildMonthFilter();
       setStatus(type,'success',`✅ ${added} registros adicionados, ${skipped} duplicatas ignoradas.`);
       renderLogs();
@@ -800,7 +822,10 @@ function processDescargas(rows) {
   const pesoLiqIdx=cols['Peso Líquido'], pesoDstIdx=cols['Peso Destino'];
   const placaIdx=cols['Placa'], motoristaIdx=cols['Nome Motorista'];
   const chegadaIdx=cols['Data Chegada'], saidaIdx=cols['Data Saída'];
-  const allCods=[3490,23184,83868];
+  // Clientes dos nossos terminais + destinos Rumo
+  const allCods     = [3490, 23184, 83868];
+  const rumoClients = [11966, 7605, 3492];  // Logum, Terminal Paulinia, Destino 3492
+  const allProcess  = [...allCods, ...rumoClients];
   let added=0, skipped=0;
   const existing = new Set(db.descargas.map(r=>r.nf+'_'+r.cliente));
   for(let i=2;i<rows.length;i++){
@@ -812,7 +837,7 @@ function processDescargas(rows) {
     if(!gVal || isNaN(parseFloat(gVal))) continue;
     const clienteRaw=r[clienteIdx];
     const cliente=typeof clienteRaw==='number'?clienteRaw:parseFloat(String(clienteRaw||'0'));
-    if(!allCods.includes(cliente)) continue;
+    if(!allProcess.includes(cliente)) continue;
     const pesoDstRaw=r[pesoDstIdx];
     const pesoDst=typeof pesoDstRaw==='number'?pesoDstRaw:parseFloat(String(pesoDstRaw||'0').replace(/\./g,'').replace(',','.'));
     if(!pesoDst||pesoDst===0) continue;
@@ -824,15 +849,23 @@ function processDescargas(rows) {
     const pesoLiq=typeof pesoLiqRaw==='number'?pesoLiqRaw:parseFloat(String(pesoLiqRaw||'0').replace(/\./g,'').replace(',','.'));
     const f=parseInt(r[fIdx])||1;
     const filial=FILIAL_MAP[f]||'Sinop';
-    const terminal=Object.keys(TERMINAL_MAP).find(t=>TERMINAL_MAP[t].cod.includes(cliente))||'teciap';
+    // Para clientes Rumo: APENAS salvar se transportadora for Rumo Malha Norte
+    const nomeTransp = String(r[17]||'').trim().toUpperCase(); // col 17 = transportador nome
+    const isRumoClient = rumoClients.includes(cliente);
+    if(isRumoClient && !nomeTransp.includes('RUMO MALHA')) continue; // ignora rodoviário
+    const terminal = isRumoClient
+      ? 'rumo_' + cliente
+      : (Object.keys(TERMINAL_MAP).find(t=>TERMINAL_MAP[t].cod.includes(cliente))||'teciap');
     const quebra=pesoDst-pesoLiq;
     const indice=pesoLiq?quebra/pesoLiq*100:0;
     // FIX: usar parseExcelDate para Data Chegada/Saída
     const dtRef=parseExcelDate(r[chegadaIdx])||parseExcelDate(r[saidaIdx])||'';
-    const nomeTransp = String(r[17]||'').trim().toUpperCase(); // col 17 = transportador nome
+    // Consultar produto via chave filial_nf no mapa de notas
+    const fNumDesc = f; // já temos o número da filial
+    const produtoDesc = db.produtoMap[fNumDesc+'_'+nf] || '';
     db.descargas.push({nf,cliente,terminal,filial,pesoLiq,pesoDst,quebra,indice,
       placa:String(r[placaIdx]||'').trim(),motorista:String(r[motoristaIdx]||'').trim(),
-      data:dtRef, nomeTransp});
+      data:dtRef, nomeTransp, produto:produtoDesc});
     added++;
   }
   return {added,skipped};
@@ -846,7 +879,10 @@ function processTransito(rows) {
   const cols={}; hdr.forEach((c,i)=>{if(c)cols[String(c).trim()]=i;});
   const gIdx=cols['G']??0, fIdx=cols['F'], nfIdx=cols['Nº Nota'], clienteIdx=cols['Cliente'];
   const emissaoIdx=cols['Dt. Emissão'], pesoLiqIdx=cols['Peso Líquido'], chegadaIdx=cols['Data Chegada'];
-  const allCods=[3490,23184,83868];
+  // Clientes dos nossos terminais + destinos Rumo
+  const allCods     = [3490, 23184, 83868];
+  const rumoClients = [11966, 7605, 3492];  // Logum, Terminal Paulinia, Destino 3492
+  const allProcess  = [...allCods, ...rumoClients];
   let added=0,skipped=0;
   const existing=new Set(db.transito.map(r=>r.nf));
   for(let i=2;i<rows.length;i++){
@@ -914,7 +950,14 @@ function processNotas(rows) {
      const qtdeRaw=r[qtdeIdx];
     const qtde=typeof qtdeRaw==='number'?qtdeRaw:(parseFloat(String(qtdeRaw||'0').replace(/\./g,'').replace(',','.'))||0);
     const data=parseExcelDate(r[emissaoIdx]);
-     db.notas.push({nf,terminal,filial,modal,rotina,qtde,data,dep:depKey,nomeCliente:nomeClienteRaw});
+     // Produto map: chave filial_nf -> produto
+    const descItem = String(r[24]||'').trim().toUpperCase();
+    const produto = descItem.includes('ANIDRO') ? 'Anidro' : descItem.includes('HIDRAT') ? 'Hidratado' : '';
+    const fNumNota = parseInt(String(r[gefIdx]||'').split('-').pop()) || 0;
+    if(produto && nf) db.produtoMap[fNumNota+'_'+nf] = produto;
+    // nfClienteMap: chave terminal_nf -> nomeCliente (para tabela de destinos)
+    if(nomeClienteRaw && nf) db.nfClienteMap[terminal+'_'+nf] = nomeClienteRaw;
+    db.notas.push({nf,terminal,filial,modal,rotina,qtde,data,dep:depKey,nomeCliente:nomeClienteRaw,produto});
     added++;
   }
   return {added,skipped};
@@ -1022,16 +1065,18 @@ function renderTerminal(t) {
   // ── VOLUME PROJETADO ──
   // Média até D-1, multiplicado pela qtd de dias do mês
   // Se mês fechado: projetado = recebido
+  // Média até D-1 = total recebido até D-1 / diaD1
+  // Volume projetado = média * dias do mês
+  const descAteD1 = isCurrentMonth && diaD1 > 0 ? descMes.filter(r => {
+    const d = new Date(r.data + 'T12:00:00').getDate();
+    return d <= diaD1;
+  }).reduce((s, r) => s + r.pesoDst, 0) / 1000 : volRecebido;
+  const mediaTerminal = (isCurrentMonth && diaD1 > 0) ? descAteD1 / diaD1 : 0;
   let volProjetado;
   if (!isCurrentMonth || diaD1 === 0) {
-    volProjetado = volRecebido;
+    volProjetado = volRecebido; // mês fechado: projetado = recebido
   } else {
-    const descAteD1 = descMes.filter(r => {
-      const d = new Date(r.data + 'T12:00:00').getDate();
-      return d <= diaD1;
-    }).reduce((s, r) => s + r.pesoDst, 0) / 1000;
-    const mediaD1 = diaD1 > 0 ? descAteD1 / diaD1 : 0;
-    volProjetado  = mediaD1 * diasMes;
+    volProjetado = mediaTerminal * diasMes;
   }
 
   // ── EXPEDIDOS ──
@@ -1047,7 +1092,8 @@ function renderTerminal(t) {
   // Dia N: descarga_diaN - meta_diaria + backlog_dia_anterior
   const metaDiaria = top > 0 ? top / diasMes : 0;
   let backlog = 0;
-  if(isCurrentMonth && diaD1 >= 1) {
+  const temContrato = top > 0;
+  if(temContrato && isCurrentMonth && diaD1 >= 1) {
     for(let d = 1; d <= diaD1; d++) {
       const descDia = descMes
         .filter(r => new Date(r.data + 'T12:00:00').getDate() === d)
@@ -1076,18 +1122,20 @@ function renderTerminal(t) {
   const giro = estatTotal > 0 ? volRecebido / estatTotal : 0;
 
   // ── KPIs ──
-  const backlogColor  = backlog >= 0 ? '#1a6b35' : '#b91c1c';
-  const backlogClass  = backlog >= 0 ? '' : 'negative';
-  const backlogLabel  = backlog >= 0 ? 'Acima do previsto' : 'Pendência';
+  const semDadosTerminal = descMes.length === 0;
+  const backlogColor  = semDadosTerminal ? '#9aa3bb' : (backlog >= 0 ? '#1a6b35' : '#b91c1c');
+  const backlogClass  = (!semDadosTerminal && backlog < 0) ? 'negative' : '';
+  const backlogLabel  = semDadosTerminal ? 'Sem dados' : (backlog >= 0 ? 'Acima do previsto' : 'Pendência');
+  const backlogValue  = semDadosTerminal ? '—' : fmt(Math.abs(backlog));
 
   document.getElementById('kpiRow').innerHTML = `
     <div class="kpi" style="--kpi-color:${color}"><div class="kpi-label">Vol. Recebido Caminhões</div><div class="kpi-value">${fmt(volRecebido)}</div><div class="kpi-sub">m³ no mês</div></div>
     <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Expedido Ferrovia</div><div class="kpi-value">${fmt(expFerro)}</div><div class="kpi-sub">m³ no mês</div></div>
     <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Expedido Rodo/Transf</div><div class="kpi-value">${fmt(expRodo)}</div><div class="kpi-sub">m³ no mês</div></div>
     <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Take or Pay / Mês</div><div class="kpi-value">${fmt(top)}</div><div class="kpi-sub">m³ contratado</div></div>
-    <div class="kpi" style="--kpi-color:${saldoTop<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Take or Pay</div><div class="kpi-value ${saldoTop<0?'negative':''}">${fmt(saldoTop)}</div><div class="kpi-sub">m³</div></div>
-    <div class="kpi" style="--kpi-color:${backlogColor}"><div class="kpi-label">Backlog Recebimento</div><div class="kpi-value ${backlogClass}">${fmt(Math.abs(backlog))}</div><div class="kpi-sub">${backlogLabel}</div></div>
-    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Volume Projetado</div><div class="kpi-value">${fmt(volProjetado)}</div><div class="kpi-sub">m³ estimado mês</div></div>
+    <div class="kpi" style="--kpi-color:${semDadosTerminal?'#9aa3bb':saldoTop<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Take or Pay</div><div class="kpi-value ${semDadosTerminal?'':saldoTop<0?'negative':''}">${semDadosTerminal?'—':fmt(saldoTop)}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${temContrato?backlogColor:'#9aa3bb'}"><div class="kpi-label">Backlog Recebimento</div><div class="kpi-value ${backlogClass}">${temContrato?(semDadosTerminal?'—':backlogValue):'—'}</div><div class="kpi-sub">${temContrato?backlogLabel:'Contrato não configurado'}</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Volume Projetado</div><div class="kpi-value">${semDadosTerminal?'—':fmt(volProjetado)}</div><div class="kpi-sub">m³ estimado mês</div></div>
     <div class="kpi" style="--kpi-color:${color}"><div class="kpi-label">Trânsito Caminhões</div><div class="kpi-value">${fmt(transitoVol)}</div><div class="kpi-sub">m³ a chegar</div></div>
     <div class="kpi" style="--kpi-color:#9aa3bb"><div class="kpi-label">Estática Hidratado</div><div class="kpi-value">${fmt(estatHid)}</div><div class="kpi-sub">m³ contratado</div></div>
     <div class="kpi" style="--kpi-color:#9aa3bb"><div class="kpi-label">Estática Anidro</div><div class="kpi-value">${fmt(estatAni)}</div><div class="kpi-sub">m³ contratado</div></div>
@@ -1332,13 +1380,21 @@ function renderFerrovia() {
   // Inclui TODOS os terminais (Teciap, Ultra, Centroeste) pois Rumo carrega de todos
   // Descarga ferroviária: transportadora = Rumo Malha Norte
   // nomeTransp armazenado a partir da v3 — dados antigos não têm este campo
-  const descFerro = db.descargas.filter(r => {
-    if(!r.data || !r.data.startsWith(curMonth)) return false;
-    if(r.nomeTransp && r.nomeTransp.includes('RUMO MALHA')) return true;
-    // fallback: placa de vagão = 3 letras + 7 números (TCT0123456)
-    if(r.placa && /^[A-Za-z]{3}\d{7}/.test(r.placa.replace(/\s/g,''))) return true;
-    return false;
-  });
+  // Descarga Ferroviária: registros com terminal iniciando em 'rumo_'
+  // Mapa de terminais destino Rumo
+  const RUMO_DEST_MAP = {
+    11966: 'Logum Logística SA',
+    7605:  'Terminal Paulínia SA',
+    3492:  'Destino 3492',
+  };
+  const descFerroAll = db.descargas.filter(r =>
+    r.terminal && r.terminal.startsWith('rumo_') && r.data && r.data.startsWith(curMonth)
+  );
+  // Filtro pelo terminal selecionado no select
+  const ferroDestSel = document.getElementById('ferroDestSelect')?.value || 'geral';
+  const descFerro = ferroDestSel === 'geral'
+    ? descFerroAll
+    : descFerroAll.filter(r => r.terminal === 'rumo_' + ferroDestSel);
   const volDescFerro = descFerro.reduce((s,r) => s+r.pesoDst, 0) / 1000;
 
   const cfg      = db.config.ferro || {};
@@ -1346,18 +1402,13 @@ function renderFerrovia() {
   const minimo   = cfg.minimo   || 83933;
   const saldo    = volCarreg - contrato;
 
-  // ── VOLUME PROJETADO ──
-  let projetado;
-  if (!isCurrentMonth || diaD1 === 0) {
-    projetado = volCarreg;
-  } else {
-    const carregAteD1 = ferroNotas.filter(r => new Date(r.data+'T12:00:00').getDate() <= diaD1)
-      .reduce((s,r) => s+r.qtde, 0) / 1000;
-    const mediaD1 = diaD1 > 0 ? carregAteD1 / diaD1 : 0;
-    projetado = mediaD1 * diasMes;
-  }
+  // ── MÉDIA/DIA: usa D-1 como referência (igual ao PDF) ──
+  const media = diaD1 > 0 ? volCarreg / diaD1 : 0;
 
-  // ── BACKLOG FERROVIA ──
+  // ── VOLUME PROJETADO: média D-1 × dias do mês ──
+  const projetado = (!isCurrentMonth || diaD1 === 0) ? volCarreg : media * diasMes;
+
+  // ── BACKLOG FERROVIA (acumulado dia a dia) ──
   const metaDiaria = contrato / diasMes;
   const metaAteD1  = metaDiaria * diaD1;
   const carregD1   = ferroNotas.filter(r => new Date(r.data+'T12:00:00').getDate() <= diaD1)
@@ -1366,23 +1417,37 @@ function renderFerrovia() {
   const backlogFerroColor = backlogFerro >= 0 ? '#1a6b35' : '#b91c1c';
   const backlogFerroLabel = backlogFerro >= 0 ? 'Acima do previsto' : 'Pendência';
 
-  const saldoMin  = volCarreg - minimo;
+  const saldoMin   = volCarreg - minimo;
   const metaMinDia = minimo / diasMes;
   const metaMinD1  = metaMinDia * diaD1;
   const backlogMin = isCurrentMonth ? (carregD1 - metaMinD1) : 0;
-  const media      = diaAtual > 0 ? volCarreg / diaAtual : 0;
+
+  // Sem dados: backlog e saldo só fazem sentido com dados carregados
+  const semDados = ferroNotas.length === 0;
+  const backlogFerroDisplay = semDados ? 0 : Math.abs(backlogFerro);
+  const backlogFerroSubLabel = semDados ? 'Sem dados' : backlogFerroLabel;
+  const backlogFerroKpiColor = semDados ? '#9aa3bb' : backlogFerroColor;
+  const backlogMinDisplay    = semDados ? 0 : Math.abs(backlogMin);
+  const backlogMinSubLabel   = semDados ? 'Sem dados' : (backlogMin>=0?'Acima do previsto':'Pendência');
+  const backlogMinKpiColor   = semDados ? '#9aa3bb' : (backlogMin<0?'#b91c1c':'#1a6b35');
+  const saldoDisplay         = semDados ? '—' : fmt(saldo);
+  const saldoClass           = semDados ? '' : (saldo<0?'negative':'');
+  const saldoColor           = semDados ? '#9aa3bb' : (saldo<0?'#b91c1c':'#1a6b35');
+  const saldoMinDisplay      = semDados ? '—' : fmt(saldoMin);
+  const saldoMinClass        = semDados ? '' : (saldoMin<0?'negative':'');
+  const saldoMinColor        = semDados ? '#9aa3bb' : (saldoMin<0?'#b91c1c':'#1a6b35');
 
   document.getElementById('ferroKpiRow').innerHTML = `
     <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Vol. Carregado Teciap/Ultra</div><div class="kpi-value">${fmt(volCarreg)}</div><div class="kpi-sub">m³ no mês</div></div>
     <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Vol. Descarregado Rumo</div><div class="kpi-value">${fmt(volDescFerro)}</div><div class="kpi-sub">m³ no mês</div></div>
     <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Contrato Transporte/Mês</div><div class="kpi-value">${fmt(contrato)}</div><div class="kpi-sub">m³</div></div>
-    <div class="kpi" style="--kpi-color:${saldo<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Contrato/Mês</div><div class="kpi-value ${saldo<0?'negative':''}">${fmt(saldo)}</div><div class="kpi-sub">m³</div></div>
-    <div class="kpi" style="--kpi-color:${backlogFerroColor}"><div class="kpi-label">Backlog Carregamento</div><div class="kpi-value ${backlogFerro<0?'negative':''}">${fmt(Math.abs(backlogFerro))}</div><div class="kpi-sub">${backlogFerroLabel}</div></div>
-    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Volume Projetado</div><div class="kpi-value">${fmt(projetado)}</div><div class="kpi-sub">m³ estimado mês</div></div>
-    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Média Carregamento/dia</div><div class="kpi-value">${fmt(media)}</div><div class="kpi-sub">m³/dia</div></div>
+    <div class="kpi" style="--kpi-color:${saldoColor}"><div class="kpi-label">Saldo Contrato/Mês</div><div class="kpi-value ${saldoClass}">${saldoDisplay}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${backlogFerroKpiColor}"><div class="kpi-label">Backlog Carregamento</div><div class="kpi-value ${semDados?'':'${backlogFerro<0?"negative":""}'}">${fmt(backlogFerroDisplay)}</div><div class="kpi-sub">${backlogFerroSubLabel}</div></div>
+    <div class="kpi" style="--kpi-color:#1a6b35"><div class="kpi-label">Volume Projetado</div><div class="kpi-value">${semDados?'—':fmt(projetado)}</div><div class="kpi-sub">m³ estimado mês</div></div>
+    <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Média Carregamento/dia</div><div class="kpi-value">${semDados?'—':fmt(media)}</div><div class="kpi-sub">m³/dia</div></div>
     <div class="kpi" style="--kpi-color:#f0a500"><div class="kpi-label">Volume Mínimo Rumo</div><div class="kpi-value">${fmt(minimo)}</div><div class="kpi-sub">m³/mês</div></div>
-    <div class="kpi" style="--kpi-color:${saldoMin<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Saldo Volume Mínimo</div><div class="kpi-value ${saldoMin<0?'negative':''}">${fmt(saldoMin)}</div><div class="kpi-sub">m³</div></div>
-    <div class="kpi" style="--kpi-color:${backlogMin<0?'#b91c1c':'#1a6b35'}"><div class="kpi-label">Backlog Mín. Rumo</div><div class="kpi-value ${backlogMin<0?'negative':''}">${fmt(Math.abs(backlogMin))}</div><div class="kpi-sub">${backlogMin>=0?'Acima do previsto':'Pendência'}</div></div>
+    <div class="kpi" style="--kpi-color:${saldoMinColor}"><div class="kpi-label">Saldo Volume Mínimo</div><div class="kpi-value ${saldoMinClass}">${saldoMinDisplay}</div><div class="kpi-sub">m³</div></div>
+    <div class="kpi" style="--kpi-color:${backlogMinKpiColor}"><div class="kpi-label">Backlog Mín. Rumo</div><div class="kpi-value">${fmt(backlogMinDisplay)}</div><div class="kpi-sub">${backlogMinSubLabel}</div></div>
   `;
 
   const days   = Array.from({length:diasMes},(_,i)=>i+1);
@@ -1394,23 +1459,52 @@ function renderFerrovia() {
   );
   renderBarWithLabels('chartFerroCarreg', labels, ferroByDay, '#f0a500', 'm³');
 
-  // Gráfico 2: Descarga ferroviária (da planilha descargas, placa vagão)
-  const descFerroByDay = days.map(d => {
-    const rs = descFerro.filter(r => new Date(r.data+'T12:00:00').getDate()===d);
+  // Gráfico 2: Descarga ferroviária — stacked por produto (Hidratado/Anidro)
+  const descFerroHidByDay = days.map(d => {
+    const rs = descFerro.filter(r => new Date(r.data+'T12:00:00').getDate()===d && r.produto==='Hidratado');
     return rs.reduce((s,r)=>s+r.pesoDst,0)/1000 || null;
   });
-  renderBarWithLabels('chartFerroDesc', labels, descFerroByDay, '#1a3a6b', 'm³');
+  const descFerroAniByDay = days.map(d => {
+    const rs = descFerro.filter(r => new Date(r.data+'T12:00:00').getDate()===d && r.produto==='Anidro');
+    return rs.reduce((s,r)=>s+r.pesoDst,0)/1000 || null;
+  });
+  const descFerroSemByDay = days.map(d => {
+    const rs = descFerro.filter(r => new Date(r.data+'T12:00:00').getDate()===d && !r.produto);
+    return rs.reduce((s,r)=>s+r.pesoDst,0)/1000 || null;
+  });
+  const temProdFerro = descFerro.some(r => r.produto);
+  if(temProdFerro) {
+    const fdDatasets = [
+      {label:'Hidratado', data:descFerroHidByDay, backgroundColor:'#1a3a6bcc', borderColor:'#1a3a6b', borderWidth:1, borderRadius:3, stack:'fd'},
+      {label:'Anidro',    data:descFerroAniByDay, backgroundColor:'#f0a500cc', borderColor:'#f0a500', borderWidth:1, borderRadius:3, stack:'fd'},
+    ].filter(ds => ds.data.some(v=>v));
+    if(descFerroSemByDay.some(v=>v)) fdDatasets.push({label:'Sem produto', data:descFerroSemByDay, backgroundColor:'#9aa3bbcc', borderColor:'#9aa3bb', borderWidth:1, borderRadius:3, stack:'fd'});
+    renderStackedBar('chartFerroDesc', labels, fdDatasets, 'm³');
+  } else {
+    const descFerroByDay = days.map(d => {
+      const rs = descFerro.filter(r => new Date(r.data+'T12:00:00').getDate()===d);
+      return rs.reduce((s,r)=>s+r.pesoDst,0)/1000 || null;
+    });
+    renderBarWithLabels('chartFerroDesc', labels, descFerroByDay, '#1a3a6b', 'm³');
+  }
 
   // ── TABELA DINÂMICA por cliente/destino ──
   // Pegar todos os clientes únicos com volume no mês (das notas Teciap+Ultra ferro)
+  // Clientes únicos das notas ferro
+  // Fontes: 1) r.nomeCliente direto, 2) nfClienteMap, 3) varrer db.notas pelo nf
+  const nfToCliente = {};
+  db.notas.forEach(r => { 
+    const c = (r.nomeCliente||'').trim(); 
+    if(c && r.nf) nfToCliente[r.nf] = c; 
+  });
   const clienteSet = new Set();
-  ferroNotas.forEach(r => { if(r.nomeCliente) clienteSet.add(r.nomeCliente); });
-  // Fallback: se não tiver nomeCliente, agrupar por dep como "Destino"
-  // Usar o campo que tiver - vamos verificar quais campos existem
-  // Agrupar por dia e por cliente
+  ferroNotas.forEach(r => {
+    let cli = (r.nomeCliente||'').trim();
+    if(!cli) cli = (db.nfClienteMap[r.terminal+'_'+r.nf]||'').trim();
+    if(!cli) cli = (nfToCliente[r.nf]||'').trim();
+    if(cli) clienteSet.add(cli);
+  });
   const clientesList = Array.from(clienteSet).sort();
-
-  // Se não há campo nomeCliente, mostrar apenas total
   const hasCli = clientesList.length > 0;
 
   let theadHtml = `<tr><th>Data</th>${hasCli ? clientesList.map(c=>`<th>${c}</th>`).join('') : ''}<th>Total</th></tr>`;
@@ -1427,7 +1521,12 @@ function renderFerrovia() {
     let row = `<td>${d}/${String(cm).padStart(2,'0')}</td>`;
     if (hasCli) {
       clientesList.forEach((c,i) => {
-        const v = dayNotas.filter(r=>r.nomeCliente===c).reduce((s,r)=>s+r.qtde,0)/1000;
+        const v = dayNotas.filter(r=>{
+          let cli = (r.nomeCliente||'').trim();
+          if(!cli) cli = (db.nfClienteMap[r.terminal+'_'+r.nf]||'').trim();
+          if(!cli) cli = (nfToCliente[r.nf]||'').trim();
+          return cli === c;
+        }).reduce((s,r)=>s+r.qtde,0)/1000;
         colTotals[i] += v;
         row += `<td>${v?fmt(v):'-'}</td>`;
       });
@@ -1568,6 +1667,10 @@ function clearAllData() {
     db[k] = [];
     localStorage.removeItem(DB_KEYS[k]);
   });
+  db.produtoMap = {};
+  localStorage.removeItem(DB_KEYS.produtoMap);
+  db.nfClienteMap = {};
+  localStorage.removeItem(DB_KEYS.nfClienteMap);
   localStorage.removeItem('op_lastupdate');
   document.getElementById('lastUpdate').textContent = '—';
   buildMonthFilter();
