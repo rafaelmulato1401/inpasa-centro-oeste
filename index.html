@@ -128,6 +128,19 @@
   .footer-text { font-size:11px; color:rgba(255,255,255,0.2); letter-spacing:.5px; }
   .footer-text span { color:#f0a500; }
 
+
+  .ct-purple { background: #5b21b6; }
+  .ci-purple { background: rgba(91,33,182,0.25); }
+  .app-card-pending { cursor: default; opacity: 0.75; }
+  .app-card-pending:hover { transform: none; border-color: rgba(255,255,255,0.09); box-shadow: none; }
+  .card-badge-soon {
+    font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: rgba(91,33,182,0.35); color: #c4b5fd;
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 4px; padding: 3px 10px;
+    margin-top: 4px;
+  }
   @media(max-width:640px){
     .apps-grid{grid-template-columns:1fr;}
     .hero-h1{font-size:34px;}
@@ -165,6 +178,43 @@
   <div class="section-label">Ferramentas Operacionais</div>
   <div class="apps-grid">
 
+    <!-- 1. Dashboard Centro Oeste -->
+    <a class="app-card" href="https://dashboardcentrooeste.vercel.app/" target="_blank">
+      <div class="card-top ct-gold"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon ci-gold">🗺️</div>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="card-title">Dashboard Centro Oeste</div>
+        <div class="card-desc">Painel consolidado de terminais e indicadores da região Centro Oeste</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-tag">Dashboard</span>
+        <span class="card-tag">Terminais</span>
+        <span class="card-ext">vercel.app ↗</span>
+      </div>
+    </a>
+
+    <!-- 2. Share de Vagões — aguardando link -->
+    <a class="app-card app-card-pending" href="#" onclick="return false;">
+      <div class="card-top ct-purple"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon ci-purple">🚃</div>
+          <div class="card-badge-soon">Em breve</div>
+        </div>
+        <div class="card-title">Share de Vagões</div>
+        <div class="card-desc">Distribuição e compartilhamento de vagões entre terminais</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-tag">Logística</span>
+        <span class="card-tag">Vagões</span>
+        <span class="card-ext" style="color:rgba(255,255,255,0.3)">Link pendente</span>
+      </div>
+    </a>
+
+    <!-- 3. Programação Ferroviária -->
     <a class="app-card" href="https://inpasa-ferroviario.vercel.app/" target="_blank">
       <div class="card-top ct-gold"></div>
       <div class="card-body">
@@ -182,22 +232,7 @@
       </div>
     </a>
 
-    <a class="app-card" href="analise_quebras_etanol.html" target="_blank">
-      <div class="card-top ct-blue"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon ci-blue">📊</div>
-          <div class="card-arrow">→</div>
-        </div>
-        <div class="card-title">Análise P&amp;S Clientes</div>
-        <div class="card-desc">Apuração de perdas e sobras — análise de quebras de etanol por cliente</div>
-      </div>
-      <div class="card-footer">
-        <span class="card-tag">Qualidade</span>
-        <span class="card-tag">Etanol</span>
-      </div>
-    </a>
-
+    <!-- 4. Descargas Ultracargo -->
     <a class="app-card" href="Cruzamento_Descargas.html" target="_blank">
       <div class="card-top ct-teal"></div>
       <div class="card-body">
@@ -214,22 +249,24 @@
       </div>
     </a>
 
-    <a class="app-card" href="https://dashboardcentrooeste.vercel.app/" target="_blank">
-      <div class="card-top ct-gold"></div>
+    <!-- 5. Análise P&S Clientes -->
+    <a class="app-card" href="analise_quebras_etanol.html" target="_blank">
+      <div class="card-top ct-blue"></div>
       <div class="card-body">
         <div class="card-icon-row">
-          <div class="card-icon ci-gold">🗺️</div>
+          <div class="card-icon ci-blue">📊</div>
           <div class="card-arrow">→</div>
         </div>
-        <div class="card-title">Dashboard Centro Oeste</div>
-        <div class="card-desc">Painel consolidado de terminais e indicadores da região Centro Oeste</div>
+        <div class="card-title">Análise P&amp;S Clientes</div>
+        <div class="card-desc">Apuração de perdas e sobras — análise de quebras de etanol por cliente</div>
       </div>
       <div class="card-footer">
-        <span class="card-tag">Dashboard</span>
-        <span class="card-tag">Terminais</span>
+        <span class="card-tag">Qualidade</span>
+        <span class="card-tag">Etanol</span>
       </div>
     </a>
 
+    <!-- 6. Seta X Balança -->
     <a class="app-card" href="perdas_sobras_inpasa.html" target="_blank">
       <div class="card-top ct-green"></div>
       <div class="card-body">
