@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share de Vagões — INPASA / TECIAP</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:#1a3a6b; --blue-dark:#0d2044; --blue-mid:#2456a4;
+    --blue-light:#e8eef8; --bg:#f4f7fd; --bg2:#ffffff; --bg3:#e8eef8;
+    --border:#cdd5e8; --gold:#f0a500; --gold-light:#ffd166;
+    --accent2:#1a6b35; --danger:#b91c1c;
+    --text:#1a2340; --text2:#6b7a99; --text3:#9aa3bb;
+    --inpasa:#1a3a6b; --outros:#f0a500;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;}
+  /* NAV */
+  .nav{background:var(--blue);border-bottom:3px solid var(--gold);display:flex;align-items:center;padding:0 20px;height:54px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(10,20,60,.3);}
+  .nav-logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;letter-spacing:1px;color:#fff;margin-right:28px;white-space:nowrap;}
+  .nav-logo span{color:var(--gold);}
+  .nav-tabs{display:flex;gap:2px;}
+  .nav-tab{padding:6px 16px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.6);border:1px solid transparent;transition:all .2s;text-transform:uppercase;white-space:nowrap;}
+  .nav-tab:hover{color:#fff;background:rgba(255,255,255,.1);}
+  .nav-tab.active{color:var(--gold);background:rgba(240,165,0,.15);border-color:rgba(240,165,0,.4);}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .last-update{font-size:11px;color:rgba(255,255,255,.5);}
+  .last-update span{color:var(--gold-light);}
+  /* PAGES */
+  .page{display:none;padding:20px;animation:fadeIn .2s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+  /* SECTION */
+  .sec-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--blue);}
+  .sec-title .g{color:var(--gold);}
+  .gold-bar{width:40px;height:3px;background:var(--gold);border-radius:2px;margin:6px 0 18px;}
+  /* KPI */
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:18px;}
+  .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(10,20,60,.06);}
+  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--blue));}
+  .kpi-label{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;line-height:1.3;}
+  .kpi-value{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:var(--text);line-height:1;}
+  .kpi-sub{font-size:10px;color:var(--text3);margin-top:4px;}
+  /* CARD */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(10,20,60,.05);margin-bottom:16px;}
+  .card-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:12px;}
+  .card-title span{color:var(--gold);}
+  /* CHARTS */
+  .chart-wrap{position:relative;height:180px;}
+  .chart-wrap-lg{position:relative;height:280px;}
+  /* GRID */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  /* TABLE */
+  .tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  .tbl th{background:var(--blue);color:#fff;font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.4px;padding:7px 10px;text-align:right;white-space:nowrap;}
+  .tbl th:first-child{text-align:left;}
+  .tbl td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;}
+  .tbl td:first-child{text-align:left;}
+  .tbl tr:hover td{background:rgba(26,58,107,.03);}
+  .tbl tr.tr-total td{font-weight:700;background:var(--bg3);color:var(--text);}
+  .tbl tr.tr-sub td{background:rgba(26,58,107,.025);font-style:italic;color:var(--text2);}
+  .ts{overflow-x:auto;}
+  /* SHARE BAR */
+  .sbar{height:26px;border-radius:7px;overflow:hidden;display:flex;box-shadow:0 1px 4px rgba(0,0,0,.08);margin:4px 0;}
+  .sbar-i{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;font-family:'Barlow Condensed',sans-serif;transition:width .5s;}
+  .sbar-o{flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#7a5200;font-family:'Barlow Condensed',sans-serif;}
+  /* MINI BAR */
+  .mbar-wrap{margin-bottom:8px;}
+  .mbar-row{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:3px;}
+  .mbar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+  .mbar-fill{height:100%;border-radius:4px;transition:width .5s;}
+  /* BADGE */
+  .b{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+  .b-i{background:rgba(26,58,107,.12);color:var(--inpasa);}
+  .b-o{background:rgba(240,165,0,.15);color:#7a5200;}
+  /* UPLOAD */
+  .uarea{max-width:900px;}
+  .u-info{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:18px;}
+  .u-info p{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:6px;}
+  .u-info strong{color:var(--blue);}
+  .ntbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+  .ntbl th{background:var(--blue-light);color:var(--blue);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:5px 10px;text-align:left;}
+  .ntbl td{padding:5px 10px;border-bottom:1px solid var(--border);font-size:11px;}
+  .ntbl tr:last-child td{border-bottom:none;}
+  .drop{border:2px dashed var(--border);border-radius:10px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--bg3);margin-bottom:16px;}
+  .drop:hover,.drop.drag{border-color:var(--blue);background:rgba(26,58,107,.06);}
+  .drop input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;}
+  .drop-icon{font-size:34px;margin-bottom:8px;}
+  .drop-text{font-size:13px;color:var(--text2);}
+  .drop-text strong{color:var(--blue);}
+  .flist{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+  .fitem{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;font-size:11px;}
+  .fitem-name{flex:1;font-weight:600;color:var(--text);}
+  .fitem-meta{color:var(--text3);font-size:10px;}
+  .fitem-ok{color:var(--accent2);font-weight:700;font-size:11px;}
+  .fitem-err{color:var(--danger);font-weight:700;font-size:11px;}
+  .btn-export{background:var(--gold);color:var(--blue-dark);border:none;padding:7px 16px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;white-space:nowrap;}
+  .btn-export:hover{background:var(--gold-light);}
+  .btn-export:disabled{background:var(--text3);color:#fff;cursor:not-allowed;}
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(5,15,40,.78);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:14px;padding:24px;max-width:880px;width:100%;max-height:92vh;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-family:"Barlow Condensed",sans-serif;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);}
+  .modal-title span{color:var(--gold);}
+  .modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1;padding:4px;}
+  .modal-close:hover{color:var(--danger);}
+  .modal-preview{overflow:auto;border:1px solid var(--border);border-radius:8px;background:#eee;flex:1;min-height:200px;display:flex;align-items:center;justify-content:center;}
+  .modal-preview img{max-width:100%;border-radius:6px;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;}
+  .modal-hint{font-size:11px;color:var(--text3);margin-right:auto;line-height:1.5;}
+  .btn-dl{background:var(--blue);color:#fff;border:none;padding:9px 22px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;transition:all .2s;}
+  .btn-dl:hover{background:var(--blue-dark);}
+  .btn-dl-gold{background:var(--gold);color:var(--blue-dark);}
+  .btn-dl-gold:hover{background:var(--gold-light);}
+  /* EMAIL RENDER CARD (off-screen) */
+  #emailCard{position:fixed;left:-9999px;top:0;width:760px;background:#f0f4fb;font-family:Arial,sans-serif;}
+  .ec-wrap{background:#f0f4fb;padding:20px;}
+  .ec-header{background:#1a3a6b;border-radius:10px 10px 0 0;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;}
+  .ec-logo{color:#fff;font-size:20px;font-weight:800;letter-spacing:1px;}
+  .ec-logo span{color:#f0a500;}
+  .ec-date{color:rgba(255,255,255,.65);font-size:11px;}
+  .ec-gold-bar{height:4px;background:#f0a500;}
+  .ec-body{background:#fff;border-radius:0 0 10px 10px;padding:18px 22px;}
+  .ec-section{margin-bottom:18px;}
+  .ec-section-title{font-size:11px;font-weight:700;color:#1a3a6b;text-transform:uppercase;letter-spacing:.8px;border-left:3px solid #f0a500;padding-left:9px;margin-bottom:10px;}
+  .ec-kpi-row{display:flex;gap:8px;margin-bottom:14px;}
+  .ec-kpi{flex:1;background:#f4f7fd;border:1px solid #cdd5e8;border-radius:8px;padding:9px 11px;border-top:3px solid #1a3a6b;}
+  .ec-kpi.g{border-top-color:#f0a500;}
+  .ec-kpi.t{border-top-color:#0e6674;}
+  .ec-kpi-label{font-size:8px;font-weight:700;color:#6b7a99;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;line-height:1.3;}
+  .ec-kpi-value{font-size:20px;font-weight:700;color:#1a2340;line-height:1;font-family:"Arial Narrow",Arial,sans-serif;}
+  .ec-kpi-sub{font-size:8px;color:#9aa3bb;margin-top:2px;}
+  .ec-divider{height:1px;background:#e8eef8;margin:14px 0;}
+  .ec-bar-wrap{margin:10px 0 6px;}
+  .ec-bar{height:24px;border-radius:6px;overflow:hidden;display:flex;}
+  .ec-bar-i{display:flex;align-items:center;justify-content:center;background:#1a3a6b;font-size:11px;font-weight:800;color:#fff;}
+  .ec-bar-o{flex:1;display:flex;align-items:center;justify-content:center;background:#f0a500;font-size:11px;font-weight:800;color:#7a5200;}
+  .ec-bar-labels{display:flex;justify-content:space-between;font-size:9px;color:#6b7a99;margin-top:3px;}
+  .ec-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:4px;}
+  .ec-tbl th{background:#1a3a6b;color:#fff;font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.3px;padding:5px 8px;text-align:right;}
+  .ec-tbl th:first-child{text-align:left;}
+  .ec-tbl td{padding:4px 8px;border-bottom:1px solid #e8eef8;text-align:right;}
+  .ec-tbl td:first-child{text-align:left;color:#6b7a99;}
+  .ec-tbl tr.ec-tot td{font-weight:700;background:#e8eef8;color:#1a2340;}
+  .ec-footer{text-align:center;font-size:9px;color:#9aa3bb;padding-top:12px;}
+  .btn-proc{background:var(--blue);color:#fff;border:none;padding:10px 26px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;transition:all .2s;}
+  .btn-proc:hover{background:var(--blue-dark);}
+  .btn-proc:disabled{background:var(--text3);cursor:not-allowed;}
+  .btn-clr{background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.3);border-radius:7px;padding:9px 16px;font-size:12px;font-weight:700;color:var(--danger);cursor:pointer;text-transform:uppercase;letter-spacing:.4px;transition:.18s;margin-left:8px;}
+  .btn-clr:hover{background:rgba(185,28,28,.22);}
+  .alert{padding:10px 14px;border-radius:7px;font-size:12px;margin-bottom:10px;}
+  .alert-ok{background:rgba(26,107,53,.1);border:1px solid rgba(26,107,53,.3);color:var(--accent2);}
+  .alert-err{background:rgba(185,28,28,.1);border:1px solid rgba(185,28,28,.3);color:var(--danger);}
+  .alert-info{background:rgba(26,58,107,.1);border:1px solid rgba(26,58,107,.3);color:var(--blue);}
+  /* DAILY TABLE */
+  .daily-wrap{max-height:340px;overflow-y:auto;}
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+  .divider{height:1px;background:var(--border);margin:10px 0;}
+  .empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;}
+  .empty-icon{font-size:40px;margin-bottom:10px;}
+  /* TABS TECIAP/ULTRA */
+  .page-tabs{display:flex;gap:6px;margin-bottom:18px;}
+  .pt{padding:8px 22px;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.5px;border:1.5px solid var(--border);color:var(--text2);background:var(--bg2);transition:all .2s;text-transform:uppercase;}
+  .pt:hover{color:var(--text);border-color:var(--blue-mid);}
+  .pt.active{color:var(--blue);border-color:var(--blue);background:rgba(26,58,107,.07);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">INPASA <span>|</span> Share de Vagões</div>
+  <div class="nav-tabs">
+    <div class="nav-tab" onclick="showPage('teciap')">Dashboard Teciap</div>
+    <div class="nav-tab" onclick="showPage('ultra')">Dashboard Ultracargo</div>
+    <div class="nav-tab" onclick="showPage('upTeciap')">Upload Teciap</div>
+    <div class="nav-tab" onclick="showPage('upUltra')">Upload Ultra</div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-export" onclick="openExport()" title="Gerar imagem consolidada para e-mail">📧 Gerar Imagem E-mail</button>
+    <div class="last-update">Atualizado: <span id="lastUpdate">—</span></div>
+  </div>
+</nav>
+
+<!-- ══════════════ PAGE: DASHBOARD TECIAP ══════════════ -->
+<div class="page" id="page-teciap">
+  <div id="teciapContent">
+    <div class="empty"><div class="empty-icon">📂</div>Sem dados. Use <strong>Upload Teciap</strong> para importar.</div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: DASHBOARD ULTRA ══════════════ -->
+<div class="page" id="page-ultra">
+  <div id="ultraContent">
+    <div class="empty"><div class="empty-icon">📂</div>Sem dados. Use <strong>Upload Ultra</strong> para importar.</div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: UPLOAD TECIAP ══════════════ -->
+<div class="page" id="page-upTeciap">
+  <div class="uarea">
+    <div class="sec-title">Upload <span class="g">Teciap</span></div>
+    <div class="gold-bar"></div>
+    <div class="u-info">
+      <p><strong>Arquivo cru do sistema (aba "dados")</strong> — O sistema lê automaticamente a seção <strong>SAÍDAS</strong> e filtra apenas linhas com transportadora <strong>RUMO</strong>.</p>
+      <p>Suba quantos arquivos quiser (um por origem/usina). O nome do arquivo determina a <strong>Origem</strong> e o <strong>Produto</strong>:</p>
+      <table class="ntbl">
+        <thead><tr><th>Nome contém</th><th>Player</th><th>Produto</th></tr></thead>
+        <tbody>
+          <tr><td><code>INPASA</code> sem <code>ANIDRO</code></td><td>INPASA</td><td>Hidratado</td></tr>
+          <tr><td><code>INPASA</code> com <code>ANIDRO</code></td><td>INPASA</td><td>Anidro</td></tr>
+          <tr><td>Outros nomes sem <code>ANIDRO</code></td><td>Outros</td><td>Hidratado</td></tr>
+          <tr><td>Outros nomes com <code>ANIDRO</code></td><td>Outros</td><td>Anidro</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="drop" id="dzTeciap">
+      <input type="file" id="fiTeciap" multiple accept=".xlsx,.xls" onchange="handleFiles(this.files,'teciap')">
+      <div class="drop-icon">📁</div>
+      <div class="drop-text">Arraste os arquivos ou <strong>clique para selecionar</strong><br><span style="font-size:11px;color:var(--text3)">Múltiplos .xlsx aceitos</span></div>
+    </div>
+    <div id="alertTeciap"></div>
+    <div class="flist" id="flistTeciap"></div>
+    <div style="display:flex;align-items:center;margin-top:8px;">
+      <button class="btn-proc" id="btnTeciap" onclick="processTeciap()" disabled>⚡ Processar Teciap</button>
+      <button class="btn-clr" onclick="clearTeciap()">🗑 Limpar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: UPLOAD ULTRA ══════════════ -->
+<div class="page" id="page-upUltra">
+  <div class="uarea">
+    <div class="sec-title">Upload <span class="g">Ultracargo</span></div>
+    <div class="gold-bar"></div>
+    <div class="u-info">
+      <p><strong>Planilha de controle Ultracargo</strong> — A aba deve conter as colunas: <strong>Data, Terminal, Programado VT, Encostado VT, Faturado VT, Programado m³, Encostado m³, Faturado m³, mês</strong>.</p>
+      <p>Pode ser enviada uma planilha única com todos os meses ou arquivos separados por mês.</p>
+    </div>
+    <div class="drop" id="dzUltra">
+      <input type="file" id="fiUltra" multiple accept=".xlsx,.xls" onchange="handleFiles(this.files,'ultra')">
+      <div class="drop-icon">📁</div>
+      <div class="drop-text">Arraste o arquivo ou <strong>clique para selecionar</strong><br><span style="font-size:11px;color:var(--text3)">Planilha Ultracargo .xlsx</span></div>
+    </div>
+    <div id="alertUltra"></div>
+    <div class="flist" id="flistUltra"></div>
+    <div style="display:flex;align-items:center;margin-top:8px;">
+      <button class="btn-proc" id="btnUltra" onclick="processUltra()" disabled>⚡ Processar Ultracargo</button>
+      <button class="btn-clr" onclick="clearUltra()">🗑 Limpar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════ STATE ═══════════
+let pendingTeciap = [], pendingUltra = [];
+let teciapRows = [];   // {data,oc,placa,transportadora,qtdeAmb,qtde20c,player,produto,origem}
+let ultraRows  = [];   // {data,terminal,progVT,encVT,fatVT,progM3,encM3,fatM3,mes}
+let charts = {};
+
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// ═══════════ NAV ═══════════
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  const map = {teciap:0, ultra:1, upTeciap:2, upUltra:3};
+  const tabs = document.querySelectorAll('.nav-tab');
+  if (map[p] !== undefined && tabs[map[p]]) tabs[map[p]].classList.add('active');
+}
+
+// ═══════════ DRAG & DROP ═══════════
+['Teciap','Ultra'].forEach(t => {
+  const dz = document.getElementById('dz'+t);
+  dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('drag');});
+  dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'));
+  dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('drag');handleFiles(e.dataTransfer.files,t.toLowerCase());});
+});
+
+// ═══════════ FILE CLASSIFICATION ═══════════
+function classify(name) {
+  const n = name.toUpperCase();
+  const isAnidro = n.includes('ANIDRO');
+  const isInpasa = n.includes('INPASA');
+  return { player: isInpasa ? 'INPASA' : 'Outros', produto: isAnidro ? 'anidro' : 'hidratado' };
+}
+function getOrigem(name) {
+  let n = name.replace(/\.[^.]+$/, '').toUpperCase();
+  n = n.replace(/_ANIDRO$/, '').replace(/^INPASA_/, '').replace(/^FS_/, '').replace(/_/g,' ');
+  return n.split(' ').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+}
+
+function handleFiles(fileList, type) {
+  const pending = type === 'teciap' ? pendingTeciap : pendingUltra;
+  const flistId = type === 'teciap' ? 'flistTeciap' : 'flistUltra';
+  const btnId   = type === 'teciap' ? 'btnTeciap' : 'btnUltra';
+
+  for (const f of fileList) {
+    if (!f.name.match(/\.xlsx?$/i)) continue;
+    if (pending.find(p => p.name === f.name)) continue;
+    const entry = { file:f, name:f.name, type, status:'pending',
+      ...classify(f.name), origem: getOrigem(f.name) };
+    pending.push(entry);
+    // add UI item
+    const list = document.getElementById(flistId);
+    const div = document.createElement('div');
+    div.className = 'fitem';
+    div.id = 'fi_'+entry.name.replace(/\W/g,'_');
+    div.innerHTML = `<span style="font-size:16px">📄</span>
+      <span class="fitem-name">${entry.name}</span>
+      ${type==='teciap' ? `<span class="b ${entry.player==='INPASA'?'b-i':'b-o'}">${entry.player}</span>
+      <span class="b" style="background:rgba(26,58,107,.08);color:var(--blue-mid)">${entry.produto==='anidro'?'Anidro':'Hidratado'}</span>` : ''}
+      <span class="fitem-meta" id="meta_fi_${entry.name.replace(/\W/g,'_')}">Aguardando…</span>
+      <span id="st_fi_${entry.name.replace(/\W/g,'_')}">⏳</span>`;
+    list.appendChild(div);
+  }
+  document.getElementById(btnId).disabled = pending.length === 0;
+}
+
+// ═══════════ XLSX READ ═══════════
+function readXlsx(file) {
+  return new Promise((res,rej) => {
+    const r = new FileReader();
+    r.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, {type:'binary', cellDates:true});
+        const sn = wb.SheetNames.includes('dados') ? 'dados' : wb.SheetNames[0];
+        res(XLSX.utils.sheet_to_json(wb.Sheets[sn], {header:1, defval:''}));
+      } catch(err){rej(err);}
+    };
+    r.onerror = rej;
+    r.readAsBinaryString(file);
+  });
+}
+
+// Parse date from various formats
+function parseDate(v) {
+  if (!v) return '';
+  if (v instanceof Date) return v.toISOString().slice(0,10);
+  if (typeof v === 'number') return new Date(Math.round((v-25569)*86400000)).toISOString().slice(0,10);
+  const s = String(v).trim();
+  // dd/mm/yyyy
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return s.slice(0,10);
+}
+
+// ═══════════ PARSE TECIAP (RAW: SAÍDAS + RUMO) ═══════════
+function parseTeciapRaw(raw, entry) {
+  // Find SAÍDAS / SAIDAS section
+  let saidas_start = -1;
+  for (let i = 0; i < raw.length; i++) {
+    const v = String(raw[i][0]||'').trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (v === 'SAIDAS' || v === 'SAÍDAS') { saidas_start = i; break; }
+  }
+  if (saidas_start === -1) {
+    // Fallback: file is already clean (has header row Data/OC/Placa...)
+    return parseClean(raw, entry);
+  }
+  // Header row is saidas_start+1, data starts saidas_start+2
+  const rows = [];
+  for (let i = saidas_start + 2; i < raw.length; i++) {
+    const row = raw[i];
+    const transportadora = String(row[3]||'').trim().toUpperCase();
+    if (!transportadora.includes('RUMO')) continue;
+    const placa = String(row[2]||'').trim();
+    if (!placa) continue;
+    const qtdeAmb = parseFloat(String(row[5]||'0').replace(',','.')) || 0;
+    const qtde20c = parseFloat(String(row[6]||'0').replace(',','.')) || 0;
+    // stop at total lines
+    const h4 = String(row[4]||'').toUpperCase();
+    if (h4.includes('TOTAL')) break;
+    if (qtde20c === 0 && qtdeAmb === 0) continue;
+    rows.push({
+      data: parseDate(row[0]),
+      oc: String(row[1]||'').trim(),
+      placa, transportadora: String(row[3]||'').trim(),
+      qtdeAmb, qtde20c,
+      player: entry.player, produto: entry.produto, origem: entry.origem
+    });
+  }
+  return rows;
+}
+
+// Parse already-clean file (has header: Data OC Placa Transportadora Histórico Qtde Amb Qtde 20c)
+function parseClean(raw, entry) {
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(5, raw.length); i++) {
+    const row = raw[i].map(c=>String(c).toLowerCase());
+    if (row.some(c=>c.includes('data')||c.includes('placa'))) { headerIdx=i; break; }
+  }
+  const rows = [];
+  for (let i = headerIdx+1; i < raw.length; i++) {
+    const row = raw[i];
+    const placa = String(row[2]||'').trim();
+    if (!placa) continue;
+    const qtdeAmb = parseFloat(String(row[5]||'0').replace(',','.')) || 0;
+    const qtde20c = parseFloat(String(row[6]||'0').replace(',','.')) || 0;
+    if (qtde20c===0 && qtdeAmb===0) continue;
+    rows.push({
+      data:parseDate(row[0]), oc:String(row[1]||'').trim(), placa,
+      transportadora:String(row[3]||'').trim(),
+      qtdeAmb, qtde20c,
+      player:entry.player, produto:entry.produto, origem:entry.origem
+    });
+  }
+  return rows;
+}
+
+// ═══════════ PARSE ULTRA ═══════════
+function parseUltra(raw) {
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(5, raw.length); i++) {
+    const row = raw[i].map(c=>String(c).toLowerCase());
+    if (row.some(c=>c.includes('data')||c.includes('terminal')||c.includes('faturado'))) { headerIdx=i; break; }
+  }
+  const headers = raw[headerIdx].map(c=>String(c).toLowerCase().trim());
+  const ci = n => headers.findIndex(h=>h.includes(n));
+  const iData=0, iTerm=ci('terminal'), iProg=ci('programado vt')>-1?ci('programado vt'):ci('progra'),
+        iEnc=ci('encostado vt')>-1?ci('encostado vt'):ci('encosta'),
+        iFat=ci('faturado vt')>-1?ci('faturado vt'):ci('fatura'),
+        iPm3=ci('programado m'),iEm3=ci('encostado m'),iFm3=ci('faturado m'),
+        iMes=ci('mês')>-1?ci('mês'):ci('mes');
+
+  const rows = [];
+  for (let i = headerIdx+1; i < raw.length; i++) {
+    const row = raw[i];
+    const d = parseDate(row[iData]);
+    if (!d) continue;
+    rows.push({
+      data:d,
+      terminal: String(row[iTerm]||'Ultracargo').trim(),
+      progVT: parseFloat(row[iProg])||0,
+      encVT:  parseFloat(row[iEnc])||0,
+      fatVT:  parseFloat(row[iFat])||0,
+      progM3: parseFloat(row[iPm3])||0,
+      encM3:  parseFloat(row[iEm3])||0,
+      fatM3:  parseFloat(row[iFm3])||0,
+      mes:    String(row[iMes]||'').toLowerCase().trim()
+    });
+  }
+  return rows;
+}
+
+// ═══════════ PROCESS TECIAP ═══════════
+async function processTeciap() {
+  const btn = document.getElementById('btnTeciap');
+  btn.disabled = true; btn.textContent = '⏳ Processando…';
+  setAlert('alertTeciap','info','Lendo arquivos…');
+  teciapRows = [];
+  let errs = 0;
+
+  for (const entry of pendingTeciap) {
+    const key = 'fi_'+entry.name.replace(/\W/g,'_');
+    const metaEl = document.getElementById('meta_'+key);
+    const stEl   = document.getElementById('st_'+key);
+    try {
+      const raw = await readXlsx(entry.file);
+      const rows = parseTeciapRaw(raw, entry);
+      entry.rows = rows;
+      teciapRows.push(...rows);
+      if(metaEl) metaEl.textContent = rows.length+' vagões (RUMO)';
+      if(stEl){ stEl.textContent='✅'; stEl.className='fitem-ok'; }
+    } catch(e) {
+      errs++;
+      if(stEl){ stEl.textContent='❌'; stEl.className='fitem-err'; }
+      if(metaEl) metaEl.textContent='Erro ao ler';
+    }
+  }
+
+  if (teciapRows.length === 0) {
+    setAlert('alertTeciap','err','Nenhum dado válido encontrado.');
+    btn.disabled=false; btn.textContent='⚡ Processar Teciap'; return;
+  }
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
+  setAlert('alertTeciap','ok','✅ '+teciapRows.length+' vagões carregados'+( errs?' ('+errs+' erro(s))':'')+'.');
+  btn.textContent='✅ Processado';
+  renderTeciap();
+  showPage('teciap');
+}
+
+// ═══════════ PROCESS ULTRA ═══════════
+async function processUltra() {
+  const btn = document.getElementById('btnUltra');
+  btn.disabled=true; btn.textContent='⏳ Processando…';
+  setAlert('alertUltra','info','Lendo arquivo…');
+  ultraRows = [];
+  let errs=0;
+
+  for (const entry of pendingUltra) {
+    const key='fi_'+entry.name.replace(/\W/g,'_');
+    const metaEl=document.getElementById('meta_'+key);
+    const stEl=document.getElementById('st_'+key);
+    try {
+      const raw = await readXlsx(entry.file);
+      const rows = parseUltra(raw);
+      ultraRows.push(...rows);
+      if(metaEl) metaEl.textContent=rows.length+' registros';
+      if(stEl){ stEl.textContent='✅'; stEl.className='fitem-ok'; }
+    } catch(e){
+      errs++;
+      if(stEl){ stEl.textContent='❌'; stEl.className='fitem-err'; }
+      if(metaEl) metaEl.textContent='Erro ao ler';
+    }
+  }
+
+  if (ultraRows.length===0){
+    setAlert('alertUltra','err','Nenhum dado válido encontrado.');
+    btn.disabled=false; btn.textContent='⚡ Processar Ultracargo'; return;
+  }
+  document.getElementById('lastUpdate').textContent=new Date().toLocaleString('pt-BR');
+  setAlert('alertUltra','ok','✅ '+ultraRows.length+' registros carregados'+(errs?' ('+errs+' erro(s))':'')+'.');
+  btn.textContent='✅ Processado';
+  renderUltra();
+  showPage('ultra');
+}
+
+// ═══════════ CLEAR ═══════════
+function clearTeciap(){
+  pendingTeciap=[]; teciapRows=[];
+  document.getElementById('flistTeciap').innerHTML='';
+  document.getElementById('alertTeciap').innerHTML='';
+  document.getElementById('btnTeciap').disabled=true;
+  document.getElementById('btnTeciap').textContent='⚡ Processar Teciap';
+  document.getElementById('fiTeciap').value='';
+  document.getElementById('teciapContent').innerHTML='<div class="empty"><div class="empty-icon">📂</div>Sem dados.</div>';
+}
+function clearUltra(){
+  pendingUltra=[]; ultraRows=[];
+  document.getElementById('flistUltra').innerHTML='';
+  document.getElementById('alertUltra').innerHTML='';
+  document.getElementById('btnUltra').disabled=true;
+  document.getElementById('btnUltra').textContent='⚡ Processar Ultracargo';
+  document.getElementById('fiUltra').value='';
+  document.getElementById('ultraContent').innerHTML='<div class="empty"><div class="empty-icon">📂</div>Sem dados.</div>';
+}
+
+function setAlert(id,type,msg){
+  const cls={ok:'alert-ok',err:'alert-err',info:'alert-info'};
+  document.getElementById(id).innerHTML=`<div class="alert ${cls[type]}">${msg}</div>`;
+}
+
+// ═══════════ HELPERS ═══════════
+const fmt = n => (n==null||isNaN(n))? '—' : Math.round(n).toLocaleString('pt-BR');
+const fmtPct = n => n.toFixed(1).replace('.',',')+' %';
+const fmtPctI = n => n.toFixed(0).replace('.',',')+' %';
+
+function getMonthKey(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr+'T00:00:00');
+  if (isNaN(d)) return null;
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function getDay(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr+'T00:00:00');
+  if (isNaN(d)) return null;
+  return d.getDate();
+}
+function getMesLabel(mk) {
+  const [y,m] = mk.split('-');
+  return MESES_PT[parseInt(m)-1]+' '+y;
+}
+
+// ═══════════ RENDER TECIAP ═══════════
+function renderTeciap() {
+  destroyCharts();
+  const rows = teciapRows;
+  const cont = document.getElementById('teciapContent');
+  if (!rows.length){ cont.innerHTML='<div class="empty"><div class="empty-icon">🔍</div>Sem dados.</div>'; return; }
+
+  // Get available months
+  const allMonths = [...new Set(rows.map(r=>getMonthKey(r.data)).filter(Boolean))].sort();
+  const curMonth = allMonths[allMonths.length-1];
+
+  const rowsMes = rows.filter(r=>getMonthKey(r.data)===curMonth);
+  const inpasaMes = rowsMes.filter(r=>r.player==='INPASA');
+  const outrosMes = rowsMes.filter(r=>r.player==='Outros');
+  const totalMes = rowsMes.length;
+  const shareIM = totalMes ? inpasaMes.length/totalMes*100 : 0;
+  const shareOM = totalMes ? outrosMes.length/totalMes*100 : 0;
+
+  const inpasaAno = rows.filter(r=>r.player==='INPASA');
+  const outrosAno = rows.filter(r=>r.player==='Outros');
+  const totalAno = rows.length;
+  const shareIA = totalAno ? inpasaAno.length/totalAno*100 : 0;
+  const shareOA = totalAno ? outrosAno.length/totalAno*100 : 0;
+
+  // Build days for current month
+  const allDays = [...new Set(rowsMes.map(r=>getDay(r.data)).filter(Boolean))].sort((a,b)=>a-b);
+  let daysHtml = '';
+  let inDayArr=[], outDayArr=[], totDayArr=[], shareArr=[];
+  allDays.forEach(d=>{
+    const dr = rowsMes.filter(r=>getDay(r.data)===d);
+    const i=dr.filter(r=>r.player==='INPASA').length;
+    const o=dr.filter(r=>r.player==='Outros').length;
+    const t=dr.length;
+    const sh=t?Math.round(i/t*100):0;
+    inDayArr.push(i); outDayArr.push(o); totDayArr.push(t); shareArr.push(sh);
+    daysHtml+=`<td>${i||'-'}</td>`;
+  });
+
+  // Monthly summary table
+  let monthlyHtml='';
+  allMonths.forEach(mk=>{
+    const mr=rows.filter(r=>getMonthKey(r.data)===mk);
+    const mi=mr.filter(r=>r.player==='INPASA').length;
+    const mo=mr.filter(r=>r.player==='Outros').length;
+    const mt=mr.length;
+    const sh=mt?Math.round(mi/mt*100):0;
+    monthlyHtml+=`<tr>
+      <td>${getMesLabel(mk)}</td>
+      <td>${fmt(mi)}</td><td>${fmtPctI(mt?mi/mt*100:0)}</td>
+      <td>${fmt(mo)}</td><td>${fmtPctI(mt?mo/mt*100:0)}</td>
+      <td style="font-weight:700">${fmt(mt)}</td>
+    </tr>`;
+  });
+
+  cont.innerHTML = `
+    <div class="sec-title">Dashboard <span class="g">Teciap</span></div>
+    <div class="gold-bar"></div>
+
+    <!-- KPIs MÊS -->
+    <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Mês Atual — ${getMesLabel(curMonth)}</div>
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Vagões INPASA Mês</div><div class="kpi-value">${fmt(inpasaMes.length)}</div><div class="kpi-sub">Transportadora RUMO</div></div>
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Share INPASA Mês</div><div class="kpi-value">${fmtPctI(shareIM)}</div><div class="kpi-sub">do total do mês</div></div>
+      <div class="kpi" style="--kc:var(--gold)"><div class="kpi-label">Vagões Outros Mês</div><div class="kpi-value">${fmt(outrosMes.length)}</div><div class="kpi-sub">Transportadora RUMO</div></div>
+      <div class="kpi" style="--kc:var(--gold)"><div class="kpi-label">Share Outros Mês</div><div class="kpi-value">${fmtPctI(shareOM)}</div><div class="kpi-sub">do total do mês</div></div>
+      <div class="kpi" style="--kc:#0e6674"><div class="kpi-label">Total Vagões Mensal</div><div class="kpi-value">${fmt(totalMes)}</div><div class="kpi-sub">${getMesLabel(curMonth)}</div></div>
+    </div>
+
+    <!-- GRÁFICO MENSAL -->
+    <div class="card">
+      <div class="card-title">Movimentação Mensal de Vagões — <span>Teciap</span></div>
+      ${allDays.length ? `
+      <div style="overflow-x:auto;margin-bottom:10px">
+        <table class="tbl" style="min-width:600px">
+          <thead><tr>
+            <th style="text-align:left">Player</th>
+            ${allDays.map(d=>`<th>${d}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            <tr><td><span class="b b-i">INPASA</span></td>${inDayArr.map(v=>`<td>${v||'-'}</td>`).join('')}</tr>
+            <tr><td><span class="b b-o">Outros</span></td>${outDayArr.map(v=>`<td>${v||'-'}</td>`).join('')}</tr>
+            <tr class="tr-total"><td>Total</td>${totDayArr.map(v=>`<td>${v||'-'}</td>`).join('')}</tr>
+            <tr class="tr-sub"><td>Share INPASA</td>${shareArr.map(v=>`<td>${v}%</td>`).join('')}</tr>
+          </tbody>
+        </table>
+      </div>` : '<div style="color:var(--text3);font-size:12px">Sem dados diários</div>'}
+      <div class="chart-wrap-lg"><canvas id="chartTeciapMes"></canvas></div>
+    </div>
+
+    <!-- KPIs ANO -->
+    <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;margin-top:4px">Acumulado Ano</div>
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Vagões INPASA Ano</div><div class="kpi-value">${fmt(inpasaAno.length)}</div><div class="kpi-sub">Acumulado</div></div>
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Share INPASA Ano</div><div class="kpi-value">${fmtPctI(shareIA)}</div><div class="kpi-sub">do total anual</div></div>
+      <div class="kpi" style="--kc:var(--gold)"><div class="kpi-label">Vagões Outros Ano</div><div class="kpi-value">${fmt(outrosAno.length)}</div><div class="kpi-sub">Acumulado</div></div>
+      <div class="kpi" style="--kc:var(--gold)"><div class="kpi-label">Share Outros Ano</div><div class="kpi-value">${fmtPctI(shareOA)}</div><div class="kpi-sub">do total anual</div></div>
+      <div class="kpi" style="--kc:#0e6674"><div class="kpi-label">Total Vagões Ano</div><div class="kpi-value">${fmt(totalAno)}</div><div class="kpi-sub">Todos os meses</div></div>
+    </div>
+
+    <!-- GRÁFICO ANUAL -->
+    <div class="card">
+      <div class="card-title">Movimentação Anual de Vagões — <span>Teciap</span></div>
+      <div style="overflow-x:auto;margin-bottom:10px">
+        <table class="tbl">
+          <thead><tr><th>Player</th>${allMonths.map(mk=>`<th>${MESES_PT[parseInt(mk.split('-')[1])-1]}</th>`).join('')}</tr></thead>
+          <tbody>
+            <tr><td><span class="b b-i">INPASA</span></td>${allMonths.map(mk=>{const c=rows.filter(r=>getMonthKey(r.data)===mk&&r.player==='INPASA').length;return`<td>${c||'-'}</td>`;}).join('')}</tr>
+            <tr><td><span class="b b-o">Outros</span></td>${allMonths.map(mk=>{const c=rows.filter(r=>getMonthKey(r.data)===mk&&r.player==='Outros').length;return`<td>${c||'-'}</td>`;}).join('')}</tr>
+            <tr class="tr-total"><td>TOTAL</td>${allMonths.map(mk=>{const c=rows.filter(r=>getMonthKey(r.data)===mk).length;return`<td>${c||'-'}</td>`;}).join('')}</tr>
+            <tr class="tr-sub"><td>Share INPASA</td>${allMonths.map(mk=>{const t=rows.filter(r=>getMonthKey(r.data)===mk);const i=t.filter(r=>r.player==='INPASA').length;return`<td>${t.length?Math.round(i/t.length*100)+'%':'-'}</td>`;}).join('')}</tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart-wrap-lg"><canvas id="chartTeciapAno"></canvas></div>
+    </div>
+  `;
+
+  // Charts
+  renderTeciapCharts(rows, allDays, allMonths, rowsMes, curMonth);
+}
+
+function renderTeciapCharts(rows, allDays, allMonths, rowsMes, curMonth) {
+  // Mensal (diário)
+  const ctx1 = document.getElementById('chartTeciapMes');
+  if (ctx1) {
+    const inD = allDays.map(d=>rowsMes.filter(r=>getDay(r.data)===d&&r.player==='INPASA').length);
+    const otD = allDays.map(d=>rowsMes.filter(r=>getDay(r.data)===d&&r.player==='Outros').length);
+    const totD = allDays.map((d,i)=>inD[i]+otD[i]);
+    const shrD = allDays.map((d,i)=>totD[i]?Math.round(inD[i]/totD[i]*100):0);
+    charts.teciapMes = new Chart(ctx1, {
+      data:{
+        labels: allDays,
+        datasets:[
+          {type:'bar',label:'INPASA',data:inD,backgroundColor:'#1a3a6b',borderRadius:3,yAxisID:'y',barPercentage:.7},
+          {type:'bar',label:'Outros',data:otD,backgroundColor:'#f0a500',borderRadius:3,yAxisID:'y',barPercentage:.7},
+          {type:'line',label:'Total',data:totD,borderColor:'#9b59b6',borderWidth:2,pointRadius:3,fill:false,yAxisID:'y',tension:.3},
+          {type:'line',label:'Share INPASA %',data:shrD,borderColor:'rgba(26,58,107,.4)',borderWidth:1.5,pointRadius:2,fill:false,yAxisID:'y2',tension:.3,borderDash:[4,3]},
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{family:'Barlow',size:11},color:'#6b7a99',boxWidth:12,padding:12}}},
+        scales:{
+          y:{stacked:false,grid:{color:'#e8eef8'},ticks:{font:{family:'Barlow',size:10},color:'#9aa3bb'}},
+          y2:{position:'right',min:0,max:100,grid:{display:false},ticks:{font:{family:'Barlow',size:10},color:'#9aa3bb',callback:v=>v+'%'}}
+        }
+      }
+    });
+  }
+  // Anual (mensal)
+  const ctx2 = document.getElementById('chartTeciapAno');
+  if (ctx2) {
+    const inA  = allMonths.map(mk=>rows.filter(r=>getMonthKey(r.data)===mk&&r.player==='INPASA').length);
+    const otA  = allMonths.map(mk=>rows.filter(r=>getMonthKey(r.data)===mk&&r.player==='Outros').length);
+    const totA = allMonths.map((mk,i)=>inA[i]+otA[i]);
+    const shrA = allMonths.map((mk,i)=>totA[i]?Math.round(inA[i]/totA[i]*100):0);
+    const labels = allMonths.map(mk=>MESES_PT[parseInt(mk.split('-')[1])-1]);
+    charts.teciapAno = new Chart(ctx2, {
+      data:{
+        labels,
+        datasets:[
+          {type:'bar',label:'INPASA',data:inA,backgroundColor:'#1a3a6b',borderRadius:4,yAxisID:'y',barPercentage:.7},
+          {type:'bar',label:'Outros',data:otA,backgroundColor:'#f0a500',borderRadius:4,yAxisID:'y',barPercentage:.7},
+          {type:'line',label:'Total',data:totA,borderColor:'#9b59b6',borderWidth:2,pointRadius:4,fill:false,yAxisID:'y',tension:.3},
+          {type:'line',label:'Share INPASA %',data:shrA,borderColor:'rgba(26,58,107,.4)',borderWidth:1.5,pointRadius:3,fill:false,yAxisID:'y2',tension:.3,borderDash:[4,3]},
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{family:'Barlow',size:11},color:'#6b7a99',boxWidth:12,padding:12}}},
+        scales:{
+          y:{stacked:false,grid:{color:'#e8eef8'},ticks:{font:{family:'Barlow',size:10},color:'#9aa3bb'}},
+          y2:{position:'right',min:0,max:100,grid:{display:false},ticks:{font:{family:'Barlow',size:10},color:'#9aa3bb',callback:v=>v+'%'}}
+        }
+      }
+    });
+  }
+}
+
+// ═══════════ RENDER ULTRA ═══════════
+function renderUltra() {
+  destroyCharts();
+  const rows = ultraRows;
+  const cont = document.getElementById('ultraContent');
+  if (!rows.length){ cont.innerHTML='<div class="empty"><div class="empty-icon">🔍</div>Sem dados.</div>'; return; }
+
+  const allMonths = [...new Set(rows.map(r=>getMonthKey(r.data)).filter(Boolean))].sort();
+  const curMonth  = allMonths[allMonths.length-1];
+  const rowsMes   = rows.filter(r=>getMonthKey(r.data)===curMonth);
+  const allDays   = [...new Set(rowsMes.map(r=>getDay(r.data)).filter(Boolean))].sort((a,b)=>a-b);
+
+  // Totals mes
+  const fatMes  = rowsMes.reduce((s,r)=>s+r.fatVT,0);
+  const progMes = rowsMes.reduce((s,r)=>s+r.progVT,0);
+  const encMes  = rowsMes.reduce((s,r)=>s+r.encVT,0);
+
+  // Totals ano
+  const fatAno  = rows.reduce((s,r)=>s+r.fatVT,0);
+
+  cont.innerHTML = `
+    <div class="sec-title">Dashboard <span class="g">Ultracargo</span></div>
+    <div class="gold-bar"></div>
+
+    <!-- KPIs MÊS -->
+    <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Mês Atual — ${getMesLabel(curMonth)}</div>
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Vagões Mês (Faturado)</div><div class="kpi-value">${fmt(fatMes)}</div><div class="kpi-sub">Ultracargo — INPASA</div></div>
+      <div class="kpi" style="--kc:#0e6674"><div class="kpi-label">Programado Mês</div><div class="kpi-value">${fmt(progMes)}</div><div class="kpi-sub">VT programados</div></div>
+      <div class="kpi" style="--kc:var(--gold)"><div class="kpi-label">Encostado Mês</div><div class="kpi-value">${fmt(encMes)}</div><div class="kpi-sub">VT encostados</div></div>
+    </div>
+
+    <!-- GRÁFICO MENSAL ULTRA -->
+    <div class="card">
+      <div class="card-title">Movimentação Mensal de Vagões — <span>Ultracargo</span></div>
+      ${allDays.length ? `
+      <div style="overflow-x:auto;margin-bottom:10px">
+        <table class="tbl" style="min-width:500px">
+          <thead><tr><th style="text-align:left"></th>${allDays.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
+          <tbody>
+            <tr><td style="text-align:left"><span class="b b-i">INPASA (Fat.)</span></td>${allDays.map(d=>{const dr=rowsMes.filter(r=>getDay(r.data)===d);const v=dr.reduce((s,r)=>s+r.fatVT,0);return`<td>${v||'-'}</td>`;}).join('')}</tr>
+          </tbody>
+        </table>
+      </div>` : ''}
+      <div class="chart-wrap-lg"><canvas id="chartUltraMes"></canvas></div>
+    </div>
+
+    <!-- KPIs ANO -->
+    <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;margin-top:4px">Acumulado Ano</div>
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:var(--blue)"><div class="kpi-label">Vagões Ultracargo Ano</div><div class="kpi-value">${fmt(fatAno)}</div><div class="kpi-sub">Faturado — INPASA</div></div>
+    </div>
+
+    <!-- GRÁFICO ANUAL ULTRA -->
+    <div class="card">
+      <div class="card-title">Movimentação Anual de Vagões — <span>Ultracargo</span></div>
+      <div style="overflow-x:auto;margin-bottom:10px">
+        <table class="tbl">
+          <thead><tr><th>Player</th>${allMonths.map(mk=>`<th>${MESES_PT[parseInt(mk.split('-')[1])-1]}</th>`).join('')}</tr></thead>
+          <tbody>
+            <tr><td><span class="b b-i">INPASA</span></td>${allMonths.map(mk=>{const v=rows.filter(r=>getMonthKey(r.data)===mk).reduce((s,r)=>s+r.fatVT,0);return`<td>${v||'-'}</td>`;}).join('')}</tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart-wrap-lg"><canvas id="chartUltraAno"></canvas></div>
+    </div>
+  `;
+
+  renderUltraCharts(rows, allDays, allMonths, rowsMes);
+}
+
+function renderUltraCharts(rows, allDays, allMonths, rowsMes) {
+  const ctx1 = document.getElementById('chartUltraMes');
+  if (ctx1) {
+    const fatD = allDays.map(d=>rowsMes.filter(r=>getDay(r.data)===d).reduce((s,r)=>s+r.fatVT,0));
+    charts.ultraMes = new Chart(ctx1, {
+      type:'bar',
+      data:{labels:allDays,datasets:[{label:'INPASA (Faturado)',data:fatD,backgroundColor:'#1a3a6b',borderRadius:4,barPercentage:.7}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{family:'Barlow',size:11},color:'#6b7a99',boxWidth:12,padding:12}}},
+        scales:{y:{grid:{color:'#e8eef8'},ticks:{font:{family:'Barlow',size:10},color:'#9aa3bb'}},
+                x:{grid:{display:false},ticks:{font:{family:'Barlow Condensed',size:11},color:'#6b7a99'}}}
+      }
+    });
+  }
+  const ctx2 = document.getElementById('chartUltraAno');
+  if (ctx2) {
+    const fatA = allMonths.map(mk=>rows.filter(r=>getMonthKey(r.data)===mk).reduce((s,r)=>s+r.fatVT,0));
+    const labels = allMonths.map(mk=>MESES_PT[parseInt(mk.split('-')[1])-1]);
+    charts.ultraAno = new Chart(ctx2, {
+      type:'bar',
+      data:{labels,datasets:[{label:'INPASA (Faturado)',data:fatA,backgroundColor:'#1a3a6b',borderRadius:4,barPercentage:.7}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{family:'Barlow',size:11},color:'#6b7a99',boxWidth:12,padding:12}}},
+        scales:{y:{grid:{color:'#e8eef8'},ticks:{font:{family:'Barlow',size:10},color:'#9aa3bb'}},
+                x:{grid:{display:false},ticks:{font:{family:'Barlow Condensed',size:11},color:'#6b7a99'}}}
+      }
+    });
+  }
+}
+
+function destroyCharts(){
+  Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});
+  charts={};
+}
+
+
+// ═══════════ EMAIL EXPORT ═══════════
+let exportCanvas = null;
+
+function openExport() {
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalPreview').innerHTML = '<div style="color:#9aa3bb;font-size:13px;text-align:center;padding:40px">⏳ Gerando imagem…</div>';
+  exportCanvas = null;
+  setTimeout(buildEmailCard, 100);
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function buildEmailCard() {
+  const hasTec = teciapRows.length > 0;
+  const hasUlt = ultraRows.length > 0;
+
+  if (!hasTec && !hasUlt) {
+    document.getElementById('modalPreview').innerHTML = '<div style="color:#b91c1c;font-size:13px;text-align:center;padding:40px">⚠️ Nenhum dado carregado. Importe os arquivos primeiro.</div>';
+    return;
+  }
+
+  // ── TECIAP data ──
+  let tecHtml = '';
+  if (hasTec) {
+    const rows = teciapRows;
+    const allMonths = [...new Set(rows.map(r=>getMonthKey(r.data)).filter(Boolean))].sort();
+    const curMonth  = allMonths[allMonths.length-1];
+    const rowsMes   = rows.filter(r=>getMonthKey(r.data)===curMonth);
+    const inpasaMes = rowsMes.filter(r=>r.player==='INPASA');
+    const outrosMes = rowsMes.filter(r=>r.player==='Outros');
+    const totalMes  = rowsMes.length;
+    const shareIM   = totalMes ? inpasaMes.length/totalMes*100 : 0;
+    const shareOM   = totalMes ? outrosMes.length/totalMes*100 : 0;
+    const inpasaAno = rows.filter(r=>r.player==='INPASA');
+    const outrosAno = rows.filter(r=>r.player==='Outros');
+    const totalAno  = rows.length;
+    const shareIA   = totalAno ? inpasaAno.length/totalAno*100 : 0;
+
+    // Monthly breakdown for table
+    const allMonthsT = [...new Set(rows.map(r=>getMonthKey(r.data)).filter(Boolean))].sort();
+    const monthRowsHtml = allMonthsT.map(mk=>{
+      const mr=rows.filter(r=>getMonthKey(r.data)===mk);
+      const mi=mr.filter(r=>r.player==='INPASA').length;
+      const mo=mr.filter(r=>r.player==='Outros').length;
+      const mt=mr.length;
+      const sh=mt?Math.round(mi/mt*100):0;
+      return `<tr><td>${getMesLabel(mk)}</td><td>${mi}</td><td>${sh}%</td><td>${mo}</td><td>${100-sh}%</td><td style="font-weight:700">${mt}</td></tr>`;
+    }).join('');
+
+    const wi = Math.max(5, shareIM).toFixed(1);
+    const wo = Math.max(5, shareOM).toFixed(1);
+
+    tecHtml = `
+    <div class="ec-section">
+      <div class="ec-section-title">🚂 Terminal Teciap — ${getMesLabel(curMonth)}</div>
+      <div class="ec-kpi-row">
+        <div class="ec-kpi"><div class="ec-kpi-label">Vagões INPASA Mês</div><div class="ec-kpi-value">${fmt(inpasaMes.length)}</div><div class="ec-kpi-sub">Transportadora RUMO</div></div>
+        <div class="ec-kpi"><div class="ec-kpi-label">Share INPASA Mês</div><div class="ec-kpi-value">${Math.round(shareIM)}%</div><div class="ec-kpi-sub">do total do mês</div></div>
+        <div class="ec-kpi g"><div class="ec-kpi-label">Vagões Outros Mês</div><div class="ec-kpi-value">${fmt(outrosMes.length)}</div><div class="ec-kpi-sub">Transportadora RUMO</div></div>
+        <div class="ec-kpi g"><div class="ec-kpi-label">Share Outros Mês</div><div class="ec-kpi-value">${Math.round(shareOM)}%</div><div class="ec-kpi-sub">do total do mês</div></div>
+        <div class="ec-kpi t"><div class="ec-kpi-label">Total Vagões Mês</div><div class="ec-kpi-value">${fmt(totalMes)}</div><div class="ec-kpi-sub">${getMesLabel(curMonth)}</div></div>
+      </div>
+      <div class="ec-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-bottom:4px"><span style="color:#1a3a6b">INPASA ${Math.round(shareIM)}%</span><span style="color:#7a5200">Outros ${Math.round(shareOM)}%</span></div>
+        <div class="ec-bar">
+          <div class="ec-bar-i" style="width:${wi}%">${shareIM>12?Math.round(shareIM)+'%':''}</div>
+          <div class="ec-bar-o">${shareOM>12?Math.round(shareOM)+'%':''}</div>
+        </div>
+        <div class="ec-bar-labels"><span>INPASA: ${fmt(inpasaMes.length)} vagões</span><span>Outros: ${fmt(outrosMes.length)} vagões</span></div>
+      </div>
+      <div class="ec-divider"></div>
+      <div style="display:flex;gap:16px;font-size:10px;color:#6b7a99;margin-bottom:10px">
+        <span>Acum. Ano — <strong style="color:#1a3a6b">INPASA: ${fmt(inpasaAno.length)}</strong></span>
+        <span><strong style="color:#7a5200">Outros: ${fmt(outrosAno.length)}</strong></span>
+        <span>Share INPASA: <strong style="color:#1a3a6b">${Math.round(shareIA)}%</strong></span>
+        <span>Total: <strong style="color:#1a2340">${fmt(totalAno)}</strong></span>
+      </div>
+      <table class="ec-tbl">
+        <thead><tr><th>Mês</th><th>INPASA</th><th>Share</th><th>Outros</th><th>Share</th><th>Total</th></tr></thead>
+        <tbody>${monthRowsHtml}</tbody>
+        <tr class="ec-tot"><td>Total</td><td>${fmt(inpasaAno.length)}</td><td>${Math.round(shareIA)}%</td><td>${fmt(outrosAno.length)}</td><td>${Math.round(100-shareIA)}%</td><td>${fmt(totalAno)}</td></tr>
+      </table>
+    </div>`;
+  }
+
+  // ── ULTRA data ──
+  let ultHtml = '';
+  if (hasUlt) {
+    const rows = ultraRows;
+    const allMonths = [...new Set(rows.map(r=>getMonthKey(r.data)).filter(Boolean))].sort();
+    const curMonth  = allMonths[allMonths.length-1];
+    const rowsMes   = rows.filter(r=>getMonthKey(r.data)===curMonth);
+    const fatMes    = rowsMes.reduce((s,r)=>s+r.fatVT,0);
+    const progMes   = rowsMes.reduce((s,r)=>s+r.progVT,0);
+    const encMes    = rowsMes.reduce((s,r)=>s+r.encVT,0);
+    const fatAno    = rows.reduce((s,r)=>s+r.fatVT,0);
+
+    const monthRowsHtml = allMonths.map(mk=>{
+      const mr=rows.filter(r=>getMonthKey(r.data)===mk);
+      const f=mr.reduce((s,r)=>s+r.fatVT,0);
+      const p=mr.reduce((s,r)=>s+r.progVT,0);
+      const e=mr.reduce((s,r)=>s+r.encVT,0);
+      return `<tr><td>${getMesLabel(mk)}</td><td>${p||'-'}</td><td>${e||'-'}</td><td style="font-weight:700">${f||'-'}</td></tr>`;
+    }).join('');
+
+    ultHtml = `
+    <div class="ec-divider"></div>
+    <div class="ec-section">
+      <div class="ec-section-title">🏭 Ultracargo — ${getMesLabel(curMonth)}</div>
+      <div class="ec-kpi-row">
+        <div class="ec-kpi"><div class="ec-kpi-label">Vagões Mês (Faturado)</div><div class="ec-kpi-value">${fmt(fatMes)}</div><div class="ec-kpi-sub">INPASA — Ultracargo</div></div>
+        <div class="ec-kpi t"><div class="ec-kpi-label">Programado Mês</div><div class="ec-kpi-value">${fmt(progMes)}</div><div class="ec-kpi-sub">VT programados</div></div>
+        <div class="ec-kpi g"><div class="ec-kpi-label">Encostado Mês</div><div class="ec-kpi-value">${fmt(encMes)}</div><div class="ec-kpi-sub">VT encostados</div></div>
+        <div class="ec-kpi t"><div class="ec-kpi-label">Faturado Ano</div><div class="ec-kpi-value">${fmt(fatAno)}</div><div class="ec-kpi-sub">Acumulado</div></div>
+      </div>
+      <table class="ec-tbl">
+        <thead><tr><th>Mês</th><th>Programado</th><th>Encostado</th><th>Faturado</th></tr></thead>
+        <tbody>${monthRowsHtml}</tbody>
+        <tr class="ec-tot"><td>Total</td><td>${fmt(rows.reduce((s,r)=>s+r.progVT,0))}</td><td>${fmt(rows.reduce((s,r)=>s+r.encVT,0))}</td><td>${fmt(fatAno)}</td></tr>
+      </table>
+    </div>`;
+  }
+
+  const now = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+  const card = document.getElementById('emailCard');
+  card.innerHTML = `
+  <div class="ec-wrap">
+    <div class="ec-header">
+      <div class="ec-logo">INPASA <span>|</span> Share de Vagões</div>
+      <div class="ec-date">Gerado em ${now}</div>
+    </div>
+    <div class="ec-gold-bar"></div>
+    <div class="ec-body">
+      ${tecHtml}
+      ${ultHtml}
+      <div class="ec-footer">INPASA — Relatório gerado automaticamente • ${now}</div>
+    </div>
+  </div>`;
+
+  // Render with html2canvas
+  setTimeout(() => {
+    html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#f0f4fb',
+      logging: false,
+      width: 760,
+    }).then(canvas => {
+      exportCanvas = canvas;
+      const img = document.createElement('img');
+      img.src = canvas.toDataURL('image/png');
+      img.style.cssText = 'max-width:100%;border-radius:6px;display:block;';
+      const preview = document.getElementById('modalPreview');
+      preview.innerHTML = '';
+      preview.appendChild(img);
+    }).catch(err => {
+      document.getElementById('modalPreview').innerHTML = '<div style="color:#b91c1c;padding:20px;font-size:12px">Erro ao gerar imagem: '+err.message+'</div>';
+    });
+  }, 300);
+}
+
+async function copyImg() {
+  if (!exportCanvas) { alert('Aguarde a imagem carregar.'); return; }
+  try {
+    const blob = await new Promise(res => exportCanvas.toBlob(res, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    const btn = document.getElementById('btnCopy');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(()=>btn.textContent='📋 Copiar Imagem', 2500);
+  } catch(e) {
+    alert('Seu navegador não suporta cópia direta.\nUse "Baixar PNG" e insira a imagem manualmente no e-mail.');
+  }
+}
+
+function downloadImg() {
+  if (!exportCanvas) { alert('Aguarde a imagem carregar.'); return; }
+  const a = document.createElement('a');
+  a.download = 'Share_Vagoes_INPASA_'+new Date().toISOString().slice(0,10)+'.png';
+  a.href = exportCanvas.toDataURL('image/png');
+  a.click();
+}
+
+// ═══════════ INIT ═══════════
+showPage('upTeciap');
+</script>
+
+<!-- ══════════════ MODAL EXPORT ══════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Imagem <span>para E-mail</span></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-preview" id="modalPreview">
+      <div id="previewLoading" style="color:#9aa3bb;font-size:13px;text-align:center;padding:30px">⏳ Gerando imagem consolidada…</div>
+    </div>
+    <div class="modal-actions">
+      <div class="modal-hint">💡 Clique em <strong>Copiar Imagem</strong> para colar diretamente no corpo do e-mail (Outlook, Gmail…)<br>ou use <strong>Baixar PNG</strong> para salvar o arquivo.</div>
+      <button class="btn-dl btn-dl-gold" onclick="copyImg()" id="btnCopy">📋 Copiar Imagem</button>
+      <button class="btn-dl" onclick="downloadImg()" id="btnDownload">⬇ Baixar PNG</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ EMAIL CARD (off-screen render) ══════════════ -->
+<div id="emailCard"></div>
+
+</body>
+</html>
