@@ -131,16 +131,7 @@
 
   .ct-purple { background: #5b21b6; }
   .ci-purple { background: rgba(91,33,182,0.25); }
-  .app-card-pending { cursor: default; opacity: 0.75; }
-  .app-card-pending:hover { transform: none; border-color: rgba(255,255,255,0.09); box-shadow: none; }
-  .card-badge-soon {
-    font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif;
-    letter-spacing: 1px; text-transform: uppercase;
-    background: rgba(91,33,182,0.35); color: #c4b5fd;
-    border: 1px solid rgba(167,139,250,0.3);
-    border-radius: 4px; padding: 3px 10px;
-    margin-top: 4px;
-  }
+
   @media(max-width:640px){
     .apps-grid{grid-template-columns:1fr;}
     .hero-h1{font-size:34px;}
@@ -196,21 +187,21 @@
       </div>
     </a>
 
-    <!-- 2. Share de Vagões — aguardando link -->
-    <a class="app-card app-card-pending" href="#" onclick="return false;">
+    <!-- 2. Share de Vagões -->
+    <a class="app-card" href="share_vagoes.html" target="_blank">
       <div class="card-top ct-purple"></div>
       <div class="card-body">
         <div class="card-icon-row">
           <div class="card-icon ci-purple">🚃</div>
-          <div class="card-badge-soon">Em breve</div>
+          <div class="card-arrow">→</div>
         </div>
         <div class="card-title">Share de Vagões</div>
-        <div class="card-desc">Distribuição e compartilhamento de vagões entre terminais</div>
+        <div class="card-desc">Dashboard de share INPASA vs Outros — Teciap e Ultracargo</div>
       </div>
       <div class="card-footer">
         <span class="card-tag">Logística</span>
-        <span class="card-tag">Vagões</span>
-        <span class="card-ext" style="color:rgba(255,255,255,0.3)">Link pendente</span>
+        <span class="card-tag">Teciap</span>
+        <span class="card-tag">Ultracargo</span>
       </div>
     </a>
 
