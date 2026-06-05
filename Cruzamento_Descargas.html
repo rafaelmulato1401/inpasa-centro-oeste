@@ -334,11 +334,19 @@ async function readXlsx(file){
   });
 }
 function norm(v){if(v===null||v===undefined)return '';return String(v).trim().replace(/^0+(\d)/,'$1');}
-function fmtDate(v){
-  if(!v)return '';
-  if(v instanceof Date)return v.toLocaleDateString('pt-BR');
-  if(typeof v==='string'){try{return new Date(v).toLocaleDateString('pt-BR');}catch(e){return v;}}
-  return String(v);
+function toDate(v){
+  if(!v&&v!==0)return null;
+  if(v instanceof Date)return isNaN(v.getTime())?null:v;
+  if(typeof v==='number'){var d=new Date(Math.round((v-25569)*86400*1000));return isNaN(d.getTime())?null:d;}
+  if(typeof v==='string'&&v.trim()){var d2=new Date(v);return isNaN(d2.getTime())?null:d2;}
+  return null;
+}
+function fmtDate(v){var d=toDate(v);return d?d.toLocaleDateString('pt-BR'):'';}
+function latestDate(){
+  var dates=[];
+  for(var i=0;i<arguments.length;i++){var d=toDate(arguments[i]);if(d)dates.push(d);}
+  if(!dates.length)return '';
+  return dates.reduce(function(a,b){return b>a?b:a;}).toLocaleDateString('pt-BR');
 }
 function numFmt(n){if(n===''||n===null||n===undefined)return '—';return Number(n).toLocaleString('pt-BR');}
 function filialDeCliente(s){const u=(s||'').toUpperCase();if(u.includes('SINOP'))return 1;if(u.includes('MUTUM'))return 3;return null;}
