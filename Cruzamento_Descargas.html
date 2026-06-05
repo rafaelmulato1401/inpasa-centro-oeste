@@ -367,10 +367,10 @@ async function run(){
       const sh=wb.Sheets[wb.SheetNames[0]];
       const raw=XLSX.utils.sheet_to_json(sh,{header:1,defval:null,cellDates:true});
       const hdr=raw[0];
-      const ui={cliente:hdr.indexOf('Cliente'),nf:hdr.indexOf('Nota Fiscal'),qtd:hdr.indexOf('Quantidade NF'),qtdReal:hdr.indexOf('Qtd. Realizada'),saida:hdr.indexOf('Dt. Saída Terminal'),entrada:hdr.indexOf('Dt. Entrada')};
+      const ui={cliente:hdr.indexOf('Cliente'),nf:hdr.indexOf('Nota Fiscal'),qtd:hdr.indexOf('Quantidade NF'),qtdReal:hdr.indexOf('Qtd. Realizada'),saida:hdr.indexOf('Dt. Saída Terminal'),entrada:hdr.indexOf('Dt. Entrada'),termino:hdr.indexOf('Dt. Término Operacao')};
       raw.slice(1).filter(r=>r&&r[ui.nf]).forEach(r=>{
         const c=String(r[ui.cliente]||'');
-        ultraRows.push({cliente:c,nf:norm(r[ui.nf]),qtd:Number(r[ui.qtd])||0,qtdRealizada:r[ui.qtdReal]!==null&&r[ui.qtdReal]!==undefined?r[ui.qtdReal]:'',dtSaida:r[ui.saida],dtEntrada:r[ui.entrada],filial:filialDeCliente(c)});
+        ultraRows.push({cliente:c,nf:norm(r[ui.nf]),qtd:Number(r[ui.qtd])||0,qtdRealizada:r[ui.qtdReal]!==null&&r[ui.qtdReal]!==undefined?r[ui.qtdReal]:'',dtSaida:r[ui.saida],dtEntrada:r[ui.entrada],dtTermino:r[ui.termino],filial:filialDeCliente(c)});
       });
     }
 
@@ -405,7 +405,7 @@ async function run(){
         return;
       }
 
-      const rec={'NF':nf,'SERIE':serie!==null?serie:'','PESODESTINO':u.qtdRealizada!==''?u.qtdRealizada:'','DATASAIDA':fmtDate(said)||fmtDate(u.dtSaida),'DATACHEGADA':fmtDate(cheg)||fmtDate(u.dtEntrada)};
+      const rec={'NF':nf,'SERIE':serie!==null?serie:'','PESODESTINO':u.qtdRealizada!==''?u.qtdRealizada:'','DATASAIDA':latestDate(said,u.dtSaida,u.dtTermino),'DATACHEGADA':latestDate(cheg,u.dtEntrada)};
       if(filialCS==1)sinop.push(rec);
       else if(filialCS==3)mutum.push(rec);
     });
