@@ -17,13 +17,11 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;}
 
-/* NAV */
 .nav{background:var(--blue);border-bottom:3px solid var(--gold);display:flex;align-items:center;padding:0 24px;height:54px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(10,20,60,.3);}
 .nav-title{margin-left:20px;padding-left:20px;border-left:1px solid rgba(255,255,255,.2);font-size:12px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.5px;text-transform:uppercase;}
 
 .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 80px;}
 
-/* STATUS */
 .status-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:24px;box-shadow:0 1px 3px rgba(10,20,60,.06);}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;}
 .status-dot.ok{background:var(--green);box-shadow:0 0 0 3px rgba(26,107,53,.18);animation:blink 2s infinite;}
@@ -31,11 +29,9 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .status-text{font-size:12px;color:var(--text2);}
 .status-text strong{color:var(--text);font-weight:600;}
 
-/* SECTION LABEL */
 .sec-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/* UPLOAD */
 .upload-zone{border:2px dashed var(--border);border-radius:10px;padding:22px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2);margin-bottom:24px;box-shadow:0 1px 4px rgba(10,20,60,.05);}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(240,165,0,.04);}
 .upload-zone h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:3px;}
@@ -49,26 +45,42 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
 .progress-fill{height:100%;background:var(--gold);border-radius:2px;width:0;transition:width .3s;}
 
-/* METHODOLOGY CARDS */
-.meto-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:24px;}
-.meto-card{background:var(--bg2);border:2px solid var(--border);border-radius:10px;padding:16px 18px;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(10,20,60,.05);position:relative;}
-.meto-card:hover{border-color:var(--blue-mid);box-shadow:0 4px 16px rgba(26,58,107,.12);}
-.meto-card.selected{border-color:var(--blue);background:var(--blue-light);box-shadow:0 4px 16px rgba(26,58,107,.18);}
-.meto-card.selected::after{content:'✓';position:absolute;top:10px;right:12px;background:var(--blue);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;display:grid;place-items:center;}
-.meto-num{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
-.meto-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--blue);margin-bottom:4px;line-height:1.2;}
-.meto-desc{font-size:11px;color:var(--text2);line-height:1.5;}
-.meto-badge{display:inline-block;margin-top:8px;padding:2px 8px;background:var(--blue);color:#fff;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3px;}
-.meto-card.selected .meto-badge{background:var(--blue-dark);}
+/* ── PRODUCT CARDS ── */
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+@media(max-width:700px){.product-grid{grid-template-columns:1fr;}}
+.product-card{background:var(--bg2);border:2px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(10,20,60,.05);position:relative;overflow:hidden;}
+.product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--border);transition:background .18s;}
+.product-card:hover{border-color:var(--blue-mid);box-shadow:0 4px 16px rgba(26,58,107,.14);}
+.product-card.selected{border-color:var(--blue);background:var(--blue-light);}
+.product-card.selected::before{background:var(--blue);}
+.product-card.selected::after{content:'✓';position:absolute;top:10px;right:12px;background:var(--blue);color:#fff;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;display:grid;place-items:center;}
+.p-icon{font-size:28px;margin-bottom:8px;}
+.p-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:var(--blue);margin-bottom:3px;}
+.p-desc{font-size:11px;color:var(--text2);line-height:1.5;}
+.p-tol{display:inline-block;margin-top:8px;padding:2px 8px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.p-tol.blue{background:var(--blue);color:#fff;}
+.p-tol.gold{background:var(--gold);color:var(--blue-dark);}
+.p-tol.green{background:var(--green);color:#fff;}
 
-/* SUB-OPTIONS (toggle inside meto card) */
-.sub-opts{margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:0;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
-.sub-btn{flex:1;padding:6px 10px;border:none;background:var(--bg);cursor:pointer;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;color:var(--text2);transition:all .15s;text-align:center;}
+/* ── METO CARDS (Etanol only) ── */
+.meto-section{display:none;}
+.meto-section.show{display:block;}
+.meto-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:20px;}
+.meto-card{background:var(--bg2);border:2px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .18s;box-shadow:0 1px 3px rgba(10,20,60,.05);position:relative;}
+.meto-card:hover{border-color:var(--blue-mid);}
+.meto-card.selected{border-color:var(--blue);background:var(--blue-light);}
+.meto-card.selected::after{content:'✓';position:absolute;top:8px;right:10px;background:var(--blue);color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:grid;place-items:center;}
+.meto-num{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.meto-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--blue);margin-bottom:3px;line-height:1.2;}
+.meto-desc{font-size:11px;color:var(--text2);line-height:1.45;}
+.meto-badge{display:inline-block;margin-top:7px;padding:2px 7px;background:var(--blue);color:#fff;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.sub-opts{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:0;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
+.sub-btn{flex:1;padding:5px 8px;border:none;background:var(--bg);cursor:pointer;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;color:var(--text2);transition:all .15s;text-align:center;}
 .sub-btn:not(:last-child){border-right:1px solid var(--border);}
 .sub-btn.active{background:var(--blue);color:#fff;}
 .sub-btn:hover:not(.active){background:var(--blue-light);color:var(--blue);}
 
-/* CONTROLS */
+/* ── CONTROLS ── */
 .controls{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:24px;align-items:end;}
 @media(max-width:600px){.controls{grid-template-columns:1fr;}}
 .field label{display:block;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
@@ -80,25 +92,26 @@ select:focus{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(36,86,164,.1
 .btn-analisar:hover{background:var(--blue-mid);}
 .btn-analisar:disabled{opacity:.4;cursor:not-allowed;}
 
-/* ACTIVE METHOD BANNER */
-.method-banner{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--blue);border-radius:8px;margin-bottom:20px;color:#fff;font-size:12px;font-weight:600;}
+/* ── ACTIVE BANNER ── */
+.method-banner{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--blue);border-radius:8px;margin-bottom:20px;color:#fff;font-size:12px;font-weight:600;flex-wrap:wrap;}
 .method-banner .badge{background:var(--gold);color:var(--blue-dark);padding:2px 10px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:.3px;}
 
-/* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:20px;}
+/* ── KPI ── */
+#resultPanel{display:none;}
+#resultPanel.show{display:block;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:20px;}
 .kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(10,20,60,.06);animation:fadeUp .35s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);}
 .kpi.kb::before{background:var(--blue);}
 .kpi.kr::before{background:var(--danger);}
 .kpi.kgr::before{background:var(--green);}
-.kpi.kg::before{background:var(--gold);}
 .kpi-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;line-height:1.3;}
 .kpi-value{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
 .kv-r{color:var(--danger);}.kv-g{color:var(--green);}
 .kpi-sub{font-size:10px;color:var(--text3);margin-top:4px;}
 
-/* RESULT BOX */
+/* ── RESULT BOX ── */
 .result-box{border-radius:8px;padding:18px 20px;margin-bottom:18px;border:1px solid;animation:fadeUp .45s ease both;}
 .result-box.ok{background:var(--green-bg);border-color:#86efac;}
 .result-box.nok{background:var(--danger-bg);border-color:#fca5a5;}
@@ -107,7 +120,7 @@ select:focus{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(36,86,164,.1
 .rb-body{font-size:13px;color:var(--text2);line-height:1.6;}
 .rb-body strong{color:var(--text);}
 
-/* CONSID */
+/* ── CONSID ── */
 .consid-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:20px;animation:fadeUp .55s ease both;box-shadow:0 1px 4px rgba(10,20,60,.06);}
 .consid-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
 .consid-text{font-size:13px;color:var(--text);line-height:1.7;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px 16px;white-space:pre-wrap;}
@@ -117,7 +130,7 @@ select:focus{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(36,86,164,.1
 .btn-client{padding:7px 20px;background:var(--gold);border:none;color:var(--blue-dark);border-radius:6px;cursor:pointer;font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;display:flex;align-items:center;gap:7px;}
 .btn-client:hover{background:var(--gold-light);}
 
-/* TABLE */
+/* ── TABLE ── */
 .detail-section{animation:fadeUp .65s ease both;}
 .table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(10,20,60,.06);}
 table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -134,14 +147,13 @@ tbody td:first-child{text-align:left;color:var(--text);font-family:'Barlow Conde
 tfoot tr{background:var(--blue-light);border-top:2px solid var(--blue);}
 tfoot td{padding:9px 12px;font-weight:700;color:var(--blue);font-family:'Barlow Condensed',sans-serif;font-size:13px;text-align:right;}
 tfoot td:first-child{text-align:left;}
-.mono{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:500;}
 .v-r{color:var(--danger);font-family:'Barlow Condensed',sans-serif;font-weight:700;}
 .v-g{color:var(--green);font-family:'Barlow Condensed',sans-serif;font-weight:600;}
 .v-d{color:var(--text3);}
-.badge-reim{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;background:rgba(185,28,28,.1);color:var(--danger);border:1px solid rgba(185,28,28,.25);margin-left:6px;}
-.badge-ci{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;background:rgba(240,165,0,.15);color:#92620a;border:1px solid rgba(240,165,0,.4);margin-left:6px;}
+.badge-ci{display:inline-flex;align-items:center;padding:2px 6px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;background:rgba(240,165,0,.15);color:#92620a;border:1px solid rgba(240,165,0,.4);margin-left:5px;}
+.badge-reim{display:inline-flex;align-items:center;padding:2px 6px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;background:rgba(185,28,28,.1);color:var(--danger);border:1px solid rgba(185,28,28,.25);margin-left:5px;}
 
-/* MODAL */
+/* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,32,68,.72);z-index:500;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;}
 .modal-overlay.show{display:flex;}
 .modal{background:#fff;border-radius:12px;overflow:hidden;max-width:900px;width:100%;box-shadow:0 20px 60px rgba(10,20,60,.45);margin:auto;}
@@ -156,18 +168,11 @@ tfoot td:first-child{text-align:left;}
 .btn-mc{padding:9px 18px;background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:7px;cursor:pointer;font-size:13px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;}
 .btn-mc:hover{border-color:var(--blue);color:var(--blue);}
 
-/* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--blue);border-bottom:3px solid var(--gold);color:#fff;padding:10px 22px;border-radius:8px;font-size:12px;font-weight:600;opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* CLI SEARCH */
 .cli-item{padding:8px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:baseline;flex-wrap:wrap;transition:background .1s;}
 .cli-item:last-child{border-bottom:none;}
 .cli-item:hover{background:var(--blue-light);}
-
-#resultPanel{display:none;}
-#resultPanel.show{display:block;}
-
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
@@ -191,10 +196,9 @@ tfoot td:first-child{text-align:left;}
   <!-- UPLOAD -->
   <div class="sec-label">Base de Dados</div>
   <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <div style="font-size:26px;margin-bottom:8px;">📂</div>
+    <div style="font-size:26px;margin-bottom:8px">📂</div>
     <h3>Atualizar Base de Movimentação</h3>
-    <p>Arraste o arquivo <strong>.xlsx</strong> ou clique para selecionar</p>
-    <p style="margin-top:4px;font-size:11px;color:var(--text3);">Linha 1 ignorada · Linha 2 = cabeçalho · Linhas com coluna A vazia descartadas</p>
+    <p>Arraste o arquivo <strong>.xlsx</strong> ou clique para selecionar — Linha 1 ignorada · Linha 2 = cabeçalho · Coluna A vazia descartada</p>
     <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('fileInput').click()">↑ Selecionar Arquivo</button>
     <input type="file" id="fileInput" accept=".xlsx,.xls"/>
   </div>
@@ -203,53 +207,69 @@ tfoot td:first-child{text-align:left;}
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
   </div>
 
-  <!-- METHODOLOGY SELECTOR -->
-  <div class="sec-label">Metodologia de Análise</div>
-  <div class="meto-grid">
-
-    <!-- M1: CC + Cobrança Individual -->
-    <div class="meto-card selected" id="card-m1" onclick="selectMeto(1)">
-      <div class="meto-num">Metodologia 1</div>
-      <div class="meto-title">Conta Corrente + Cobrança Individual</div>
-      <div class="meto-desc">Quebras acumuladas no mês. Viagens acima de −0,50% tratadas individualmente; demais entram no pool acumulado com tolerância por raiz quadrada das viagens.</div>
-      <span class="meto-badge">Raiz · CI ≥ 0,50%</span>
+  <!-- PRODUCT SELECTOR -->
+  <div class="sec-label">Produto</div>
+  <div class="product-grid">
+    <div class="product-card selected" id="prod-etanol" onclick="selectProduct('etanol')">
+      <div class="p-icon">⛽</div>
+      <div class="p-name">Etanol</div>
+      <div class="p-desc">Anidro e Hidratado. Múltiplas metodologias de cálculo disponíveis.</div>
+      <span class="p-tol blue">4 Metodologias</span>
     </div>
-
-    <!-- M2: CC puro com raiz -->
-    <div class="meto-card" id="card-m2" onclick="selectMeto(2)">
-      <div class="meto-num">Metodologia 2</div>
-      <div class="meto-title">Conta Corrente — Cálculo por Viagens</div>
-      <div class="meto-desc">Todas as viagens no pool acumulado. Tolerância calculada pela fórmula da raiz quadrada da quantidade de viagens, travada em −0,10%.</div>
-      <span class="meto-badge">Raiz · Teto −0,10%</span>
+    <div class="product-card" id="prod-fortipro" onclick="selectProduct('fortipro')">
+      <div class="p-icon">🌽</div>
+      <div class="p-name">FortiPro</div>
+      <div class="p-desc">Farelo de Milho e Sorgo. Conta Corrente acumulada no mês.</div>
+      <span class="p-tol gold">CC Fixa −0,25%</span>
     </div>
-
-    <!-- M3: CC fixa com toggle -->
-    <div class="meto-card" id="card-m3" onclick="selectMeto(3)">
-      <div class="meto-num">Metodologia 3</div>
-      <div class="meto-title">Conta Corrente — Índice Fixo</div>
-      <div class="meto-desc">Todas as viagens no pool acumulado. Tolerância fixa aplicada sobre o volume total faturado no período.</div>
-      <span class="meto-badge" id="badge-m3">Fixo −0,10%</span>
-      <div class="sub-opts" onclick="event.stopPropagation()">
-        <button class="sub-btn active" id="m3-010" onclick="setM3(0.001)">−0,10%</button>
-        <button class="sub-btn" id="m3-020" onclick="setM3(0.002)">−0,20%</button>
-      </div>
+    <div class="product-card" id="prod-oleo" onclick="selectProduct('oleo')">
+      <div class="p-icon">🛢️</div>
+      <div class="p-name">Óleo Bruto de Milho</div>
+      <div class="p-desc">Conta Corrente acumulada no mês com índice fixo.</div>
+      <span class="p-tol green">CC Fixa −0,20%</span>
     </div>
-
-    <!-- M4: Caminhão a caminhão com toggle -->
-    <div class="meto-card" id="card-m4" onclick="selectMeto(4)">
-      <div class="meto-num">Metodologia 4</div>
-      <div class="meto-title">Caminhão a Caminhão</div>
-      <div class="meto-desc">Cada viagem avaliada individualmente. O índice selecionado é aplicado sobre o volume de cada NF — o excedente de cada uma é reembolsado separadamente.</div>
-      <span class="meto-badge" id="badge-m4">Indiv. −0,10%</span>
-      <div class="sub-opts" onclick="event.stopPropagation()">
-        <button class="sub-btn active" id="m4-010" onclick="setM4(0.001)">−0,10%</button>
-        <button class="sub-btn" id="m4-020" onclick="setM4(0.002)">−0,20%</button>
-      </div>
-    </div>
-
   </div>
 
-  <!-- QUERY CONTROLS -->
+  <!-- METO SELECTOR (Etanol only) -->
+  <div class="meto-section show" id="metoSection">
+    <div class="sec-label">Metodologia de Cálculo</div>
+    <div class="meto-grid">
+      <div class="meto-card selected" id="card-m1" onclick="selectMeto(1)">
+        <div class="meto-num">Metodologia 1</div>
+        <div class="meto-title">Conta Corrente + Cobrança Individual</div>
+        <div class="meto-desc">Quebras acumuladas no mês. Viagens acima de −0,50% tratadas individualmente; demais entram no pool acumulado com tolerância por raiz quadrada.</div>
+        <span class="meto-badge">Raiz · CI ≥ 0,50%</span>
+      </div>
+      <div class="meto-card" id="card-m2" onclick="selectMeto(2)">
+        <div class="meto-num">Metodologia 2</div>
+        <div class="meto-title">Conta Corrente — Cálculo por Viagens</div>
+        <div class="meto-desc">Todas as viagens no pool acumulado. Tolerância pela raiz quadrada da quantidade de viagens, travada em −0,10%.</div>
+        <span class="meto-badge">Raiz · Teto −0,10%</span>
+      </div>
+      <div class="meto-card" id="card-m3" onclick="selectMeto(3)">
+        <div class="meto-num">Metodologia 3</div>
+        <div class="meto-title">Conta Corrente — Índice Fixo</div>
+        <div class="meto-desc">Todas as viagens no pool acumulado com tolerância fixa sobre o volume total faturado.</div>
+        <span class="meto-badge" id="badge-m3">Fixo −0,10%</span>
+        <div class="sub-opts" onclick="event.stopPropagation()">
+          <button class="sub-btn active" id="m3-010" onclick="setM3(0.001)">−0,10%</button>
+          <button class="sub-btn" id="m3-020" onclick="setM3(0.002)">−0,20%</button>
+        </div>
+      </div>
+      <div class="meto-card" id="card-m4" onclick="selectMeto(4)">
+        <div class="meto-num">Metodologia 4</div>
+        <div class="meto-title">Caminhão a Caminhão</div>
+        <div class="meto-desc">Cada viagem avaliada individualmente. O índice é aplicado sobre o volume de cada NF e o excedente é reembolsado por viagem.</div>
+        <span class="meto-badge" id="badge-m4">Indiv. −0,10%</span>
+        <div class="sub-opts" onclick="event.stopPropagation()">
+          <button class="sub-btn active" id="m4-010" onclick="setM4(0.001)">−0,10%</button>
+          <button class="sub-btn" id="m4-020" onclick="setM4(0.002)">−0,20%</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
   <div class="sec-label">Consulta</div>
   <div class="controls">
     <div class="field">
@@ -260,7 +280,7 @@ tfoot td:first-child{text-align:left;}
     </div>
     <div class="field">
       <label>Cliente (código ou nome)</label>
-      <div style="position:relative;">
+      <div style="position:relative">
         <input type="text" id="selCliente" placeholder="Digite o código ou nome..." autocomplete="off"
           oninput="filtrarClientes()" onfocus="mostrarSugestoes()" onblur="setTimeout(esconderSugestoes,200)"
           onfocusin="this.style.borderColor='#2456a4';this.style.boxShadow='0 0 0 3px rgba(36,86,164,.1)'"
@@ -275,8 +295,8 @@ tfoot td:first-child{text-align:left;}
   <!-- RESULTS -->
   <div id="resultPanel">
     <div class="method-banner" id="methodBanner">
-      <span>Metodologia aplicada:</span>
-      <span class="badge" id="methodBadge">—</span>
+      <span>Produto:</span><span class="badge" id="bannerProd">—</span>
+      <span style="margin-left:8px">Metodologia:</span><span class="badge" id="bannerMeto">—</span>
     </div>
     <div class="sec-label">Resultado</div>
     <div class="kpi-grid" id="kpiGrid"></div>
@@ -290,18 +310,17 @@ tfoot td:first-child{text-align:left;}
       </div>
     </div>
     <div class="detail-section">
-      <div class="sec-label" id="tableLabel">Detalhamento por Viagem</div>
+      <div class="sec-label">Detalhamento por Viagem</div>
       <div class="table-wrap" id="tableWrap"></div>
     </div>
   </div>
-
 </div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title" id="modalTitle">📄 Relatório — Apuração P&S</div>
+      <div class="modal-title">📄 Relatório — Apuração P&amp;S</div>
       <button class="modal-close" onclick="fecharModal()">✕</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
@@ -317,56 +336,65 @@ tfoot td:first-child{text-align:left;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // STATE
-// ══════════════════════════════════════════════════════
-let DB = [];
-let LAST = null;
-let ALL_CLIENTES = [];
-let selectedCod = '';
-let METO = 1;      // selected methodology (1-4)
-let M3_IND = 0.001; // M3 fixed index
-let M4_IND = 0.001; // M4 per-truck index
+// ════════════════════════════════════════════
+let DB=[], LAST=null, ALL_CLIENTES=[], selectedCod='';
+let PRODUCT='etanol'; // etanol | fortipro | oleo
+let METO=1;           // Etanol: 1-4
+let M3_IND=0.001, M4_IND=0.001;
 
-const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-                  'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const TOL_COB_IND = 0.5; // M1: CI threshold %
+const MESES_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const TOL_COB_IND=0.5; // M1 CI threshold %
 
 // Col indices (0-based raw row):
 // D=3 NF | F=5 DtEm | H=7 Cod | I=8 Nome | M=12 PLiq | N=13 PDest
 // O=14 VNota | AC=28 DatCh | AD=29 DatSa | AE=30 Qbr | AF=31 QbrPct | AO=40 Tol
-const C={nf:3,dtEm:5,cod:7,nome:8,pLiq:12,pDest:13,vNota:14,dCh:28,dSa:29,qbr:30,qPct:31,tol:40};
+const C={nf:3,dtEm:5,cod:7,nome:8,pLiq:12,pDest:13,vNota:14,dCh:28,dSa:29,qPct:31,tol:40};
 
 const LOGO_B64="data:image/png;base64,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";
 
-// ══════════════════════════════════════════════════════
-// METHODOLOGY SELECTION
-// ══════════════════════════════════════════════════════
+// Product config
+const PRODUCTS={
+  etanol:{name:'Etanol',icon:'⛽',tol:null},
+  fortipro:{name:'FortiPro',icon:'🌽',tol:0.0025},
+  oleo:{name:'Óleo Bruto de Milho',icon:'🛢️',tol:0.002}
+};
+
+// ════════════════════════════════════════════
+// PRODUCT / METO SELECTION
+// ════════════════════════════════════════════
+function selectProduct(p){
+  PRODUCT=p;
+  ['etanol','fortipro','oleo'].forEach(k=>
+    document.getElementById('prod-'+k).classList.toggle('selected',k===p));
+  document.getElementById('metoSection').classList.toggle('show',p==='etanol');
+  if(LAST) analisar();
+}
 function selectMeto(n){
   METO=n;
-  [1,2,3,4].forEach(i=>{
-    document.getElementById('card-m'+i).classList.toggle('selected',i===n);
-  });
-  if(LAST) analisar();
+  [1,2,3,4].forEach(i=>document.getElementById('card-m'+i).classList.toggle('selected',i===n));
+  if(LAST&&PRODUCT==='etanol') analisar();
 }
 function setM3(v){
   M3_IND=v;
   document.getElementById('m3-010').classList.toggle('active',v===0.001);
   document.getElementById('m3-020').classList.toggle('active',v===0.002);
   document.getElementById('badge-m3').textContent='Fixo '+(v===0.001?'−0,10%':'−0,20%');
-  if(LAST&&METO===3) analisar();
+  if(LAST&&PRODUCT==='etanol'&&METO===3) analisar();
 }
 function setM4(v){
   M4_IND=v;
   document.getElementById('m4-010').classList.toggle('active',v===0.001);
   document.getElementById('m4-020').classList.toggle('active',v===0.002);
   document.getElementById('badge-m4').textContent='Indiv. '+(v===0.001?'−0,10%':'−0,20%');
-  if(LAST&&METO===4) analisar();
+  if(LAST&&PRODUCT==='etanol'&&METO===4) analisar();
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // FILE UPLOAD
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 const dropZone=document.getElementById('dropZone');
 const fileInput=document.getElementById('fileInput');
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag');});
@@ -395,7 +423,7 @@ function readFile(file){
       if(raw.length<3){showToast('Arquivo inválido.');return;}
       setProgress(80,'Processando '+(raw.length-2)+' linhas...');
       const rows=[];
-      for(let i=2;i<raw.length;i++){const r=raw[i],a=r[0];if(a===null||a===undefined||a==='')continue;rows.push(r);}
+      for(let i=2;i<raw.length;i++){const r=raw[i];if(!r[0]&&r[0]!==0)continue;rows.push(r);}
       setProgress(90,'Calculando...');
       loadDB(rows,file.name);
       setProgress(100,'Concluído!');
@@ -424,7 +452,8 @@ function loadDB(rows,fileName){
     const nf=String(r[C.nf]??'').replace(/\.0$/,'').trim();
     const vUnit=pLiq>0?vNota/pLiq:0;
     const qbAnal=pDest-pLiq,idxAnal=pLiq>0?qbAnal/pLiq:0;
-    return{cod,nome,mes,nf,dtEm:r[C.dtEm],dCh:r[C.dCh],dSa:r[C.dSa],pLiq,pDest,vNota,vUnit,qPct,tol,qbAnal,idxAnal};
+    return{cod,nome,mes,nf,dtEm:r[C.dtEm],dCh:r[C.dCh],dSa:r[C.dSa],
+           pLiq,pDest,vNota,vUnit,qPct,tol,qbAnal,idxAnal};
   }).filter(r=>r.mes!==null&&r.cod!=='');
 
   const mesSet=new Set(DB.map(r=>r.mes));
@@ -436,9 +465,8 @@ function loadDB(rows,fileName){
   const sm=document.getElementById('selMes');
   sm.innerHTML='<option value="">— Selecione o mês —</option>';
   meses.forEach(m=>sm.innerHTML+=`<option>${m}</option>`);
-
   document.getElementById('selCliente').value='';
-  selectedCod=''; esconderSugestoes();
+  selectedCod='';esconderSugestoes();
   document.getElementById('btnAnalisar').disabled=false;
   document.getElementById('statusDot').className='status-dot ok';
   document.getElementById('statusText').innerHTML=
@@ -448,54 +476,70 @@ function loadDB(rows,fileName){
   showToast('✓ Base atualizada!');
 }
 
-// ══════════════════════════════════════════════════════
-// TOLERANCE HELPERS
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// ANALYSIS ROUTER
+// ════════════════════════════════════════════
 function tolRaiz(n){return n>0?Math.min((0.002/Math.sqrt(n))*-1,-0.001):0;}
 
-// ══════════════════════════════════════════════════════
-// ANALYSIS ROUTER
-// ══════════════════════════════════════════════════════
 function analisar(){
-  const mes=document.getElementById('selMes').value;
-  const cod=selectedCod;
+  const mes=document.getElementById('selMes').value,cod=selectedCod;
   if(!mes||!cod){showToast('Selecione mês e cliente.');return;}
   const viagens=DB.filter(r=>r.mes===mes&&r.cod===cod);
   if(!viagens.length){showToast('Sem movimentação para esse cliente/mês.');return;}
-  if(METO===1) calcM1(mes,cod,viagens);
-  else if(METO===2) calcM2(mes,cod,viagens);
-  else if(METO===3) calcM3(mes,cod,viagens);
-  else calcM4(mes,cod,viagens);
+
+  const prod=PRODUCTS[PRODUCT];
+  document.getElementById('bannerProd').textContent=prod.icon+' '+prod.name;
+
+  if(PRODUCT==='fortipro'||PRODUCT==='oleo'){
+    calcFixo(mes,cod,viagens,prod.tol,prod.name);
+  } else {
+    if(METO===1) calcM1(mes,cod,viagens);
+    else if(METO===2) calcM2(mes,cod,viagens);
+    else if(METO===3) calcM3(mes,cod,viagens);
+    else calcM4(mes,cod,viagens);
+  }
   document.getElementById('resultPanel').classList.add('show');
   document.getElementById('resultPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// ── M1: CC + Cobrança Individual ──
+// ── Fixed CC (FortiPro -0,25% | Óleo -0,20%) ──
+function calcFixo(mes,cod,viagens,tol,prodName){
+  const nome=viagens[0].nome,nV=viagens.length;
+  const volFat=viagens.reduce((s,r)=>s+r.pLiq,0);
+  const volRec=viagens.reduce((s,r)=>s+r.pDest,0);
+  const perda=volRec-volFat;
+  const tolPct=-tol,volTol=tolPct*volFat;
+  let volReim=0;if(perda<volTol)volReim=volTol-perda;
+  const mediaUnit=viagens.reduce((s,r)=>s+r.vUnit,0)/nV;
+  const valorReim=volReim*mediaUnit,temR=valorReim>0;
+  const indLbl=(tol*100).toFixed(2).replace('.',',')+'%';
+  LAST={meto:'fixo',produto:PRODUCT,prodName,mes,cod,nome,nV,
+        volFat,volRec,perda,tolPct,volTol,volReim,mediaUnit,valorReim,temR,viagens,indLbl};
+  document.getElementById('bannerMeto').textContent=`CC Fixa −${indLbl}`;
+  renderKPIs_fixo(LAST);renderResultBox_cc(LAST);renderConsid_cc(LAST);renderTable_simples(viagens);
+}
+
+// ── M1: CC + CI ──
 function calcM1(mes,cod,viagens){
   const nome=viagens[0].nome,nV=viagens.length;
-  const vCC=viagens.filter(r=>r.qPct>0&&r.qPct<=TOL_COB_IND||r.qPct<=0);
+  const vCC=viagens.filter(r=>r.qPct<=TOL_COB_IND||r.qPct<=0);
   const vCI=viagens.filter(r=>r.qPct>TOL_COB_IND);
-  const volFatCC=vCC.reduce((s,r)=>s+r.pLiq,0);
-  const volRecCC=vCC.reduce((s,r)=>s+r.pDest,0);
-  const perdaCC=volRecCC-volFatCC;
-  const tolPct=tolRaiz(nV),volTolCC=tolPct*volFatCC;
+  const volFatCC=vCC.reduce((s,r)=>s+r.pLiq,0),volRecCC=vCC.reduce((s,r)=>s+r.pDest,0);
+  const perdaCC=volRecCC-volFatCC,tolPct=tolRaiz(nV),volTolCC=tolPct*volFatCC;
   let volReemCC=0;if(perdaCC<volTolCC)volReemCC=volTolCC-perdaCC;
   const mediaUnit=viagens.reduce((s,r)=>s+r.vUnit,0)/nV;
   const valReemCC=volReemCC*mediaUnit;
-  const volReemCI=vCI.reduce((s,r)=>{
-    const vt=(r.tol/100)*r.pLiq,diff=vt-r.qbAnal;return s+(diff<0?Math.abs(diff):0);},0);
-  const valReemCI=vCI.reduce((s,r)=>{
-    const vt=(r.tol/100)*r.pLiq,diff=vt-r.qbAnal;
-    return s+(diff<0?Math.abs(diff)*r.vUnit:0);},0);
+  const volReemCI=vCI.reduce((s,r)=>{const vt=(r.tol/100)*r.pLiq,d=vt-r.qbAnal;return s+(d<0?Math.abs(d):0);},0);
+  const valReemCI=vCI.reduce((s,r)=>{const vt=(r.tol/100)*r.pLiq,d=vt-r.qbAnal;return s+(d<0?Math.abs(d)*r.vUnit:0);},0);
   const valorTotal=valReemCC+valReemCI,temR=valorTotal>0;
-  LAST={meto:1,mes,cod,nome,nV,nCC:vCC.length,nCI:vCI.length,
+  LAST={meto:1,produto:'etanol',mes,cod,nome,nV,nCC:vCC.length,nCI:vCI.length,
         volFatCC,volRecCC,perdaCC,tolPct,volTolCC,volReemCC,mediaUnit,valReemCC,
         volReemCI,valReemCI,valorTotal,temR,viagens,vCC,vCI};
-  updateBanner('Conta Corrente + Cobrança Individual (Raiz)');
-  renderKPIs_M1(LAST);renderResultBox_M12(LAST);renderConsid_M12(LAST);renderTable_M1(viagens);
+  document.getElementById('bannerMeto').textContent='CC + Cobrança Individual (Raiz)';
+  renderKPIs_M1(LAST);renderResultBox_M1(LAST);renderConsid_cc(LAST);renderTable_M1(viagens);
 }
 
-// ── M2: CC puro com raiz ──
+// ── M2: CC raiz puro ──
 function calcM2(mes,cod,viagens){
   const nome=viagens[0].nome,nV=viagens.length;
   const volFat=viagens.reduce((s,r)=>s+r.pLiq,0),volRec=viagens.reduce((s,r)=>s+r.pDest,0);
@@ -503,10 +547,9 @@ function calcM2(mes,cod,viagens){
   let volReim=0;if(perda<volTol)volReim=volTol-perda;
   const mediaUnit=viagens.reduce((s,r)=>s+r.vUnit,0)/nV;
   const valorReim=volReim*mediaUnit,temR=valorReim>0;
-  LAST={meto:2,mes,cod,nome,nV,volFat,volRec,perda,tolPct,volTol,volReim,mediaUnit,valorReim,temR,viagens};
-  updateBanner('Conta Corrente — Cálculo por Viagens (Raiz)');
-  renderKPIs_M2(LAST);renderResultBox_M12({...LAST,valorTotal:valorReim,volReemCC:volReim,valReemCC:valorReim,volReemCI:0,valReemCI:0,nCC:nV,nCI:0});
-  renderConsid_M12({...LAST,valorTotal:valorReim,temR});renderTable_M24(viagens);
+  LAST={meto:2,produto:'etanol',mes,cod,nome,nV,volFat,volRec,perda,tolPct,volTol,volReim,mediaUnit,valorReim,temR,viagens};
+  document.getElementById('bannerMeto').textContent='CC — Cálculo por Viagens (Raiz)';
+  renderKPIs_cc(LAST);renderResultBox_cc(LAST);renderConsid_cc(LAST);renderTable_simples(viagens);
 }
 
 // ── M3: CC fixo ──
@@ -517,11 +560,10 @@ function calcM3(mes,cod,viagens){
   let volReim=0;if(perda<volTol)volReim=volTol-perda;
   const mediaUnit=viagens.reduce((s,r)=>s+r.vUnit,0)/nV;
   const valorReim=volReim*mediaUnit,temR=valorReim>0;
-  const lbl=M3_IND===0.001?'−0,10%':'−0,20%';
-  LAST={meto:3,mes,cod,nome,nV,volFat,volRec,perda,tolPct,volTol,volReim,mediaUnit,valorReim,temR,viagens,indLbl:lbl};
-  updateBanner('Conta Corrente — Índice Fixo '+lbl);
-  renderKPIs_M3(LAST);renderResultBox_M12({...LAST,valorTotal:valorReim,volReemCC:volReim,valReemCC:valorReim,volReemCI:0,valReemCI:0,nCC:nV,nCI:0,temR});
-  renderConsid_M12({...LAST,valorTotal:valorReim,temR});renderTable_M24(viagens);
+  const indLbl=M3_IND===0.001?'−0,10%':'−0,20%';
+  LAST={meto:3,produto:'etanol',mes,cod,nome,nV,volFat,volRec,perda,tolPct,volTol,volReim,mediaUnit,valorReim,temR,viagens,indLbl};
+  document.getElementById('bannerMeto').textContent='CC — Índice Fixo '+indLbl;
+  renderKPIs_cc(LAST);renderResultBox_cc(LAST);renderConsid_cc(LAST);renderTable_simples(viagens);
 }
 
 // ── M4: Caminhão a caminhão ──
@@ -536,60 +578,57 @@ function calcM4(mes,cod,viagens){
   const totQb=rows.reduce((s,r)=>s+r.qb,0),totExc=rows.reduce((s,r)=>s+r.volExc,0);
   const totVal=rows.reduce((s,r)=>s+r.valExc,0),totIdx=totPLiq>0?totQb/totPLiq:0;
   const nReim=rows.filter(r=>r.volExc>0).length,temR=totVal>0;
-  const lbl=ind===0.001?'−0,10%':'−0,20%';
-  LAST={meto:4,mes,cod,nome,nV,totPLiq,totPDest,totQb,totExc,totVal,totIdx,nReim,temR,viagens:rows,indLbl:lbl};
-  updateBanner('Caminhão a Caminhão — Índice '+lbl);
+  const indLbl=ind===0.001?'−0,10%':'−0,20%';
+  LAST={meto:4,produto:'etanol',mes,cod,nome,nV,totPLiq,totPDest,totQb,totExc,totVal,totIdx,nReim,temR,viagens:rows,indLbl};
+  document.getElementById('bannerMeto').textContent='Caminhão a Caminhão '+indLbl;
   renderKPIs_M4(LAST);renderResultBox_M4(LAST);renderConsid_M4(LAST);renderTable_M4(rows);
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // FORMAT
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 function f(n,d=2){return Number(n).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});}
 function brl(n){return 'R$ '+f(n,2);}
 function pct(n,d=4){return f(n*100,d)+'%';}
-function updateBanner(txt){document.getElementById('methodBadge').textContent=txt;}
+function kpiHtml(cards){return cards.map((c,i)=>`<div class="kpi ${c.acc||''}" style="animation-delay:${i*.06}s">
+  <div class="kpi-label">${c.lbl}</div><div class="kpi-value ${c.vc||''}">${c.val}</div>
+  <div class="kpi-sub">${c.sub}</div></div>`).join('');}
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // KPIs
-// ══════════════════════════════════════════════════════
-function kpiHtml(cards){
-  return cards.map((c,i)=>`<div class="kpi ${c.acc||''}" style="animation-delay:${i*.06}s">
-    <div class="kpi-label">${c.lbl}</div>
-    <div class="kpi-value ${c.vc||''}">${c.val}</div>
-    <div class="kpi-sub">${c.sub}</div></div>`).join('');
+// ════════════════════════════════════════════
+function renderKPIs_fixo(d){
+  const pp=d.volFat>0?(d.perda/d.volFat)*100:0;
+  document.getElementById('kpiGrid').innerHTML=kpiHtml([
+    {lbl:'Viagens no Mês',val:d.nV.toLocaleString('pt-BR'),sub:'Todas em Conta Corrente',acc:'kb'},
+    {lbl:'Vol. Faturado',val:f(d.volFat,0)+' L',sub:'Peso líquido total',acc:''},
+    {lbl:'Perda',val:f(Math.abs(d.perda),0)+' L',vc:d.perda<0?'kv-r':'kv-g',sub:pp.toFixed(4)+'% sobre faturado',acc:d.perda<0?'kr':''},
+    {lbl:'Tolerância Fixa',val:'−'+d.indLbl,sub:f(Math.abs(d.volTol),0)+' L tolerados',acc:''},
+    {lbl:'Vol. a Reembolsar',val:d.volReim>0?f(d.volReim,0)+' L':'—',vc:d.volReim>0?'kv-r':'',sub:'Excedente da tolerância',acc:d.volReim>0?'kr':''},
+    {lbl:'Total a Reembolsar',val:brl(d.valorReim),vc:d.valorReim>0?'kv-r':'kv-g',sub:d.valorReim>0?'Reembolso aprovado':'Dentro da tolerância',acc:d.valorReim>0?'kr':'kgr'},
+  ]);
+}
+function renderKPIs_cc(d){
+  const pp=d.volFat>0?(d.perda/d.volFat)*100:0;
+  const tolStr=d.meto===2?(d.tolPct*100).toFixed(4)+'%':(d.indLbl||'—');
+  document.getElementById('kpiGrid').innerHTML=kpiHtml([
+    {lbl:'Viagens no Mês',val:d.nV.toLocaleString('pt-BR'),sub:'Todas em Conta Corrente',acc:'kb'},
+    {lbl:'Vol. Faturado',val:f(d.volFat,0)+' L',sub:'Peso líquido total',acc:''},
+    {lbl:'Perda',val:f(Math.abs(d.perda),0)+' L',vc:d.perda<0?'kv-r':'kv-g',sub:pp.toFixed(4)+'% sobre faturado',acc:d.perda<0?'kr':''},
+    {lbl:'Tolerância',val:tolStr,sub:f(Math.abs(d.volTol),0)+' L tolerados',acc:''},
+    {lbl:'Vol. a Reembolsar',val:d.volReim>0?f(d.volReim,0)+' L':'—',vc:d.volReim>0?'kv-r':'',sub:'Excedente da tolerância',acc:d.volReim>0?'kr':''},
+    {lbl:'Total a Reembolsar',val:brl(d.valorReim),vc:d.valorReim>0?'kv-r':'kv-g',sub:d.valorReim>0?'Reembolso aprovado':'Dentro da tolerância',acc:d.valorReim>0?'kr':'kgr'},
+  ]);
 }
 function renderKPIs_M1(d){
   const pp=d.volFatCC>0?(d.perdaCC/d.volFatCC)*100:0;
   document.getElementById('kpiGrid').innerHTML=kpiHtml([
-    {lbl:'Viagens no Mês',val:d.nV.toLocaleString('pt-BR'),sub:`${d.nCC} Conta Corrente · ${d.nCI} Cob. Individual`,acc:'kb'},
+    {lbl:'Viagens no Mês',val:d.nV.toLocaleString('pt-BR'),sub:`${d.nCC} CC · ${d.nCI} Cob. Individual`,acc:'kb'},
     {lbl:'Vol. Faturado (CC)',val:f(d.volFatCC,0)+' L',sub:'Peso líquido das viagens CC',acc:''},
     {lbl:'Perda CC',val:f(Math.abs(d.perdaCC),0)+' L',vc:d.perdaCC<0?'kv-r':'kv-g',sub:pp.toFixed(4)+'% sobre faturado',acc:d.perdaCC<0?'kr':''},
     {lbl:'Tolerância (Raiz)',val:(d.tolPct*100).toFixed(4)+'%',sub:f(Math.abs(d.volTolCC),0)+' L tolerados',acc:''},
-    {lbl:'Reembolso CI',val:d.valReemCI>0?brl(d.valReemCI):'—',vc:d.valReemCI>0?'kv-r':'',sub:`${d.nCI} viagens individuais`,acc:d.valReemCI>0?'kr':''},
+    {lbl:'Reembolso CI',val:d.valReemCI>0?brl(d.valReemCI):'—',vc:d.valReemCI>0?'kv-r':'',sub:d.nCI+' viagens individuais',acc:d.valReemCI>0?'kr':''},
     {lbl:'Total a Reembolsar',val:brl(d.valorTotal),vc:d.valorTotal>0?'kv-r':'kv-g',sub:d.valorTotal>0?'Reembolso aprovado':'Dentro da tolerância',acc:d.valorTotal>0?'kr':'kgr'},
-  ]);
-}
-function renderKPIs_M2(d){
-  const pp=d.volFat>0?(d.perda/d.volFat)*100:0;
-  document.getElementById('kpiGrid').innerHTML=kpiHtml([
-    {lbl:'Viagens no Mês',val:d.nV.toLocaleString('pt-BR'),sub:'Todas em Conta Corrente',acc:'kb'},
-    {lbl:'Vol. Faturado',val:f(d.volFat,0)+' L',sub:'Peso líquido total',acc:''},
-    {lbl:'Perda',val:f(Math.abs(d.perda),0)+' L',vc:d.perda<0?'kv-r':'kv-g',sub:pp.toFixed(4)+'% sobre faturado',acc:d.perda<0?'kr':''},
-    {lbl:'Tolerância (Raiz)',val:(d.tolPct*100).toFixed(4)+'%',sub:f(Math.abs(d.volTol),0)+' L tolerados',acc:''},
-    {lbl:'Vol. a Reembolsar',val:d.volReim>0?f(d.volReim,0)+' L':'—',vc:d.volReim>0?'kv-r':'',sub:'Excedente da tolerância',acc:d.volReim>0?'kr':''},
-    {lbl:'Total a Reembolsar',val:brl(d.valorReim),vc:d.valorReim>0?'kv-r':'kv-g',sub:d.valorReim>0?'Reembolso aprovado':'Dentro da tolerância',acc:d.valorReim>0?'kr':'kgr'},
-  ]);
-}
-function renderKPIs_M3(d){
-  const pp=d.volFat>0?(d.perda/d.volFat)*100:0;
-  document.getElementById('kpiGrid').innerHTML=kpiHtml([
-    {lbl:'Viagens no Mês',val:d.nV.toLocaleString('pt-BR'),sub:'Todas em Conta Corrente',acc:'kb'},
-    {lbl:'Vol. Faturado',val:f(d.volFat,0)+' L',sub:'Peso líquido total',acc:''},
-    {lbl:'Perda',val:f(Math.abs(d.perda),0)+' L',vc:d.perda<0?'kv-r':'kv-g',sub:pp.toFixed(4)+'% sobre faturado',acc:d.perda<0?'kr':''},
-    {lbl:'Tolerância Fixa',val:d.indLbl,sub:f(Math.abs(d.volTol),0)+' L tolerados',acc:''},
-    {lbl:'Vol. a Reembolsar',val:d.volReim>0?f(d.volReim,0)+' L':'—',vc:d.volReim>0?'kv-r':'',sub:'Excedente da tolerância',acc:d.volReim>0?'kr':''},
-    {lbl:'Total a Reembolsar',val:brl(d.valorReim),vc:d.valorReim>0?'kv-r':'kv-g',sub:d.valorReim>0?'Reembolso aprovado':'Dentro da tolerância',acc:d.valorReim>0?'kr':'kgr'},
   ]);
 }
 function renderKPIs_M4(d){
@@ -603,24 +642,30 @@ function renderKPIs_M4(d){
   ]);
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // RESULT BOXES
-// ══════════════════════════════════════════════════════
-function renderResultBox_M12(d){
-  const box=document.getElementById('resultBox'),vt=d.valorTotal||d.valorReim||0,tr=d.temR;
-  box.innerHTML=tr
+// ════════════════════════════════════════════
+function renderResultBox_cc(d){
+  const vt=d.valorReim||d.valorTotal||0,tr=d.temR;
+  document.getElementById('resultBox').innerHTML=tr
     ?`<div class="result-box nok"><div class="rb-header"><span style="font-size:18px">⚠️</span><span class="rb-title">Reembolso identificado — ${brl(vt)}</span></div>
+      <div class="rb-body"><strong>Vol. a Reembolsar:</strong> ${f(d.volReim||d.volReemCC||0,3)} L → <strong>${brl(vt)}</strong><br><br>Para aprovação da ND é necessário o envio da <strong>carta de não aproveitamento de crédito</strong>.</div></div>`
+    :`<div class="result-box ok"><div class="rb-header"><span style="font-size:18px">✅</span><span class="rb-title">Dentro da tolerância — sem reembolso</span></div>
+      <div class="rb-body">Com base na análise de descargas apresentadas no sistema, não há reembolso a ser considerado para este cliente no período.</div></div>`;
+}
+function renderResultBox_M1(d){
+  document.getElementById('resultBox').innerHTML=d.temR
+    ?`<div class="result-box nok"><div class="rb-header"><span style="font-size:18px">⚠️</span><span class="rb-title">Reembolso identificado — ${brl(d.valorTotal)}</span></div>
       <div class="rb-body">
-        ${d.valReemCC>0?`<strong>Conta Corrente:</strong> ${f(d.volReemCC||0,3)} L → <strong>${brl(d.valReemCC)}</strong><br>`:''}
-        ${(d.valReemCI||0)>0?`<strong>Cobrança Individual:</strong> ${f(d.volReemCI||0,3)} L → <strong>${brl(d.valReemCI)}</strong><br>`:''}
+        ${d.valReemCC>0?`<strong>Conta Corrente:</strong> ${f(d.volReemCC,3)} L → <strong>${brl(d.valReemCC)}</strong><br>`:''}
+        ${d.valReemCI>0?`<strong>Cobrança Individual:</strong> ${f(d.volReemCI,3)} L → <strong>${brl(d.valReemCI)}</strong><br>`:''}
         <br>Para aprovação da ND é necessário o envio da <strong>carta de não aproveitamento de crédito</strong>.
       </div></div>`
     :`<div class="result-box ok"><div class="rb-header"><span style="font-size:18px">✅</span><span class="rb-title">Dentro da tolerância — sem reembolso</span></div>
       <div class="rb-body">Com base na análise de descargas apresentadas no sistema, não há reembolso a ser considerado para este cliente no período.</div></div>`;
 }
 function renderResultBox_M4(d){
-  const box=document.getElementById('resultBox');
-  box.innerHTML=d.temR
+  document.getElementById('resultBox').innerHTML=d.temR
     ?`<div class="result-box nok"><div class="rb-header"><span style="font-size:18px">⚠️</span><span class="rb-title">Reembolso identificado — ${brl(d.totVal)}</span></div>
       <div class="rb-body"><strong>${d.nReim}</strong> viagem(ns) ultrapassaram a tolerância de <strong>${d.indLbl}</strong>.<br>
       Vol. excedente total: <strong>${f(d.totExc,3)} L</strong> → <strong>${brl(d.totVal)}</strong><br><br>
@@ -629,11 +674,11 @@ function renderResultBox_M4(d){
       <div class="rb-body">Nenhuma viagem ultrapassou a tolerância de <strong>${d.indLbl}</strong> no período analisado.</div></div>`;
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // CONSIDERAÇÕES
-// ══════════════════════════════════════════════════════
-function renderConsid_M12(d){
-  const vt=d.valorTotal||d.valorReim||0,tr=d.temR;
+// ════════════════════════════════════════════
+function renderConsid_cc(d){
+  const vt=d.valorReim||d.valorTotal||0,tr=d.temR;
   document.getElementById('considText').textContent=tr
     ?`Com base na análise de descargas apresentadas em nosso sistema, segue reembolso referente à movimentação da solicitação em questão.\n\nPara aprovação da ND necessitamos que seja enviada a carta de não aproveitamento de crédito relativo ao valor acima apontado.\n\nValor a reembolsar: ${brl(vt)}\nPeríodo: ${d.mes}`
     :`Com base na análise de descargas apresentadas em nosso sistema, não há reembolso a ser considerado.\n\nPeríodo: ${d.mes}`;
@@ -646,197 +691,187 @@ function renderConsid_M4(d){
   document.getElementById('considBox').style.display='block';
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // TABLES
-// ══════════════════════════════════════════════════════
-function renderTable_M1(viagens){
-  const rows=viagens.map(r=>{
-    const dDt=fmtD(r.dCh)!=='—'?fmtD(r.dCh):fmtD(r.dSa);
-    const qC=r.qbAnal<0?'v-r':r.qbAnal>0?'v-g':'';
-    const iC=r.idxAnal<0?'v-r':r.idxAnal>0?'v-g':'';
-    const isCI=r.qPct>TOL_COB_IND;
-    const volT=isCI?(r.tol/100)*r.pLiq:null;
-    const volE=isCI&&volT!==null&&r.qbAnal<volT?volT-r.qbAnal:null;
-    const valE=volE!==null?volE*r.vUnit:null;
-    return`<tr class="${(isCI&&valE>0)?'row-reim':''}">
-      <td>${r.nf||'—'}${isCI?'<span class="badge-ci">CI</span>':''} ${!isCI&&false?'':''}</td>
-      <td>${fmtD(r.dtEm)}</td>
-      <td class="mono">${f(r.pLiq,0)}</td><td class="mono">${f(r.pDest,0)}</td>
-      <td>${dDt}</td>
-      <td class="mono ${qC}">${f(r.qbAnal,0)}</td>
-      <td class="mono ${iC}">${pct(r.idxAnal)}</td>
-      <td class="mono v-d">${isCI?f(volT||0,0):'CC'}</td>
-      <td class="mono ${valE>0?'v-r':'v-d'}">${volE!=null&&volE>0?f(volE,3):'—'}</td>
-      <td class="mono ${valE>0?'v-r':'v-d'}">${valE!=null&&valE>0?brl(valE):'—'}</td>
-    </tr>`;
-  }).join('');
-  const tQb=viagens.reduce((s,r)=>s+r.qbAnal,0),tPL=viagens.reduce((s,r)=>s+r.pLiq,0);
-  const tIdx=tPL>0?tQb/tPL:0;
-  const ftQ=tQb<0?'color:var(--danger)':tQb>0?'color:var(--green)':'';
-  document.getElementById('tableWrap').innerHTML=`<table>
-    <thead><tr><th style="text-align:left">Nº Nota</th><th>Dt. Emissão</th><th>Peso Líq.</th><th>Peso Dest.</th><th>Dt. Descarga</th><th>Quebra (L)</th><th>Índice</th><th>Tol / Tipo</th><th>Vol. Exc.</th><th>Valor Reimb.</th></tr></thead>
-    <tbody>${rows}</tbody>
-    <tfoot><tr><td colspan="2">TOTAL</td><td>${f(tPL,0)}</td><td></td><td></td>
-      <td style="${ftQ}">${f(tQb,0)}</td><td style="${ftQ}">${pct(tIdx)}</td>
-      <td></td><td></td><td></td></tr></tfoot></table>`;
-}
-function renderTable_M24(viagens){
+// ════════════════════════════════════════════
+function renderTable_simples(viagens){
   const rows=viagens.map(r=>{
     const dDt=fmtD(r.dCh)!=='—'?fmtD(r.dCh):fmtD(r.dSa);
     const qC=r.qbAnal<0?'v-r':r.qbAnal>0?'v-g':'',iC=r.idxAnal<0?'v-r':r.idxAnal>0?'v-g':'';
     return`<tr><td>${r.nf||'—'}</td><td>${fmtD(r.dtEm)}</td>
-      <td class="mono">${f(r.pLiq,0)}</td><td class="mono">${f(r.pDest,0)}</td>
-      <td>${dDt}</td><td class="mono ${qC}">${f(r.qbAnal,0)}</td><td class="mono ${iC}">${pct(r.idxAnal)}</td></tr>`;
+      <td>${f(r.pLiq,0)}</td><td>${f(r.pDest,0)}</td><td>${dDt}</td>
+      <td class="${qC}">${f(r.qbAnal,0)}</td><td class="${iC}">${pct(r.idxAnal)}</td></tr>`;
   }).join('');
-  const tQb=viagens.reduce((s,r)=>s+r.qbAnal,0),tPL=viagens.reduce((s,r)=>s+r.pLiq,0);
+  const tPL=viagens.reduce((s,r)=>s+r.pLiq,0),tQb=viagens.reduce((s,r)=>s+r.qbAnal,0);
   const tIdx=tPL>0?tQb/tPL:0,ftQ=tQb<0?'color:var(--danger)':tQb>0?'color:var(--green)':'';
   document.getElementById('tableWrap').innerHTML=`<table>
-    <thead><tr><th style="text-align:left">Nº Nota</th><th>Dt. Emissão</th><th>Peso Líq. (L)</th><th>Peso Dest. (L)</th><th>Dt. Descarga</th><th>Quebra (L)</th><th>Índice</th></tr></thead>
+    <thead><tr><th style="text-align:left">Nº Nota</th><th>Dt. Emissão</th><th>Peso Líq. (L)</th>
+    <th>Peso Dest. (L)</th><th>Dt. Descarga</th><th>Quebra (L)</th><th>Índice</th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr><td colspan="2">TOTAL</td><td>${f(tPL,0)}</td><td></td><td></td>
-      <td style="${ftQ}">${f(tQb,0)}</td><td style="${ftQ}">${pct(tIdx)}</td></tr></tfoot></table>`;
+    <td style="${ftQ}">${f(tQb,0)}</td><td style="${ftQ}">${pct(tIdx)}</td></tr></tfoot></table>`;
+}
+function renderTable_M1(viagens){
+  const rows=viagens.map(r=>{
+    const dDt=fmtD(r.dCh)!=='—'?fmtD(r.dCh):fmtD(r.dSa);
+    const qC=r.qbAnal<0?'v-r':r.qbAnal>0?'v-g':'',iC=r.idxAnal<0?'v-r':r.idxAnal>0?'v-g':'';
+    const isCI=r.qPct>TOL_COB_IND;
+    const vt=isCI?(r.tol/100)*r.pLiq:null,vE=isCI&&vt!==null&&r.qbAnal<vt?vt-r.qbAnal:null;
+    const vaE=vE?vE*r.vUnit:null;
+    return`<tr class="${isCI&&vaE>0?'row-reim':''}">
+      <td>${r.nf||'—'}${isCI?'<span class="badge-ci">CI</span>':''}</td>
+      <td>${fmtD(r.dtEm)}</td><td>${f(r.pLiq,0)}</td><td>${f(r.pDest,0)}</td><td>${dDt}</td>
+      <td class="${qC}">${f(r.qbAnal,0)}</td><td class="${iC}">${pct(r.idxAnal)}</td>
+      <td class="v-d">${isCI?f(vt||0,0):'CC'}</td>
+      <td class="${vaE>0?'v-r':'v-d'}">${vaE>0?brl(vaE):'—'}</td></tr>`;
+  }).join('');
+  const tPL=viagens.reduce((s,r)=>s+r.pLiq,0),tQb=viagens.reduce((s,r)=>s+r.qbAnal,0);
+  const tIdx=tPL>0?tQb/tPL:0,ftQ=tQb<0?'color:var(--danger)':tQb>0?'color:var(--green)':'';
+  document.getElementById('tableWrap').innerHTML=`<table>
+    <thead><tr><th style="text-align:left">Nº Nota</th><th>Dt. Emissão</th><th>Peso Líq.</th>
+    <th>Peso Dest.</th><th>Dt. Descarga</th><th>Quebra (L)</th><th>Índice</th><th>Tol/Tipo</th><th>Valor Reimb.</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="2">TOTAL</td><td>${f(tPL,0)}</td><td></td><td></td>
+    <td style="${ftQ}">${f(tQb,0)}</td><td style="${ftQ}">${pct(tIdx)}</td><td></td><td></td></tr></tfoot></table>`;
 }
 function renderTable_M4(rows){
   const trs=rows.map(r=>{
-    const dDt=fmtD(r.dCh)!=='—'?fmtD(r.dCh):fmtD(r.dSa);
-    const qC=r.qb<0?'v-r':r.qb>0?'v-g':'',iC=r.idx<0?'v-r':r.idx>0?'v-g':'',hR=r.volExc>0;
+    const dDt=fmtD(r.dCh)!=='—'?fmtD(r.dCh):fmtD(r.dSa),hR=r.volExc>0;
+    const qC=r.qb<0?'v-r':r.qb>0?'v-g':'',iC=r.idx<0?'v-r':r.idx>0?'v-g':'';
     return`<tr class="${hR?'row-reim':''}">
       <td>${r.nf||'—'}${hR?'<span class="badge-reim">Reimb.</span>':''}</td>
-      <td>${fmtD(r.dtEm)}</td>
-      <td class="mono">${f(r.pLiq,0)}</td><td class="mono">${f(r.pDest,0)}</td>
-      <td>${dDt}</td><td class="mono ${qC}">${f(r.qb,0)}</td><td class="mono ${iC}">${pct(r.idx)}</td>
-      <td class="mono v-d">${f(r.volTol,0)}</td>
-      <td class="mono ${hR?'v-r':'v-d'}">${hR?f(r.volExc,3):'—'}</td>
-      <td class="mono ${hR?'v-r':'v-d'}">${hR?brl(r.valExc):'—'}</td></tr>`;
+      <td>${fmtD(r.dtEm)}</td><td>${f(r.pLiq,0)}</td><td>${f(r.pDest,0)}</td><td>${dDt}</td>
+      <td class="${qC}">${f(r.qb,0)}</td><td class="${iC}">${pct(r.idx)}</td>
+      <td class="v-d">${f(r.volTol,0)}</td>
+      <td class="${hR?'v-r':'v-d'}">${hR?f(r.volExc,3):'—'}</td>
+      <td class="${hR?'v-r':'v-d'}">${hR?brl(r.valExc):'—'}</td></tr>`;
   }).join('');
   const tPL=rows.reduce((s,r)=>s+r.pLiq,0),tQb=rows.reduce((s,r)=>s+r.qb,0);
   const tIdx=tPL>0?tQb/tPL:0,tExc=rows.reduce((s,r)=>s+r.volExc,0),tVal=rows.reduce((s,r)=>s+r.valExc,0);
   const ftQ=tQb<0?'color:var(--danger)':tQb>0?'color:var(--green)':'';
   document.getElementById('tableWrap').innerHTML=`<table>
-    <thead><tr><th style="text-align:left">Nº Nota</th><th>Dt. Emissão</th><th>Peso Líq.</th><th>Peso Dest.</th><th>Dt. Descarga</th><th>Quebra (L)</th><th>Índice</th><th>Vol. Tol.</th><th>Vol. Exc.</th><th>Valor Reimb.</th></tr></thead>
+    <thead><tr><th style="text-align:left">Nº Nota</th><th>Dt. Emissão</th><th>Peso Líq.</th>
+    <th>Peso Dest.</th><th>Dt. Descarga</th><th>Quebra (L)</th><th>Índice</th>
+    <th>Vol. Tol.</th><th>Vol. Exc.</th><th>Valor Reimb.</th></tr></thead>
     <tbody>${trs}</tbody>
     <tfoot><tr><td colspan="2">TOTAL</td><td>${f(tPL,0)}</td><td></td><td></td>
-      <td style="${ftQ}">${f(tQb,0)}</td><td style="${ftQ}">${pct(tIdx)}</td><td></td>
-      <td style="color:${tExc>0?'var(--danger)':'inherit'}">${tExc>0?f(tExc,3):'—'}</td>
-      <td style="color:${tVal>0?'var(--danger)':'inherit'}">${tVal>0?brl(tVal):'—'}</td></tr></tfoot></table>`;
+    <td style="${ftQ}">${f(tQb,0)}</td><td style="${ftQ}">${pct(tIdx)}</td><td></td>
+    <td style="color:${tExc>0?'var(--danger)':'inherit'}">${tExc>0?f(tExc,3):'—'}</td>
+    <td style="color:${tVal>0?'var(--danger)':'inherit'}">${tVal>0?brl(tVal):'—'}</td></tr></tfoot></table>`;
 }
 
-// ══════════════════════════════════════════════════════
-// MODAL & PDF
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// PDF CARD BUILDER
+// ════════════════════════════════════════════
 function buildPDFCard(d){
-  const isM4=d.meto===4;
-  const vt=isM4?d.totVal:(d.valorTotal||d.valorReim||0);
+  const prod=PRODUCTS[d.produto||'etanol'];
   const temR=d.temR,simX=temR?'X':'',naoX=temR?'':'X';
   const consid=temR
     ?'Com base na análise de descargas apresentadas em nosso sistema, segue reembolso referente à movimentação da solicitação em questão. Para aprovação da ND necessitamos que seja enviada a carta de não aproveitamento de crédito relativo ao valor acima apontado.'
     :'Com base na análise de descargas apresentadas em nosso sistema, não há reembolso a ser considerado.';
 
-  // Build rows for modal preview
-  let innerRows='';
-  if(d.meto===1){
-    const pp=d.volFatCC>0?(d.perdaCC/d.volFatCC):0;
-    innerRows=`
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol. Faturado (CC)</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${f(d.volFatCC,0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol. Recebido (CC)</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${f(d.volRecCC,0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Perda</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">-</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${f(Math.abs(d.perdaCC),0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Indice CC</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${pct(Math.abs(pp))}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Tolerancia (Raiz)</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${(d.tolPct*100).toFixed(4)}%</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Qtde Viagens</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${d.nV} (${d.nCC} CC · ${d.nCI} CI)</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol Tolerancia</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">-</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${f(Math.abs(d.volTolCC),0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Vol a Reembolsar CC</td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${d.volReemCC>0?f(d.volReemCC,3):'-'}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Média Valor Unit. <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${f(d.mediaUnit,2)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Valor Reimb. CC <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${d.valReemCC>0?brl(d.valReemCC):'-'}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Vol a Reimb. Cob. Individual</td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${d.volReemCI>0?f(d.volReemCI,3):'-'}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Valor Reimb. Cob. Individual <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${d.valReemCI>0?brl(d.valReemCI):'-'}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Valor Total a Reembolsar <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${vt>0?brl(vt):'-'}</td></tr>`;
-  } else if(d.meto===2||d.meto===3){
+  // Build card rows
+  let cardRows='';
+  const row=(lbl,val,opts='')=>`<tr style="border-bottom:1px solid #e8eef8"><td style="padding:5px 16px;color:${opts==='bold'?'#1a2340':'#6b7a99'};font-weight:${opts==='bold'?700:400}">${lbl}</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${val}</td></tr>`;
+  const rowRS=(lbl,val)=>`<tr style="border-bottom:1px solid #e8eef8"><td style="padding:5px 16px;color:#1a2340;font-weight:700">${lbl} <span style="color:#6b7a99;font-weight:400">R$</span></td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right" colspan="2">${val}</td></tr>`;
+  const rowNeg=(lbl,val)=>`<tr style="border-bottom:1px solid #e8eef8"><td style="padding:5px 16px;color:#6b7a99">${lbl}</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">-</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${val}</td></tr>`;
+
+  const metoLabel={1:'CC + Cobrança Individual',2:'CC — Viagens (Raiz)',3:'CC — Índice Fixo',4:'Caminhão a Caminhão',fixo:'CC Fixa'};
+
+  if(d.meto==='fixo'||d.meto===2||d.meto===3){
     const pp=d.volFat>0?(d.perda/d.volFat):0;
-    const tolStr=d.meto===2?(d.tolPct*100).toFixed(4)+'%':d.indLbl;
-    innerRows=`
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol. Faturado</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${f(d.volFat,0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol. Recebido</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${f(d.volRec,0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Perda</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">-</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${f(Math.abs(d.perda),0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Indice</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${pct(Math.abs(pp))}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Tolerancia</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${tolStr}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Qtde Viagens</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${d.nV}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol Tolerancia</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">-</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${f(Math.abs(d.volTol),0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Vol a Reembolsar <span style="color:#6b7a99;font-weight:400">CC</span></td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${d.volReim>0?f(d.volReim,3):'-'}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Média Valor Unit. <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;font-weight:700;text-align:right">${f(d.mediaUnit,2)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Valor Total a Reembolsar <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${vt>0?brl(vt):'-'}</td></tr>`;
+    const tolStr=d.meto===2?(d.tolPct*100).toFixed(4)+'%':'−'+d.indLbl;
+    cardRows+=row('Vol. Faturado',f(d.volFat,0))+row('Vol. Recebido',f(d.volRec,0));
+    cardRows+=rowNeg('Perda',f(Math.abs(d.perda),0));
+    cardRows+=row('Indice',pct(Math.abs(pp)))+row('Tolerancia',tolStr);
+    cardRows+=row('Qtde Viagens',String(d.nV));
+    cardRows+=rowNeg('Vol Tolerancia',f(Math.abs(d.volTol),0));
+    cardRows+=row('Vol a Reembolsar',d.volReim>0?f(d.volReim,3):'-','bold');
+    cardRows+=rowRS('Média Valor Unit.',f(d.mediaUnit,2));
+    cardRows+=rowRS('Valor Total a Reembolsar',d.valorReim>0?brl(d.valorReim):'-');
+  } else if(d.meto===1){
+    const pp=d.volFatCC>0?(d.perdaCC/d.volFatCC):0;
+    cardRows+=row('Vol. Faturado (CC)',f(d.volFatCC,0))+row('Vol. Recebido (CC)',f(d.volRecCC,0));
+    cardRows+=rowNeg('Perda',f(Math.abs(d.perdaCC),0));
+    cardRows+=row('Indice CC',pct(Math.abs(pp)))+row('Tolerancia (Raiz)',(d.tolPct*100).toFixed(4)+'%');
+    cardRows+=row('Qtde Viagens',`${d.nV} (${d.nCC} CC · ${d.nCI} CI)`);
+    cardRows+=rowNeg('Vol Tolerancia',f(Math.abs(d.volTolCC),0));
+    cardRows+=row('Vol a Reimb. CC',d.volReemCC>0?f(d.volReemCC,3):'-','bold');
+    cardRows+=rowRS('Média Valor Unit.',f(d.mediaUnit,2));
+    cardRows+=rowRS('Valor Reimb. CC',d.valReemCC>0?brl(d.valReemCC):'-');
+    cardRows+=row('Vol a Reimb. CI',d.volReemCI>0?f(d.volReemCI,3):'-','bold');
+    cardRows+=rowRS('Valor Reimb. CI',d.valReemCI>0?brl(d.valReemCI):'-');
+    cardRows+=rowRS('Valor Total a Reembolsar',d.valorTotal>0?brl(d.valorTotal):'-');
   } else {
-    innerRows=`
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Índice Aplicado</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:700;text-align:right">${d.indLbl}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Qtde Viagens</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${d.nV}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol. Faturado Total</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${f(d.totPLiq,0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Vol. Recebido Total</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${f(d.totPDest,0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Perda Total</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">-</td><td style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${f(Math.abs(d.totQb),0)}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#6b7a99">Viagens c/ Reembolso</td><td colspan="2" style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${d.nReim}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Vol. Excedente Total</td><td colspan="2" style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${d.totExc>0?f(d.totExc,3):'-'}</td></tr>
-      <tr style="border-bottom:1px solid #e8eef8;"><td style="padding:5px 16px;color:#1a2340;font-weight:700">Valor Total a Reembolsar <span style="color:#6b7a99;font-weight:400">R$</span></td><td colspan="2" style="padding:5px 16px;color:#b91c1c;font-weight:700;text-align:right">${vt>0?brl(vt):'-'}</td></tr>`;
+    cardRows+=row('Índice Aplicado',d.indLbl,'bold')+row('Qtde Viagens',String(d.nV));
+    cardRows+=row('Vol. Faturado Total',f(d.totPLiq,0))+row('Vol. Recebido Total',f(d.totPDest,0));
+    cardRows+=rowNeg('Perda Total',f(Math.abs(d.totQb),0));
+    cardRows+=row('Viagens c/ Reembolso',String(d.nReim));
+    cardRows+=row('Vol. Excedente Total',d.totExc>0?f(d.totExc,3):'-','bold');
+    cardRows+=rowRS('Valor Total a Reembolsar',d.totVal>0?brl(d.totVal):'-');
   }
 
-  const metoNames=['','Conta Corrente + Cobrança Individual','Conta Corrente — Viagens','Conta Corrente — Índice Fixo','Caminhão a Caminhão'];
+  // Analytic table rows
+  const isM4=d.meto===4;
   const tblRows=d.viagens.map(r=>{
-    const rv=d.meto===4?r:r; // same structure
-    const dDt=fmtD(rv.dCh||rv.dCh)!=='—'?fmtD(rv.dCh):fmtD(rv.dSa);
-    const qb=d.meto===4?rv.qb:rv.qbAnal, idx=d.meto===4?rv.idx:rv.idxAnal;
+    const dDt=fmtD(r.dCh)!=='—'?fmtD(r.dCh):fmtD(r.dSa);
+    const qb=isM4?r.qb:r.qbAnal,idx=isM4?r.idx:r.idxAnal;
     const qC=qb<0?'color:#b91c1c;font-weight:700':qb>0?'color:#1a6b35;font-weight:700':'';
     const iC=idx<0?'color:#b91c1c;font-weight:700':idx>0?'color:#1a6b35;font-weight:700':'';
-    let extraCols='';
-    if(d.meto===4){const hR=rv.volExc>0;extraCols=`<td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;color:#6b7a99">${f(rv.volTol,0)}</td><td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;${hR?'color:#b91c1c;font-weight:700':''}">${hR?f(rv.volExc,3):'—'}</td><td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;${hR?'color:#b91c1c;font-weight:700':''}">${hR?brl(rv.valExc):'—'}</td>`;}
-    else if(d.meto===1){const isCI=rv.qPct>TOL_COB_IND,volT=isCI?(rv.tol/100)*rv.pLiq:null,volE=isCI&&volT!==null&&rv.qbAnal<volT?volT-rv.qbAnal:null,valE=volE?volE*rv.vUnit:null;extraCols=`<td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px">${isCI?'CI':'CC'}</td><td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;${valE>0?'color:#b91c1c;font-weight:700':''}">${valE>0?brl(valE):'—'}</td>`;}
+    let extra='';
+    if(isM4){const hR=r.volExc>0;extra=`<td style="padding:5px 8px;text-align:right;font-size:11px;color:#6b7a99">${f(r.volTol,0)}</td><td style="padding:5px 8px;text-align:right;font-size:11px;${hR?'color:#b91c1c;font-weight:700':''}">${hR?f(r.volExc,3):'—'}</td><td style="padding:5px 8px;text-align:right;font-size:11px;${hR?'color:#b91c1c;font-weight:700':''}">${hR?brl(r.valExc):'—'}</td>`;}
+    else if(d.meto===1){const isCI=r.qPct>TOL_COB_IND,vt=isCI?(r.tol/100)*r.pLiq:null,vE=isCI&&vt!==null&&r.qbAnal<vt?vt-r.qbAnal:null,vaE=vE?vE*r.vUnit:null;extra=`<td style="padding:5px 8px;text-align:right;font-size:11px">${isCI?'CI':'CC'}</td><td style="padding:5px 8px;text-align:right;font-size:11px;${vaE>0?'color:#b91c1c;font-weight:700':''}">${vaE>0?brl(vaE):'—'}</td>`;}
     return`<tr style="border-bottom:1px solid #e8eef8">
-      <td style="padding:5px 8px;color:#1a2340;font-weight:600;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px">${rv.nf||'—'}</td>
-      <td style="padding:5px 8px;color:#6b7a99;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px">${fmtD(rv.dtEm)}</td>
-      <td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px">${f(rv.pLiq,0)}</td>
-      <td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px">${f(rv.pDest,0)}</td>
-      <td style="padding:5px 8px;text-align:right;color:#6b7a99;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px">${dDt}</td>
-      <td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;${qC}">${f(qb,0)}</td>
-      <td style="padding:5px 8px;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;${iC}">${pct(idx)}</td>
-      ${extraCols}</tr>`;
+      <td style="padding:5px 8px;color:#1a2340;font-weight:600;font-size:11px">${r.nf||'—'}</td>
+      <td style="padding:5px 8px;text-align:right;color:#6b7a99;font-size:11px">${fmtD(r.dtEm)}</td>
+      <td style="padding:5px 8px;text-align:right;font-size:11px">${f(r.pLiq,0)}</td>
+      <td style="padding:5px 8px;text-align:right;font-size:11px">${f(r.pDest,0)}</td>
+      <td style="padding:5px 8px;text-align:right;color:#6b7a99;font-size:11px">${dDt}</td>
+      <td style="padding:5px 8px;text-align:right;font-size:11px;${qC}">${f(qb,0)}</td>
+      <td style="padding:5px 8px;text-align:right;font-size:11px;${iC}">${pct(idx)}</td>
+      ${extra}</tr>`;
   }).join('');
 
   let extraTh='';
-  if(d.meto===4) extraTh='<th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:\'Barlow Condensed\',Arial,sans-serif;font-size:10px">Vol. Tol.</th><th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:\'Barlow Condensed\',Arial,sans-serif;font-size:10px">Vol. Exc.</th><th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:\'Barlow Condensed\',Arial,sans-serif;font-size:10px">Valor Reimb.</th>';
-  else if(d.meto===1) extraTh='<th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:\'Barlow Condensed\',Arial,sans-serif;font-size:10px">Tipo</th><th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:\'Barlow Condensed\',Arial,sans-serif;font-size:10px">Valor Reimb.</th>';
+  if(isM4) extraTh='<th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Vol.Tol.</th><th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Vol.Exc.</th><th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Valor Reimb.</th>';
+  else if(d.meto===1) extraTh='<th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Tipo</th><th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Valor Reimb.</th>';
 
   return`
-  <div id="rptCard" style="font-family:Arial,sans-serif;background:#fff;width:720px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;border-bottom:2px solid #d0d9e8;">
+  <div id="rptCard" style="font-family:Arial,sans-serif;background:#fff;width:720px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;border-bottom:2px solid #d0d9e8">
       <div><img src="${LOGO_B64}" alt="INPASA" style="height:42px;display:block">
         <div style="font-size:9px;color:#6b7a99;letter-spacing:.1em;text-transform:uppercase">Agroindustrial S.A.</div></div>
       <div style="text-align:right">
         <div style="font-size:14px;font-weight:700;color:#1a2340;text-transform:uppercase">APURAÇÃO P&amp;S</div>
-        <div style="font-size:10px;color:#6b7a99;margin-top:2px">${metoNames[d.meto]}</div>
+        <div style="font-size:11px;color:#6b7a99;margin-top:2px">${prod.icon} ${prod.name} · ${metoLabel[d.meto]||d.meto}</div>
       </div>
     </div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
       <tr style="background:#1a3a6b"><td style="padding:7px 16px;color:#fff;font-weight:700;width:44%">Cliente</td><td colspan="2" style="padding:7px 16px;color:#fff;font-weight:700;text-align:right">${d.nome.toUpperCase()}</td></tr>
       <tr style="border-bottom:1px solid #e8eef8"><td style="padding:5px 16px;color:#6b7a99">Mês</td><td style="padding:5px 16px;color:#1a2340;font-weight:600;text-align:right">${d.mes}</td><td style="padding:5px 16px;color:#1a2340;text-align:right">${d.cod}</td></tr>
-      ${innerRows}
+      ${cardRows}
       <tr style="background:#1a3a6b"><td style="padding:7px 16px;color:#fff;font-weight:700;text-align:center">Conclusão</td><td style="padding:7px 16px;color:#fff;font-weight:700;text-align:center">Sim</td><td style="padding:7px 16px;color:#fff;font-weight:700;text-align:center">Não</td></tr>
       <tr style="border-bottom:2px solid #d0d9e8"><td style="padding:6px 16px;color:#1a2340">Reembolso aprovado?</td><td style="padding:6px 16px;color:#1a2340;font-weight:700;text-align:center">${simX}</td><td style="padding:6px 16px;color:#1a2340;font-weight:700;text-align:center">${naoX}</td></tr>
       <tr style="background:#e8eef8"><td colspan="3" style="padding:7px 16px;color:#1a3a6b;font-weight:700;text-align:center">Considerações</td></tr>
       <tr><td colspan="3" style="padding:10px 16px;font-size:12px;color:#1a2340;line-height:1.6;text-align:center">${consid}</td></tr>
     </table>
   </div>
-  <div id="rptAnalytic" style="font-family:Arial,sans-serif;background:#fff;width:720px;margin-top:24px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;border-bottom:2px solid #d0d9e8;">
+  <div id="rptAnalytic" style="font-family:Arial,sans-serif;background:#fff;width:720px;margin-top:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;border-bottom:2px solid #d0d9e8">
       <div><img src="${LOGO_B64}" alt="INPASA" style="height:34px;display:block">
         <div style="font-size:8px;color:#6b7a99;letter-spacing:.1em;text-transform:uppercase">Agroindustrial S.A.</div></div>
       <div><div style="font-size:12px;font-weight:700;color:#1a2340;text-transform:uppercase;text-align:right">Relatório Analítico de Descargas</div>
-        <div style="font-size:11px;color:#6b7a99;text-align:right">${d.nome} · ${d.mes}</div></div>
+        <div style="font-size:11px;color:#6b7a99;text-align:right">${d.nome} · ${d.mes} · ${prod.name}</div></div>
     </div>
-    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
       <thead><tr style="background:#1a3a6b">
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:left;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Nº Nota</th>
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Dt. Emissão</th>
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Peso Líq.</th>
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Peso Dest.</th>
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Dt. Descarga</th>
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Quebra (L)</th>
-        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px">Índice</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:left;font-size:10px">Nº Nota</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Dt. Emissão</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Peso Líq.</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Peso Dest.</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Dt. Descarga</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Quebra (L)</th>
+        <th style="padding:6px 8px;color:#fff;font-weight:700;text-align:right;font-size:10px">Índice</th>
         ${extraTh}
       </tr></thead>
       <tbody>${tblRows}</tbody>
@@ -844,6 +879,9 @@ function buildPDFCard(d){
   </div>`;
 }
 
+// ════════════════════════════════════════════
+// MODAL & PDF
+// ════════════════════════════════════════════
 function abrirRelatorio(){
   if(!LAST)return;
   document.getElementById('modalBody').innerHTML=`<div id="rptEl">${buildPDFCard(LAST)}</div>`;
@@ -858,20 +896,20 @@ async function baixarRelatorio(){
   document.getElementById('modalOverlay').classList.add('show');
   await new Promise(r=>setTimeout(r,300));
   try{
-    const{jsPDF}=window.jspdf;
+    const{jsPDF}=window.jspdf,d=LAST,prod=PRODUCTS[d.produto||'etanol'];
     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const A4_W=210,A4_H=297,MARGIN=10,usableW=A4_W-MARGIN*2,usableH=A4_H-MARGIN*2;
-    const d=LAST,ML=14,MR=196,COL2=110,ROW_H=8.2,HEADER_H=8;
+    const ML=14,MR=196,COL2=110,ROW_H=8.2,HEADER_H=8;
     const ra=(t,x,y)=>pdf.text(String(t),x,y,{align:'right'});
     const la=(t,x,y)=>pdf.text(String(t),x,y);
+    const metoLabel={1:'CC + Cob. Individual',2:'CC — Viagens (Raiz)',3:'CC — Índice Fixo',4:'Caminhão a Caminhão',fixo:'CC Fixa'};
 
-    // PAGE 1: native jsPDF card
+    // PAGE 1 native jsPDF
     pdf.addImage(LOGO_B64,'PNG',ML,10,45,10.9);
     pdf.setFont('helvetica','bold');pdf.setFontSize(12);pdf.setTextColor(26,35,64);
     ra('APURAÇÃO P&S',MR,16);
-    const metoNames=['','CC + Cob. Individual','CC — Viagens (Raiz)','CC — Índice Fixo','Caminhão a Caminhão'];
     pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor(107,122,153);
-    ra(metoNames[d.meto],MR,22);
+    ra(prod.name+' · '+(metoLabel[d.meto]||d.meto),MR,22);
     pdf.setDrawColor(208,217,232);pdf.setLineWidth(0.5);pdf.line(ML,26,MR,26);
     let y=31;
     pdf.setFillColor(26,58,107);pdf.rect(ML,y-5.5,MR-ML,HEADER_H,'F');
@@ -880,6 +918,7 @@ async function baixarRelatorio(){
     pdf.setDrawColor(232,238,248);pdf.line(ML,y+2.5,MR,y+2.5);
     pdf.setFont('helvetica','normal');pdf.setFontSize(10);pdf.setTextColor(107,122,153);la('Mês',ML+2,y);
     pdf.setFont('helvetica','bold');pdf.setTextColor(26,35,64);la(d.mes,COL2,y);ra(d.cod,MR-2,y);y+=ROW_H;
+
     const row=(lbl,val,opts={})=>{
       pdf.setDrawColor(232,238,248);pdf.line(ML,y+2.5,MR,y+2.5);
       pdf.setFont('helvetica',opts.bold?'bold':'normal');pdf.setFontSize(10);
@@ -894,7 +933,17 @@ async function baixarRelatorio(){
       pdf.setFont('helvetica','normal');pdf.setTextColor(107,122,153);ra('R$',COL2,y);
       pdf.setFont('helvetica','bold');pdf.setTextColor(26,35,64);ra(String(val),MR-2,y);y+=ROW_H;
     };
-    if(d.meto===1){
+
+    if(d.meto==='fixo'||d.meto===2||d.meto===3){
+      const pp=d.volFat>0?(d.perda/d.volFat):0;
+      const tolStr=d.meto===2?(d.tolPct*100).toFixed(4)+'%':(d.indLbl||'—');
+      row('Vol. Faturado',f(d.volFat,0));row('Vol. Recebido',f(d.volRec,0));
+      row('Perda',f(Math.abs(d.perda),0),{mid:'-',red:true});
+      row('Indice',(pp*100).toFixed(4)+'%');row('Tolerancia',tolStr);row('Qtde Viagens',String(d.nV));
+      row('Vol Tolerancia',f(Math.abs(d.volTol),0),{mid:'-',red:true});
+      row('Vol a Reembolsar',d.volReim>0?f(d.volReim,3):'-',{bold:true});
+      rowR('Média Valor Unit.',f(d.mediaUnit,2));rowR('Valor Total a Reembolsar',d.valorReim>0?f(d.valorReim,2):'-');
+    } else if(d.meto===1){
       const pp=d.volFatCC>0?(d.perdaCC/d.volFatCC):0;
       row('Vol. Faturado (CC)',f(d.volFatCC,0));row('Vol. Recebido (CC)',f(d.volRecCC,0));
       row('Perda',f(Math.abs(d.perdaCC),0),{mid:'-',red:true});
@@ -906,15 +955,6 @@ async function baixarRelatorio(){
       row('Vol a Reimb. CI',d.volReemCI>0?f(d.volReemCI,3):'-',{bold:true});
       rowR('Valor Reimb. CI',d.valReemCI>0?f(d.valReemCI,2):'-');
       rowR('Valor Total a Reembolsar',d.valorTotal>0?f(d.valorTotal,2):'-');
-    } else if(d.meto===2||d.meto===3){
-      const pp=d.volFat>0?(d.perda/d.volFat):0;
-      const tolStr=d.meto===2?(d.tolPct*100).toFixed(4)+'%':d.indLbl;
-      row('Vol. Faturado',f(d.volFat,0));row('Vol. Recebido',f(d.volRec,0));
-      row('Perda',f(Math.abs(d.perda),0),{mid:'-',red:true});
-      row('Indice',(pp*100).toFixed(4)+'%');row('Tolerancia',tolStr);row('Qtde Viagens',String(d.nV));
-      row('Vol Tolerancia',f(Math.abs(d.volTol),0),{mid:'-',red:true});
-      row('Vol a Reembolsar',d.volReim>0?f(d.volReim,3):'-',{bold:true});
-      rowR('Média Valor Unit.',f(d.mediaUnit,2));rowR('Valor Total a Reembolsar',d.valorReim>0?f(d.valorReim,2):'-');
     } else {
       row('Índice Aplicado',d.indLbl,{bold:true});row('Qtde Viagens',String(d.nV));
       row('Vol. Faturado Total',f(d.totPLiq,0));row('Vol. Recebido Total',f(d.totPDest,0));
@@ -923,6 +963,7 @@ async function baixarRelatorio(){
       row('Vol. Excedente Total',d.totExc>0?f(d.totExc,3):'-',{bold:true,red:d.totExc>0});
       rowR('Valor Total a Reembolsar',d.totVal>0?f(d.totVal,2):'-');
     }
+
     y+=1;
     pdf.setFillColor(26,58,107);pdf.rect(ML,y-5.5,MR-ML,HEADER_H,'F');
     pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.setTextColor(255,255,255);
@@ -962,9 +1003,9 @@ async function baixarRelatorio(){
   }catch(e){console.error(e);fecharModal();showToast('Erro ao gerar PDF: '+e.message);}
 }
 
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // CLIENTE SEARCH
-// ══════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 function filtrarClientes(){selectedCod='';mostrarSugestoes();}
 function mostrarSugestoes(){
   const q=document.getElementById('selCliente').value.trim().toLowerCase();
