@@ -1393,9 +1393,14 @@ function render(){
   document.getElementById('kpiMeta').innerText = metaTotal>0 ? `${pctMeta.toFixed(1)}%` : '—';
   document.getElementById('kpiMetaSub').innerText = metaTotal>0 ? `Meta: ${fmtVol(metaTotal)} m³${naviosAtivas.length>1?' (soma '+naviosAtivas.length+' navios)':''}` : 'Cadastre a meta em Configurações';
 
-  const bySinop = notasView.filter(n=>n.origem==="Sinop").reduce((s,n)=>s+n.pesoLiquido,0);
-  const bySidro = notasView.filter(n=>n.origem==="Sidrolândia").reduce((s,n)=>s+n.pesoLiquido,0);
-  document.getElementById('kpiCarregadoSub').innerText = `Sinop: ${fmtVol(bySinop)} m³ · Sidrolândia: ${fmtVol(bySidro)} m³`;
+  // Carregamento por pedido — dinâmico com base em PEDIDOS configurados
+  const byPedido = {};
+  Object.keys(PEDIDOS).forEach(nro=>{ byPedido[nro] = 0; });
+  notasView.forEach(n=>{ if(byPedido[n.pedido]!==undefined) byPedido[n.pedido] += n.pesoLiquido; });
+  const kpiSub = Object.entries(byPedido)
+    .map(([nro, vol])=>`${PEDIDOS[nro]?.origem||nro}: ${fmtVol(vol)} m³`)
+    .join(' · ');
+  document.getElementById('kpiCarregadoSub').innerText = kpiSub || 'Nenhum pedido configurado';
 
   // necessidade diária de descarga
   const necEl = document.getElementById('kpiNecessidade');
@@ -1414,7 +1419,7 @@ function render(){
     necSub.innerText = `Cadastre meta e data limite do navio em Configurações`;
   }
 
-  renderChartCarregamento(bySinop, bySidro);
+  renderChartCarregamento(byPedido);
   renderChartEstoque(descView, metaTotal);
   renderChartPrevisao(notasView);
   renderPlanoSection(notasView);
@@ -1472,17 +1477,26 @@ function renderNavioSummary(ids, notasView, descView){
   }).join('');
 }
 
-function renderChartCarregamento(sinopL, sidroL){
-  const sinop = sinopL/1000;
-  const sidro = sidroL/1000;
+function renderChartCarregamento(byPedido){
+  // Paleta de cores que alterna entre navy e gold e variações
+  const PALETTE = ['#1a3a6b','#f0a500','#2a5caa','#c98700','#3a7bca','#e09400','#4a4a8a','#d08000'];
+  const pedidos = Object.keys(byPedido);
+  const labels  = pedidos.map(nro=>{
+    const p = PEDIDOS[nro];
+    return p ? `${p.origem}\n(Ped. ${nro})` : `Ped. ${nro}`;
+  });
+  const data   = pedidos.map(nro=>byPedido[nro]/1000);
+  const colors = pedidos.map((_,i)=>PALETTE[i % PALETTE.length]);
+
   const ctx = document.getElementById('chartCarregamento').getContext('2d');
   if(chartCarregamento) chartCarregamento.destroy();
   chartCarregamento = new Chart(ctx, {
     type:'bar',
     data:{
-      labels:['Sinop\n(Ped. 228122)','Sidrolândia\n(Ped. 228041)'],
-      datasets:[{ label:'Volume Carregado (m³)', data:[sinop, sidro],
-        backgroundColor:['#1a3a6b','#f0a500'], borderRadius:8, maxBarThickness:100,
+      labels,
+      datasets:[{ label:'Volume Carregado (m³)', data,
+        backgroundColor: colors, borderRadius:8,
+        maxBarThickness: Math.max(60, Math.round(300/Math.max(pedidos.length,1))),
         borderSkipped:false }]
     },
     options:{
@@ -1493,8 +1507,8 @@ function renderChartCarregamento(sinopL, sidroL){
         tooltip:{callbacks:{label:c=>` ${c.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} m³`}},
         datalabels:{
           anchor:'end', align:'top', offset:4,
-          color:['#1a3a6b','#c98700'],
-          font:{family:"'Barlow Condensed',sans-serif", weight:800, size:15},
+          color: colors,
+          font:{family:"'Barlow Condensed',sans-serif", weight:800, size:13},
           formatter:v=>v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' m³'
         }
       },
