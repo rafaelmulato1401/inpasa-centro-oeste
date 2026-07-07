@@ -577,7 +577,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         <h3>Descargas Recebidas em Tanque (Ultracargo Santos)</h3>
         <table>
           <thead><tr>
-            <th>Navio</th><th>NF</th><th>Data Chegada</th><th class="num">Peso Destino (m³)</th>
+            <th>Navio</th><th>NF</th><th>Data Chegada</th>
+            <th class="num">Peso Líquido (m³)</th>
+            <th class="num">Peso Destino (m³)</th>
+            <th class="num">Quebra (m³)</th>
+            <th class="num">Índice (%)</th>
           </tr></thead>
           <tbody id="tbodyDescarga"></tbody>
         </table>
@@ -1652,14 +1656,30 @@ function renderTables(notasView, descView){
   }).join('') || `<tr><td colspan="7" class="empty">Sem registros</td></tr>`;
 
   const tbD = document.getElementById('tbodyDescarga');
+  // Índice de notas por NF para cruzar Peso Líquido
+  const notasPorNF = {};
+  notasView.forEach(n=>{ notasPorNF[n.nf] = n; });
+
   const sortedDesc = [...descView].sort((a,b)=>(a.dataChegadaObj||0)-(b.dataChegadaObj||0));
   tbD.innerHTML = sortedDesc.map(d=>{
-    const b = navios.find(x=>x.id===d.navioId);
+    const b   = navios.find(x=>x.id===d.navioId);
+    const nf  = notasPorNF[d.nf];
+    const plM3 = nf ? nf.pesoLiquido/1000 : null;
+    const pdM3 = d.pesoDestino/1000;
+    const quebra = plM3 !== null ? pdM3 - plM3 : null;
+    const indice = (plM3 !== null && plM3 > 0) ? (quebra / plM3) * 100 : null;
+    const quebraColor = quebra === null ? '' : quebra >= 0 ? 'color:var(--green);font-weight:600' : 'color:var(--red);font-weight:600';
+    const indiceColor = indice === null ? '' : indice >= 0 ? 'color:var(--green);font-weight:600' : 'color:var(--red);font-weight:600';
     return `<tr>
       <td><span class="pill navio">${b?b.nome:'—'}</span></td>
-      <td>${d.nf}</td><td>${d.dataChegada}</td><td class="num">${fmtVol(d.pesoDestino)}</td>
+      <td>${d.nf}</td>
+      <td>${d.dataChegada}</td>
+      <td class="num">${plM3 !== null ? plM3.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3}) : '—'}</td>
+      <td class="num">${pdM3.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3})}</td>
+      <td class="num" style="${quebraColor}">${quebra !== null ? quebra.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3,signDisplay:'always'}) : '—'}</td>
+      <td class="num" style="${indiceColor}">${indice !== null ? indice.toFixed(3).replace('.',',')+'%' : '—'}</td>
     </tr>`;
-  }).join('') || `<tr><td colspan="4" class="empty">Sem registros</td></tr>`;
+  }).join('') || `<tr><td colspan="7" class="empty">Sem registros</td></tr>`;
 }
 
 // ---------- exportar Excel ----------
@@ -1694,7 +1714,8 @@ function exportXlsx(){
     'Status Descarga',
     'Data Descarga',
     'Peso Destino (m³)',
-    'Diferença (m³)'
+    'Quebra (m³)',
+    'Índice (%)'
   ];
 
   const rows = sortedNotas.map(n=>{
@@ -1702,7 +1723,8 @@ function exportXlsx(){
     const desc    = descPorNF[n.nf];
     const plM3    = +(n.pesoLiquido/1000).toFixed(3);
     const pdM3    = desc ? +(desc.pesoDestino/1000).toFixed(3) : null;
-    const diff    = (pdM3 !== null) ? +(pdM3 - plM3).toFixed(3) : null;
+    const quebra  = (pdM3 !== null) ? +(pdM3 - plM3).toFixed(3) : null;
+    const indice  = (quebra !== null && plM3 > 0) ? +((quebra / plM3) * 100).toFixed(3) : null;
     const status  = desc ? 'Descarregado' : 'Em trânsito / Pendente';
 
     return [
@@ -1717,14 +1739,17 @@ function exportXlsx(){
       status,
       desc ? desc.dataChegada : '',
       pdM3 !== null ? pdM3 : '',
-      diff  !== null ? diff  : ''
+      quebra !== null ? quebra : '',
+      indice !== null ? indice : ''
     ];
   });
 
   // Totalizador
-  const totalPlM3  = +(sortedNotas.reduce((s,n)=>s+n.pesoLiquido,0)/1000).toFixed(3);
-  const totalPdM3  = +(descView.reduce((s,d)=>s+d.pesoDestino,0)/1000).toFixed(3);
-  const totalDiff  = +(totalPdM3 - descView.length > 0 ? totalPdM3 - sortedNotas.filter(n=>descPorNF[n.nf]).reduce((s,n)=>s+n.pesoLiquido,0)/1000 : 0).toFixed(3);
+  const totalPlM3   = +(sortedNotas.reduce((s,n)=>s+n.pesoLiquido,0)/1000).toFixed(3);
+  const totalPdM3   = +(descView.reduce((s,d)=>s+d.pesoDestino,0)/1000).toFixed(3);
+  const totalQuebraBase = sortedNotas.filter(n=>descPorNF[n.nf]).reduce((s,n)=>s+n.pesoLiquido,0)/1000;
+  const totalQuebra = +(totalPdM3 - totalQuebraBase).toFixed(3);
+  const totalIndice = totalQuebraBase > 0 ? +((totalQuebra/totalQuebraBase)*100).toFixed(3) : 0;
   rows.push([]); // linha em branco
   rows.push([
     'TOTAL', '', '', '', '', '', '',
@@ -1732,7 +1757,8 @@ function exportXlsx(){
     `${descView.length} / ${notasView.length} NFs descarregadas`,
     '',
     totalPdM3,
-    ''
+    totalQuebra,
+    totalIndice
   ]);
 
   // Monta workbook
@@ -1742,7 +1768,7 @@ function exportXlsx(){
   // Larguras de coluna
   ws['!cols'] = [
     {wch:18},{wch:10},{wch:14},{wch:10},{wch:10},{wch:6},
-    {wch:14},{wch:16},{wch:22},{wch:14},{wch:16},{wch:14}
+    {wch:14},{wch:16},{wch:22},{wch:14},{wch:16},{wch:14},{wch:12}
   ];
 
   // Estilo de cabeçalho via definição de células
