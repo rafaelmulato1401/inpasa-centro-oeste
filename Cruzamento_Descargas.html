@@ -141,7 +141,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-icon{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .12s}
 .btn-icon:hover{background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)}
 .btn-icon.danger:hover{background:var(--red-bg);border-color:var(--red);color:var(--red)}
-.add-unit-form{display:grid;grid-template-columns:1.4fr 2fr 1fr 0.8fr auto;gap:10px;align-items:end;padding:16px;background:var(--blue-light);border-radius:var(--radius);margin-top:12px;border:1px solid var(--border)}
+.add-unit-form{display:grid;grid-template-columns:1.4fr 2fr 0.8fr auto;gap:10px;align-items:end;padding:16px;background:var(--blue-light);border-radius:var(--radius);margin-top:12px;border:1px solid var(--border)}
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
 .form-input{padding:8px 12px;border:1px solid var(--border2);border-radius:6px;font-size:13px;font-family:'Barlow',sans-serif;color:var(--text);background:var(--surface);transition:border-color .12s;outline:none}
@@ -294,15 +294,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
           <label class="form-label">Codigo do Cliente (Ultracargo)</label>
           <input class="form-input" id="f-cod" type="text" placeholder="Ex: 29316596000115">
         </div>
-        <div class="form-group">
-          <label class="form-label">Filial Inpasa</label>
-          <select class="form-select" id="f-filial">
-            <option value="1">1 -- Sinop</option>
-            <option value="2">2 -- Dourados</option>
-            <option value="3">3 -- Nova Mutum</option>
-            <option value="6">6 -- Sidrolandia</option>
-          </select>
-        </div>
+
         <div class="form-group">
           <label class="form-label">Status</label>
           <select class="form-select" id="f-ativo">
@@ -378,7 +370,7 @@ function renderUnitChips(){
     <div class="unit-chip${selectedUnits[u.id]?' selected':''}" onclick="toggleUnit('${u.id}')">
       <span class="unit-chip-dot"></span>
       <span class="unit-chip-name">${u.nome}</span>
-      <span class="unit-chip-filial">\u00b7 Filial ${u.filial}</span>
+
     </div>`).join('');
 }
 function toggleUnit(id){selectedUnits[id]=!selectedUnits[id];renderUnitChips();}
@@ -388,7 +380,7 @@ function renderUnitsTable(){
   const wrap=document.getElementById('units-table-wrap');
   if(!units.length){wrap.innerHTML='<div class="empty" style="padding:2rem"><div class="empty-icon">&#127981;</div>Nenhuma unidade cadastrada ainda.</div>';return;}
   wrap.innerHTML=`<table class="units-table"><thead><tr>
-    <th>Unidade</th><th>Filial Inpasa</th><th>C\u00f3digo Cliente (Ultracargo)</th><th>Status</th>
+    <th>Unidade</th><th>C\u00f3digo Cliente / CNPJ (Ultracargo)</th><th>Status</th>
     <th style="text-align:right">A\u00e7\u00f5es</th>
   </tr></thead><tbody id="units-tbody">${units.map(unitRow).join('')}</tbody></table>`;
 }
@@ -396,7 +388,6 @@ function renderUnitsTable(){
 function unitRow(u){
   return `<tr id="row-${u.id}">
     <td class="unit-name-cell">${u.nome}</td>
-    <td><span class="unit-filial-pill">${u.filial} \u2014 ${nomFilial(u.filial)}</span></td>
     <td class="unit-cod-cell">${u.cod}</td>
     <td><span class="unit-status ${u.ativo?'on':'off'}">${u.ativo?'\u25cf Ativo':'\u25cb Inativo'}</span></td>
     <td><div class="unit-actions">
@@ -407,18 +398,16 @@ function unitRow(u){
 }
 
 function editRowHtml(u){
-  const opts=Object.entries(FILIAIS).map(([k,v])=>`<option value="${k}"${u.filial==k?' selected':''}>${k} \u2014 ${v}</option>`).join('');
   return `<tr id="row-${u.id}" class="edit-row">
     <td><input class="edit-input" id="ei-nome" value="${u.nome}"></td>
-    <td><select class="form-select" id="ei-filial" style="padding:6px 8px;font-size:12px">${opts}</select></td>
-    <td><input class="edit-input" id="ei-cod" value="${u.cod}"></td>
+    <td><input class="edit-input" id="ei-cod" value="${u.cod}" placeholder="CNPJ ou código"></td>
     <td><select class="form-select" id="ei-ativo" style="padding:6px 8px;font-size:12px">
       <option value="1"${u.ativo?' selected':''}>Ativo</option>
       <option value="0"${!u.ativo?' selected':''}>Inativo</option>
     </select></td>
     <td><div class="unit-actions">
-      <button class="btn-icon" onclick="saveEdit('${u.id}')" style="color:var(--green);border-color:var(--green)">\u2713 Salvar</button>
-      <button class="btn-icon" onclick="cancelEdit()">\u2715</button>
+      <button class="btn-icon" onclick="saveEdit('${u.id}')" style="color:var(--green);border-color:var(--green)">✓ Salvar</button>
+      <button class="btn-icon" onclick="cancelEdit()">✕</button>
     </div></td>
   </tr>`;
 }
@@ -426,11 +415,10 @@ function editRowHtml(u){
 function addUnit(){
   const nome=document.getElementById('f-nome').value.trim();
   const cod=document.getElementById('f-cod').value.trim();
-  const filial=parseInt(document.getElementById('f-filial').value);
   const ativo=document.getElementById('f-ativo').value==='1';
   if(!nome||!cod){toast('\u26a0 Preencha Nome e C\u00f3digo do Cliente.');return;}
   const id='u'+Date.now();
-  units.push({id,nome,cod,filial,ativo});
+  units.push({id,nome,cod,ativo});
   selectedUnits[id]=ativo;
   saveUnits();
   document.getElementById('f-nome').value='';
@@ -443,11 +431,10 @@ function editUnit(id){if(editingId)cancelEdit();editingId=id;const u=units.find(
 function saveEdit(id){
   const nome=document.getElementById('ei-nome').value.trim();
   const cod=document.getElementById('ei-cod').value.trim();
-  const filial=parseInt(document.getElementById('ei-filial').value);
   const ativo=document.getElementById('ei-ativo').value==='1';
   if(!nome||!cod){toast('\u26a0 Preencha Nome e C\u00f3digo.');return;}
   const idx=units.findIndex(x=>x.id===id);
-  units[idx]={id,nome,cod,filial,ativo};
+  units[idx]={id,nome,cod,ativo};
   editingId=null;saveUnits();renderUnitsTable();renderUnitChips();
   toast('\u2713 Unidade atualizada!');
 }
@@ -540,15 +527,15 @@ function latestDate(){
 }
 function numFmt(n){if(n===''||n===null||n===undefined)return '\u2014';return Number(n).toLocaleString('pt-BR');}
 
+// Resolve filial lendo o NOME da filial direto do campo Cliente da Ultra (coluna D)
+// Ex: "29316596000620 - INPASA / SIDROLANDIA" -> 6
+// O codigo cadastrado em units serve apenas para FILTRAR quais registros processar
 function filialDoCodigo(clienteStr){
-  const s=(clienteStr||'').trim();
-  const match=units.find(u=>s.includes(u.cod));
-  if(match)return Number(match.filial);
-  const up=s.toUpperCase();
+  const up=(clienteStr||'').toUpperCase();
+  if(up.includes('SIDROLANDIA')||up.includes('SIDROL'))return 6;
+  if(up.includes('MUTUM'))return 3;
   if(up.includes('SINOP'))return 1;
   if(up.includes('DOURADOS'))return 2;
-  if(up.includes('MUTUM'))return 3;
-  if(up.includes('SIDRO'))return 6;
   return null;
 }
 
