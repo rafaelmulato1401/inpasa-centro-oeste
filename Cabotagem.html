@@ -1248,29 +1248,41 @@ function processNotasWorkbook(wb, filename){
 function processDescargaWorkbook(wb, filename){
   const navioId = currentUploadNavio();
   if(!navioId){ alert('Cadastre e selecione um navio em "Subir dados para" antes de importar.'); return; }
-  const clienteAlvoD = getClienteAlvoUpload();
-  let added = 0, duplicados = 0;
-  // Set de NFs de descarga já existentes
+
+  let added = 0, duplicados = 0, semPedido = 0;
   const nfsDescExistentes = new Set(descargaData.map(d=>d.nf));
+
   wb.SheetNames.forEach(sn=>{
     const objs = sheetToObjects(wb.Sheets[sn]);
     objs.forEach(row=>{
-      const cliente = String(col(row, ["Cód. Cliente","Cod. Cliente","Codigo Cliente","Código Cliente","Cliente"]) || "").trim();
-      if(clienteAlvoD && cliente !== clienteAlvoD) return;
-      const pesoDestino = toNum(col(row, ["Peso Destino","PESODESTINO","Qtd. Realizada","Quantidade NF"]));
+      // Filtro por pedido cadastrado (coluna Nr. Pedido / Pedido)
+      const pedido = String(col(row, ["Nr. Pedido","Nr Pedido","Pedido","Número Pedido","Numero Pedido"]) || "").trim().replace(/\.0$/,"");
+      if(!PEDIDOS[pedido]){ semPedido++; return; }
+
+      const pesoDestino = toNum(col(row, ["Peso Destino","PESODESTINO","Qtd. Realizada"]));
       if(pesoDestino <= 0) return;
-      const nf = String(col(row, ["Nr. NF","Nº Nota","NF","Nota Fiscal"])||"").trim();
-      if(nfsDescExistentes.has(nf)){ duplicados++; return; } // ignora duplicata
-      const dataChegada = col(row, ["Data Chegada","Dt. Chegada","Dt. Entrada","DATACHEGADA"]);
+
+      const nf = String(col(row, ["Nº Nota","Nr. NF","NF","Nota Fiscal"]) || "").trim();
+      if(nfsDescExistentes.has(nf)){ duplicados++; return; }
+
+      const dataChegada  = col(row, ["Data Chegada","Dt. Chegada","Dt. Entrada","DATACHEGADA"]);
+      // Peso Líquido da origem (disponível no próprio relatório de descarga)
+      const pesoLiquido  = toNum(col(row, ["Peso Líquido","Peso Liquido"]));
+
       descargaData.push({
-        navioId, nf,
-        dataChegada: toDateStr(dataChegada), dataChegadaObj: toDateObj(dataChegada), pesoDestino
+        navioId, nf, pedido,
+        dataChegada: toDateStr(dataChegada), dataChegadaObj: toDateObj(dataChegada),
+        pesoDestino,
+        pesoLiquido  // peso na origem para calcular quebra de forma autônoma
       });
       nfsDescExistentes.add(nf);
       added++;
     });
   });
-  const msg = duplicados > 0 ? ` (${duplicados} duplicada(s) ignorada(s))` : '';
+
+  let msg = '';
+  if(duplicados > 0) msg += ` · ${duplicados} dup. ignorada(s)`;
+  if(semPedido > 0)  msg += ` · ${semPedido} s/ pedido ignorada(s)`;
   descargaFiles.push({name:filename, count:added, navioId, msg});
   renderLog('logDescarga', descargaFiles);
 }
@@ -1656,16 +1668,16 @@ function renderTables(notasView, descView){
   }).join('') || `<tr><td colspan="7" class="empty">Sem registros</td></tr>`;
 
   const tbD = document.getElementById('tbodyDescarga');
-  // Índice de notas por NF para cruzar Peso Líquido
+  // Peso líquido: prioriza o que veio no próprio relatório de descarga; fallback para notas
   const notasPorNF = {};
   notasView.forEach(n=>{ notasPorNF[n.nf] = n; });
 
   const sortedDesc = [...descView].sort((a,b)=>(a.dataChegadaObj||0)-(b.dataChegadaObj||0));
   tbD.innerHTML = sortedDesc.map(d=>{
-    const b   = navios.find(x=>x.id===d.navioId);
-    const nf  = notasPorNF[d.nf];
-    const plM3 = nf ? nf.pesoLiquido/1000 : null;
-    const pdM3 = d.pesoDestino/1000;
+    const b      = navios.find(x=>x.id===d.navioId);
+    const plRaw  = (d.pesoLiquido > 0) ? d.pesoLiquido : (notasPorNF[d.nf]?.pesoLiquido ?? null);
+    const plM3   = plRaw !== null ? plRaw/1000 : null;
+    const pdM3   = d.pesoDestino/1000;
     const quebra = plM3 !== null ? pdM3 - plM3 : null;
     const indice = (plM3 !== null && plM3 > 0) ? (quebra / plM3) * 100 : null;
     const quebraColor = quebra === null ? '' : quebra >= 0 ? 'color:var(--green);font-weight:600' : 'color:var(--red);font-weight:600';
