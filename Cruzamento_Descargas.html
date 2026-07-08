@@ -39,11 +39,10 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .unit-chip{display:flex;align-items:center;gap:8px;padding:7px 14px;border:1.5px solid var(--border2);border-radius:8px;background:var(--bg);cursor:pointer;transition:all .15s;user-select:none}
 .unit-chip-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);transition:background .15s;flex-shrink:0}
 .unit-chip-name{font-size:13px;font-weight:600;color:var(--text2);transition:color .15s}
-.unit-chip-filial{font-size:11px;color:var(--text3);margin-left:2px}
-.unit-chip.selected{border-color:var(--blue);background:var(--blue-light)}
-.unit-chip.selected .unit-chip-dot{background:var(--blue)}
-.unit-chip.selected .unit-chip-name{color:var(--blue)}
-.unit-chip.selected .unit-chip-filial{color:var(--blue-mid)}
+.unit-chip.selected{border-color:var(--green);background:var(--green-bg)}
+.unit-chip.selected .unit-chip-dot{background:var(--green)}
+.unit-chip.selected .unit-chip-name{color:var(--green)}
+.unit-chip.selected .unit-chip-filial{color:var(--green)}
 .unit-chip-empty{font-size:12px;color:var(--text3);font-style:italic;padding:4px 0}
 .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
 .upload-zone{background:var(--surface);border:1.5px dashed var(--border2);border-radius:var(--radius);padding:1.5rem;transition:border-color .15s,background .15s}
@@ -117,45 +116,12 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .empty-icon{font-size:20px;margin-bottom:8px}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.cfg-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.5rem;overflow:hidden}
-.cfg-section-head{background:var(--blue-dark);padding:14px 20px;display:flex;align-items:center;gap:10px}
 .cfg-section-head h3{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#fff}
 .cfg-section-head p{font-size:12px;color:rgba(255,255,255,.5);margin-top:1px}
-.cfg-section-body{padding:20px}
-.filiais-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:.5rem}
-.filial-card{background:var(--blue-light);border:1px solid var(--border);border-left:3px solid var(--blue-mid);border-radius:8px;padding:10px 14px}
-.filial-card-num{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--blue);line-height:1}
-.filial-card-name{font-size:12px;font-weight:600;color:var(--text2);margin-top:2px}
-.units-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1rem}
-.units-table th{background:var(--surface2);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);padding:9px 14px;text-align:left;border-bottom:1px solid var(--border)}
-.units-table td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
 .units-table tr:last-child td{border-bottom:none}
 .units-table tr:nth-child(even) td{background:var(--blue-light)}
-.unit-name-cell{font-weight:600;color:var(--blue)}
-.unit-cod-cell{font-family:monospace;font-size:12px;color:var(--text)}
-.unit-filial-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue-mid);border:1px solid var(--border)}
-.unit-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
 .unit-status.on{background:var(--green-bg);color:var(--green)}
 .unit-status.off{background:var(--surface2);color:var(--text3)}
-.unit-actions{display:flex;gap:6px;justify-content:flex-end}
-.btn-icon{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .12s}
-.btn-icon:hover{background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)}
-.btn-icon.danger:hover{background:var(--red-bg);border-color:var(--red);color:var(--red)}
-.add-unit-form{display:grid;grid-template-columns:1.4fr 2fr 0.8fr auto;gap:10px;align-items:end;padding:16px;background:var(--blue-light);border-radius:var(--radius);margin-top:12px;border:1px solid var(--border)}
-.form-group{display:flex;flex-direction:column;gap:5px}
-.form-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2)}
-.form-input{padding:8px 12px;border:1px solid var(--border2);border-radius:6px;font-size:13px;font-family:'Barlow',sans-serif;color:var(--text);background:var(--surface);transition:border-color .12s;outline:none}
-.form-input:focus{border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(36,86,164,.15)}
-.form-select{padding:8px 12px;border:1px solid var(--border2);border-radius:6px;font-size:13px;font-family:'Barlow',sans-serif;color:var(--text);background:var(--surface);cursor:pointer;outline:none}
-.form-select:focus{border-color:var(--blue-mid)}
-.btn-primary{padding:9px 20px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;transition:background .12s;white-space:nowrap;align-self:flex-end}
-.btn-primary:hover{background:var(--blue-mid)}
-.cfg-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem}
-.btn-outline{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:var(--surface);color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius);cursor:pointer;transition:all .12s}
-.btn-outline:hover{background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)}
-.btn-outline.danger{color:var(--red)}.btn-outline.danger:hover{background:var(--red-bg);border-color:var(--red)}
-.edit-row td{background:var(--amber-bg)!important}
-.edit-input{padding:6px 10px;border:1.5px solid var(--blue-mid);border-radius:5px;font-size:13px;font-family:'Barlow',sans-serif;width:100%;outline:none;background:#fff}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--blue-dark);color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;border-left:3px solid var(--gold);box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
 .toast.show{transform:translateY(0);opacity:1}
 @media(max-width:700px){
@@ -184,10 +150,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
       <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 6l6-4 6 4v7a1 1 0 01-1 1H3a1 1 0 01-1-1V6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
       Cruzamento
     </button>
-    <button class="nav-btn" id="nav-cfg" onclick="navTo('cfg')">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      Configuracoes
-    </button>
+
   </div>
 </div>
 
@@ -254,82 +217,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 </div>
 </div>
 
-<!-- CONFIGURACOES -->
-<div class="page" id="page-cfg">
-<div class="container">
-  <h1 class="page-title">Configuracoes</h1>
-  <p class="page-sub">Cadastre as unidades Ultracargo com codigo de cliente e filial Inpasa correspondente.</p>
-
-  <div class="cfg-section">
-    <div class="cfg-section-head">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L1 6v8h4v-4h6v4h4V6L8 1z" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linejoin="round"/></svg>
-      <div><h3>Filiais Inpasa</h3><p>Fixas no sistema -- identificadas pela coluna F do relatorio CS</p></div>
-    </div>
-    <div class="cfg-section-body">
-      <div class="filiais-grid">
-        <div class="filial-card"><div class="filial-card-num">1</div><div class="filial-card-name">Sinop</div></div>
-        <div class="filial-card"><div class="filial-card-num">2</div><div class="filial-card-name">Dourados</div></div>
-        <div class="filial-card"><div class="filial-card-num">3</div><div class="filial-card-name">Nova Mutum</div></div>
-        <div class="filial-card"><div class="filial-card-num">6</div><div class="filial-card-name">Sidrolandia</div></div>
-      </div>
-      <p style="font-size:12px;color:var(--text3);margin-top:10px">Outras filiais que aparecerem no relatorio CS serao processadas com o numero como identificador.</p>
-    </div>
-  </div>
-
-  <div class="cfg-section">
-    <div class="cfg-section-head">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4"/><path d="M4 7h8M4 10h5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <div><h3>Unidades Ultracargo</h3><p>Codigo do cliente conforme campo "Cliente" no relatorio Ultracargo</p></div>
-    </div>
-    <div class="cfg-section-body">
-      <div id="units-table-wrap">
-        <div class="empty" style="padding:2rem"><div class="empty-icon">&#127981;</div>Nenhuma unidade cadastrada ainda.</div>
-      </div>
-      <div class="add-unit-form">
-        <div class="form-group">
-          <label class="form-label">Nome da Unidade</label>
-          <input class="form-input" id="f-nome" type="text" placeholder="Ex: Sinop">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Codigo do Cliente (Ultracargo)</label>
-          <input class="form-input" id="f-cod" type="text" placeholder="Ex: 29316596000115">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Status</label>
-          <select class="form-select" id="f-ativo">
-            <option value="1">Ativo</option>
-            <option value="0">Inativo</option>
-          </select>
-        </div>
-        <button class="btn-primary" onclick="addUnit()">+ Adicionar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="cfg-section">
-    <div class="cfg-section-head">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 7l3 3 3-3" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><h3>Backup das Configuracoes</h3><p>Exporte para transferir entre computadores ou restaurar apos limpeza do navegador</p></div>
-    </div>
-    <div class="cfg-section-body">
-      <div class="cfg-actions">
-        <button class="btn-outline" onclick="exportCfg()">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Exportar (.json)
-        </button>
-        <label class="btn-outline">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 11V3M5 6l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Importar (.json)
-          <input type="file" accept=".json" style="display:none" onchange="importCfg(this)">
-        </label>
-        <button class="btn-outline danger" onclick="clearAllUnits()">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V2h4v2M5 4v9a1 1 0 001 1h4a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Limpar tudo
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 </div>
 
@@ -340,21 +227,20 @@ const FILIAIS={1:'Sinop',2:'Dourados',3:'Nova Mutum',6:'Sidrol\u00e2ndia'};
 function nomFilial(f){return FILIAIS[Number(f)]||('Filial '+f);}
 
 const state={cs:[],ultra:[],resultsByFilial:{},logs:[]};
-let units=[],selectedUnits={},editingId=null;
 
-function saveUnits(){localStorage.setItem('inpasa_ultra_units_v2',JSON.stringify(units));}
-function loadUnits(){
-  try{const s=localStorage.getItem('inpasa_ultra_units_v2');if(s)units=JSON.parse(s);}catch(e){units=[];}
-  units.forEach(u=>{if(selectedUnits[u.id]===undefined&&u.ativo)selectedUnits[u.id]=true;});
-}
+// Unidades fixas — Rondonópolis (83868) e Santos (103206)
+const units=[
+  {id:'ron',nome:'Rondon\u00f3polis',cod:'83868',ativo:true},
+  {id:'san',nome:'Santos',cod:'103206',ativo:true}
+];
+let selectedUnits={ron:true,san:true};
 
 function navTo(pg){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+pg).classList.add('active');
   document.getElementById('nav-'+pg).classList.add('active');
-  if(pg==='cfg')renderUnitsTable();
-  if(pg==='main')renderUnitChips();
+  renderUnitChips();
 }
 
 function toast(msg,dur=2500){
@@ -376,102 +262,22 @@ function renderUnitChips(){
 function toggleUnit(id){selectedUnits[id]=!selectedUnits[id];renderUnitChips();}
 function getSelectedUnits(){return units.filter(u=>selectedUnits[u.id]);}
 
-function renderUnitsTable(){
-  const wrap=document.getElementById('units-table-wrap');
-  if(!units.length){wrap.innerHTML='<div class="empty" style="padding:2rem"><div class="empty-icon">&#127981;</div>Nenhuma unidade cadastrada ainda.</div>';return;}
-  wrap.innerHTML=`<table class="units-table"><thead><tr>
-    <th>Unidade</th><th>C\u00f3digo Cliente / CNPJ (Ultracargo)</th><th>Status</th>
-    <th style="text-align:right">A\u00e7\u00f5es</th>
-  </tr></thead><tbody id="units-tbody">${units.map(unitRow).join('')}</tbody></table>`;
-}
 
-function unitRow(u){
-  return `<tr id="row-${u.id}">
-    <td class="unit-name-cell">${u.nome}</td>
-    <td class="unit-cod-cell">${u.cod}</td>
-    <td><span class="unit-status ${u.ativo?'on':'off'}">${u.ativo?'\u25cf Ativo':'\u25cb Inativo'}</span></td>
-    <td><div class="unit-actions">
-      <button class="btn-icon" onclick="editUnit('${u.id}')">&#9998; Editar</button>
-      <button class="btn-icon danger" onclick="deleteUnit('${u.id}')">&#128465;</button>
-    </div></td>
-  </tr>`;
-}
 
-function editRowHtml(u){
-  return `<tr id="row-${u.id}" class="edit-row">
-    <td><input class="edit-input" id="ei-nome" value="${u.nome}"></td>
-    <td><input class="edit-input" id="ei-cod" value="${u.cod}" placeholder="CNPJ ou código"></td>
-    <td><select class="form-select" id="ei-ativo" style="padding:6px 8px;font-size:12px">
-      <option value="1"${u.ativo?' selected':''}>Ativo</option>
-      <option value="0"${!u.ativo?' selected':''}>Inativo</option>
-    </select></td>
-    <td><div class="unit-actions">
-      <button class="btn-icon" onclick="saveEdit('${u.id}')" style="color:var(--green);border-color:var(--green)">✓ Salvar</button>
-      <button class="btn-icon" onclick="cancelEdit()">✕</button>
-    </div></td>
-  </tr>`;
-}
 
-function addUnit(){
-  const nome=document.getElementById('f-nome').value.trim();
-  const cod=document.getElementById('f-cod').value.trim();
-  const ativo=document.getElementById('f-ativo').value==='1';
-  if(!nome||!cod){toast('\u26a0 Preencha Nome e C\u00f3digo do Cliente.');return;}
-  const id='u'+Date.now();
-  units.push({id,nome,cod,ativo});
-  selectedUnits[id]=ativo;
-  saveUnits();
-  document.getElementById('f-nome').value='';
-  document.getElementById('f-cod').value='';
-  renderUnitsTable();renderUnitChips();
-  toast('\u2713 Unidade "'+nome+'" cadastrada!');
-}
 
-function editUnit(id){if(editingId)cancelEdit();editingId=id;const u=units.find(x=>x.id===id);document.getElementById('row-'+id).outerHTML=editRowHtml(u);}
-function saveEdit(id){
-  const nome=document.getElementById('ei-nome').value.trim();
-  const cod=document.getElementById('ei-cod').value.trim();
-  const ativo=document.getElementById('ei-ativo').value==='1';
-  if(!nome||!cod){toast('\u26a0 Preencha Nome e C\u00f3digo.');return;}
-  const idx=units.findIndex(x=>x.id===id);
-  units[idx]={id,nome,cod,ativo};
-  editingId=null;saveUnits();renderUnitsTable();renderUnitChips();
-  toast('\u2713 Unidade atualizada!');
-}
-function cancelEdit(){editingId=null;renderUnitsTable();}
-function deleteUnit(id){
-  const u=units.find(x=>x.id===id);
-  if(!confirm('Excluir a unidade "'+u.nome+'"?'))return;
-  units=units.filter(x=>x.id!==id);delete selectedUnits[id];
-  saveUnits();renderUnitsTable();renderUnitChips();toast('Unidade removida.');
-}
-function clearAllUnits(){
-  if(!confirm('Excluir TODAS as unidades cadastradas?'))return;
-  units=[];selectedUnits={};saveUnits();renderUnitsTable();renderUnitChips();toast('Configura\u00e7\u00f5es limpas.');
-}
 
-function exportCfg(){
-  const blob=new Blob([JSON.stringify({units,v:2},null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='config_descargas_ultracargo.json';a.click();
-  toast('\u2713 Configura\u00e7\u00f5es exportadas!');
-}
-function importCfg(input){
-  const file=input.files[0];if(!file)return;
-  const fr=new FileReader();
-  fr.onload=e=>{
-    try{
-      const data=JSON.parse(e.target.result);
-      if(!data.units||!Array.isArray(data.units))throw new Error('Formato inv\u00e1lido');
-      units=data.units;selectedUnits={};
-      units.forEach(u=>{if(u.ativo)selectedUnits[u.id]=true;});
-      saveUnits();renderUnitsTable();renderUnitChips();
-      toast('\u2713 '+units.length+' unidades importadas!');
-    }catch(err){alert('Erro ao importar: '+err.message);}
-    input.value='';
-  };
-  fr.readAsText(file);
-}
+
+
+
+
+
+
+
+
+
+
+
 
 function onDrag(e,z){e.preventDefault();document.getElementById('zone-'+z).classList.add('drag');}
 function offDrag(z){document.getElementById('zone-'+z).classList.remove('drag');}
@@ -546,15 +352,28 @@ async function run(){
   btn.disabled=true;
   await new Promise(r=>setTimeout(r,30));
   try{
+    // ── CS: lê todas as linhas, filtra pelo código Ultra na coluna Cliente (índice 7)
     const csWb=await readXlsx(state.cs[0]);
     const csSheet=csWb.Sheets[csWb.SheetNames[0]];
     const csRaw=XLSX.utils.sheet_to_json(csSheet,{header:1,defval:null});
-    const csHdr=csRaw[1];
+    const csHdr=csRaw[1]; // linha 2 = cabeçalhos
     const csRows=csRaw.slice(2).filter(r=>r&&r.some(c=>c!==null&&c!==''));
     const ci=h=>csHdr.indexOf(h);
-    const iF=2,iNF=ci('N\u00ba Nota'),iSer=ci('S\u00e9rie'),iPesL=ci('Peso L\u00edquido'),iCheg=ci('Data Chegada'),iSaid=ci('Data Sa\u00edda');
+    const iF=2, iNF=ci('Nº Nota'), iSer=ci('Série'), iPesL=ci('Peso Líquido'),
+          iCliente=ci('Cliente'), iCheg=ci('Data Chegada'), iSaid=ci('Data Saída');
 
+    // Códigos das unidades selecionadas — filtram NFs do CS
     const selectedCods=sel.map(u=>u.cod);
+
+    // Filtra NFs do CS que pertencem às unidades Ultra selecionadas
+    const csFiltered = csRows.filter(row=>{
+      if(!row[iNF]) return false;
+      if(!selectedCods.length) return true; // nenhuma selecionada = aceita todas
+      const clienteCS = String(row[iCliente]||'').trim();
+      return selectedCods.some(cod=>clienteCS===cod||clienteCS.includes(cod));
+    });
+
+    // ── Ultra: lê todos os registros sem filtro de código
     let ultraRows=[];
     for(const f of state.ultra){
       const wb=await readXlsx(f);
@@ -562,70 +381,81 @@ async function run(){
       const raw=XLSX.utils.sheet_to_json(sh,{header:1,defval:null,cellDates:true});
       const hdr=raw[0];
       const ui={
-        cliente:hdr.indexOf('Cliente'),nf:hdr.indexOf('Nota Fiscal'),
-        qtd:hdr.indexOf('Quantidade NF'),qtdReal:hdr.indexOf('Qtd. Realizada'),
-        saida:hdr.indexOf('Dt. Sa\u00edda Terminal'),entrada:hdr.indexOf('Dt. Entrada'),
-        termino:hdr.indexOf('Dt. T\u00e9rmino Operacao')
+        cliente:hdr.indexOf('Cliente'), nf:hdr.indexOf('Nota Fiscal'),
+        qtd:hdr.indexOf('Quantidade NF'), qtdReal:hdr.indexOf('Qtd. Realizada'),
+        saida:hdr.indexOf('Dt. Saída Terminal'), entrada:hdr.indexOf('Dt. Entrada'),
+        termino:hdr.indexOf('Dt. Término Operacao')
       };
       raw.slice(1).filter(r=>r&&r[ui.nf]).forEach(r=>{
         const c=String(r[ui.cliente]||'');
-        if(selectedCods.length&&!selectedCods.some(cod=>c.includes(cod)))return;
         ultraRows.push({
-          cliente:c,nf:norm(r[ui.nf]),
+          cliente:c, nf:norm(r[ui.nf]),
           qtd:Number(r[ui.qtd])||0,
           qtdRealizada:r[ui.qtdReal]!==null&&r[ui.qtdReal]!==undefined?r[ui.qtdReal]:'',
-          dtSaida:r[ui.saida],dtEntrada:r[ui.entrada],dtTermino:r[ui.termino],
+          dtSaida:r[ui.saida], dtEntrada:r[ui.entrada], dtTermino:r[ui.termino],
           filial:filialDoCodigo(c)
         });
       });
     }
 
+    // Mapa NF → registro Ultra
     const ultraMap={};
     ultraRows.forEach(r=>{if(!ultraMap[r.nf])ultraMap[r.nf]=r;});
 
-    const logs={},byFilial={};
-    const logArr=[];
+    // ── Cruzamento: base é o CS filtrado por unidade
+    const logArr=[], byFilial={};
 
-    csRows.forEach(row=>{
+    csFiltered.forEach(row=>{
       const filialCS=row[iF];
-      const nfRaw=row[iNF];if(!nfRaw)return;
-      const nf=norm(nfRaw),serie=row[iSer],pesL=Number(row[iPesL])||0,cheg=row[iCheg],said=row[iSaid];
+      const nf=norm(row[iNF]);
+      const serie=row[iSer], pesL=Number(row[iPesL])||0,
+            cheg=row[iCheg], said=row[iSaid];
       const u=ultraMap[nf];
 
       if(!u){
-        logArr.push({nf,status:'N\u00e3o encontrada',cls:'sp-nao',dot:'dot-grey',
-          detalhe:'NF n\u00e3o localizada nos relat\u00f3rios Ultracargo selecionados',
-          csVal:pesL,uVal:null,diff:null,filialCS:nomFilial(filialCS),filialUltra:'\u2014'});
+        logArr.push({nf,status:'Não encontrada',cls:'sp-nao',dot:'dot-grey',
+          detalhe:'NF não localizada no relatório Ultracargo',
+          csVal:pesL,uVal:null,diff:null,filialCS:nomFilial(filialCS),filialUltra:'—'});
         return;
       }
-      const diff=pesL-u.qtd,pesoOk=Math.abs(diff)<1,filialOk=Number(filialCS)===Number(u.filial);
+
+      const diff=pesL-u.qtd, pesoOk=Math.abs(diff)<1,
+            filialOk=Number(filialCS)===Number(u.filial);
+
       if(!filialOk){
         logArr.push({nf,status:'Filial incorreta',cls:'sp-fil',dot:'dot-purple',
           detalhe:'CS aponta '+nomFilial(filialCS)+', Ultra registra '+nomFilial(u.filial),
-          csVal:pesL,uVal:u.qtd,diff:pesoOk?null:diff,filialCS:nomFilial(filialCS),filialUltra:nomFilial(u.filial)});
+          csVal:pesL,uVal:u.qtd,diff:pesoOk?null:diff,
+          filialCS:nomFilial(filialCS),filialUltra:nomFilial(u.filial)});
         return;
       }
+
       if(!pesoOk){
         logArr.push({nf,status:'Peso incorreto',cls:'sp-peso',dot:'dot-amber',
-          detalhe:'Diferen\u00e7a de '+Math.abs(diff).toLocaleString('pt-BR')+' kg',
-          csVal:pesL,uVal:u.qtd,diff,filialCS:nomFilial(filialCS),filialUltra:nomFilial(u.filial)});
+          detalhe:'Diferença de '+Math.abs(diff).toLocaleString('pt-BR')+' kg',
+          csVal:pesL,uVal:u.qtd,diff,
+          filialCS:nomFilial(filialCS),filialUltra:nomFilial(u.filial)});
         return;
       }
-      const rec={'NF':nf,'SERIE':serie!==null?serie:'',
+
+      // OK — agrupa por filial
+      const rec={
+        'NF':nf,'SERIE':serie!==null?serie:'',
         'PESODESTINO':u.qtdRealizada!==''?u.qtdRealizada:'',
         'DATASAIDA':latestDate(said,u.dtSaida,u.dtTermino),
-        'DATACHEGADA':latestDate(cheg,u.dtEntrada)};
+        'DATACHEGADA':latestDate(cheg,u.dtEntrada)
+      };
       const fk=Number(filialCS);
       if(!byFilial[fk])byFilial[fk]=[];
       byFilial[fk].push(rec);
     });
 
-    state.resultsByFilial=byFilial;state.logs=logArr;
+    state.resultsByFilial=byFilial; state.logs=logArr;
     const totalOk=Object.values(byFilial).reduce((s,a)=>s+a.length,0);
     const nFilial=logArr.filter(l=>l.status==='Filial incorreta').length;
-    const nPeso=logArr.filter(l=>l.status==='Peso incorreto').length;
+    const nPeso  =logArr.filter(l=>l.status==='Peso incorreto').length;
 
-    document.getElementById('s-cs').textContent=csRows.filter(r=>r[iNF]).length;
+    document.getElementById('s-cs').textContent=csFiltered.length;
     document.getElementById('s-ultra').textContent=ultraRows.length;
     document.getElementById('s-ok').textContent=totalOk;
     document.getElementById('s-filial').textContent=nFilial;
@@ -636,7 +466,7 @@ async function run(){
     document.getElementById('reset-btn').classList.add('show');
 
   }catch(err){alert('Erro ao processar: '+err.message);console.error(err);}
-  btn.innerHTML='Cruzar informa\u00e7\u00f5es';btn.disabled=false;checkReady();
+  btn.innerHTML='Cruzar informações';btn.disabled=false;checkReady();
 }
 
 function renderResultTabs(byFilial,logs){
@@ -743,7 +573,6 @@ function resetAll(){
   checkReady();
 }
 
-loadUnits();
 renderUnitChips();
 </script>
 </body>
