@@ -231,7 +231,7 @@ const state={cs:[],ultra:[],resultsByFilial:{},logs:[]};
 // Unidades fixas — Rondonópolis (83868) e Santos (103206)
 const units=[
   {id:'ron',nome:'Rondon\u00f3polis',cod:'83868',ativo:true},
-  {id:'san',nome:'Santos',cod:'103206',ativo:true}
+  {id:'san',nome:'Santos',cod:'106203',ativo:true}
 ];
 let selectedUnits={ron:true,san:true};
 
@@ -316,7 +316,15 @@ async function readXlsx(file){
     fr.onerror=rej;fr.readAsArrayBuffer(file);
   });
 }
-function norm(v){if(v===null||v===undefined)return '';return String(v).trim().replace(/^0+(\d)/,'$1');}
+function norm(v){
+  if(v===null||v===undefined)return '';
+  var s=String(v).trim();
+  // Remove .0 de números float vindos do Excel (ex: "376593.0" → "376593")
+  s=s.replace(/\.0+$/,'');
+  // Remove zeros à esquerda
+  s=s.replace(/^0+(\d)/,'$1');
+  return s;
+}
 function toDate(v){
   if(!v&&v!==0)return null;
   if(v instanceof Date)return isNaN(v.getTime())?null:v;
