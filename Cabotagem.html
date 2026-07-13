@@ -498,11 +498,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
           <div class="chs">Volume carregado em m³ — Notas Fiscais cruzadas por Cliente + Pedido</div>
           <div class="chart-box"><canvas id="chartCarregamento"></canvas></div>
         </div>
-        <div class="card chart-card" id="cardEstoque">
-          <h3>Evolução do Estoque em Tanque</h3>
-          <div class="chs" id="chsEstoque">Acúmulo diário recebido na Ultracargo Santos vs. Meta do Navio</div>
-          <div class="chart-box"><canvas id="chartEstoque"></canvas></div>
+        <div class="card chart-card" id="cardDescargaDia">
+          <h3>Descarga Recebida por Dia</h3>
+          <div class="chs">Volume descarregado diariamente no terminal (m³) — Peso Destino</div>
+          <div class="chart-box"><canvas id="chartDescargaDia"></canvas></div>
         </div>
+      </div>
+      <div class="card chart-card" id="cardEstoque" style="margin-top:18px;">
+        <h3>Evolução do Estoque em Tanque</h3>
+        <div class="chs" id="chsEstoque">Acúmulo diário recebido na Ultracargo Santos vs. Meta do Navio</div>
+        <div class="chart-box"><canvas id="chartEstoque"></canvas></div>
       </div>
       <div class="card chart-card" id="cardPrevisao" style="margin-top:18px;">
         <h3>Previsão de Chegada na Ultracargo Santos</h3>
@@ -915,7 +920,7 @@ let notasData = [];        // {navioId, origem, pedido, nf, serie, dataEmissao, 
 let descargaData = [];     // {navioId, nf, dataChegada, dataChegadaObj, pesoDestino}
 let notasFiles = [];
 let descargaFiles = [];
-let chartCarregamento, chartEstoque, chartPrevisao;
+let chartCarregamento, chartEstoque, chartDescargaDia, chartPrevisao;
 if(window.ChartDataLabels) Chart.register(ChartDataLabels);
 
 // ---------- persistência simples dos navios (somente cadastro, não dos dados importados) ----------
@@ -1344,7 +1349,7 @@ document.getElementById('btnPdf').addEventListener('click', ()=>{
 // Re-renderiza gráficos antes da impressão para evitar sobreposição de canvas
 window.addEventListener('beforeprint', ()=>{
   // Reduz legenda de todos os gráficos para economizar espaço no PDF
-  [chartCarregamento, chartEstoque, chartPrevisao, chartPlano].forEach(c=>{
+  [chartCarregamento, chartEstoque, chartDescargaDia, chartPrevisao, chartPlano].forEach(c=>{
     if(!c) return;
     if(c.options.plugins?.legend?.labels) c.options.plugins.legend.labels.font = {size:8};
     c.resize();
@@ -1353,7 +1358,7 @@ window.addEventListener('beforeprint', ()=>{
 });
 window.addEventListener('afterprint', ()=>{
   // Restaura legenda original
-  [chartCarregamento, chartEstoque, chartPrevisao, chartPlano].forEach(c=>{
+  [chartCarregamento, chartEstoque, chartDescargaDia, chartPrevisao, chartPlano].forEach(c=>{
     if(!c) return;
     if(c.options.plugins?.legend?.labels) c.options.plugins.legend.labels.font = {size:11};
     c.resize();
@@ -1436,6 +1441,7 @@ function render(){
   }
 
   renderChartCarregamento(byPedido);
+  renderChartDescargaDia(descView);
   renderChartEstoque(descView, metaTotal);
   renderChartPrevisao(notasView);
   renderPlanoSection(notasView);
@@ -1536,6 +1542,46 @@ function renderChartCarregamento(byPedido){
   });
 }
 
+function renderChartDescargaDia(descView){
+  const byDate = {};
+  descView.forEach(d=>{
+    const key = d.dataChegadaObj ? localISO(d.dataChegadaObj) : (d.dataChegada||'s/ data');
+    byDate[key] = (byDate[key]||0) + d.pesoDestino/1000;
+  });
+  const dates  = Object.keys(byDate).sort();
+  const vals   = dates.map(d=>byDate[d]);
+  const labels = dates.map(d=>{ const dt=localDateFromISO(d); return dt?dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):d; });
+
+  const ctx = document.getElementById('chartDescargaDia').getContext('2d');
+  if(chartDescargaDia) chartDescargaDia.destroy();
+  chartDescargaDia = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{ label:'Descarga no dia (m³)', data:vals,
+        backgroundColor:'#1e8e5a', borderRadius:6, maxBarThickness:50 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:28, bottom:20 } },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} m³`}},
+        datalabels:{
+          anchor:'end', align:'top', offset:2,
+          color:'#1e8e5a',
+          font:{family:"'Barlow Condensed',sans-serif", weight:800, size:11},
+          formatter:v=>v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' m³'
+        }
+      },
+      scales:{
+        y:{ beginAtZero:true, ticks:{callback:v=>v.toLocaleString('pt-BR',{minimumFractionDigits:0})}, grid:{color:'#eef1f6'} },
+        x:{ grid:{display:false} }
+      }
+    }
+  });
+}
+
 function renderChartEstoque(descView, metaTotal){
   const byDate = {};
   descView.forEach(d=>{
@@ -1551,9 +1597,16 @@ function renderChartEstoque(descView, metaTotal){
   const datasets = [
     { type:'bar', label:'Recebido no dia (m³)', data: dailyValues, backgroundColor:'#1a3a6b', borderRadius:5, maxBarThickness:34, order:3, datalabels:{display:false} },
     { type:'line', label:'Estoque acumulado em tanque (m³)', data: accValues, borderColor:'#f0a500', backgroundColor:'#f0a500',
-      tension:.25, pointRadius:3, pointBackgroundColor:'#f0a500', borderWidth:2.5, order:1,
-      datalabels:{ display:ctx=>ctx.dataIndex===accValues.length-1, align:'top', anchor:'end', color:'#c98700',
-        font:{family:"'Barlow Condensed',sans-serif", weight:800, size:13}, formatter:v=>fmtVol(v)+' m³' } }
+      tension:.25, pointRadius:4, pointBackgroundColor:'#f0a500', borderWidth:2.5, order:1,
+      datalabels:{
+        display:true,
+        align: ctx => ctx.dataIndex === accValues.length-1 ? 'right' : 'top',
+        anchor:'end',
+        color:'#c98700',
+        font:{family:"'Barlow Condensed',sans-serif", weight:800, size:10},
+        formatter:v=>fmtVol(v)
+      }
+    }
   ];
   if(metaTotal>0 && labels.length>0){
     datasets.push({ type:'line', label:'Meta do Navio', data: labels.map(()=>metaTotal),
@@ -1568,10 +1621,11 @@ function renderChartEstoque(descView, metaTotal){
     data:{ labels: labels, datasets },
     options:{
       responsive:true, maintainAspectRatio:false,
-      layout:{ padding:{ top:28, bottom:20 } },
+      layout:{ padding:{ top:20, right:50, bottom:20 } },
       plugins:{
         legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtVol(c.parsed.y)} m³`}}
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtVol(c.parsed.y)} m³`}},
+        datalabels:{ color:'#c98700' }
       },
       scales:{ y:{ beginAtZero:true, ticks:{callback:v=>fmtVol(v)}, grid:{color:'#eef1f6'} }, x:{ grid:{display:false} } }
     }
