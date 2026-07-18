@@ -2222,7 +2222,7 @@ function renderPlanoSection(notasView){
       datasets:[
         { type:'bar', label:'Realizado dia (m³)', data:chartRows.map(r=>r.realDia),
           backgroundColor:'#1a3a6b', borderRadius:5, maxBarThickness:40,
-          yAxisID:'y', order:3, datalabels:{display:false} },
+          yAxisID:'y', order:3, datalabels:{ display:true, anchor:'end', align:'top', offset:2, color:'#1a3a6b', font:{family:"'Barlow Condensed',sans-serif", weight:800, size:11}, formatter:v=>v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' m³' } },
         { type:'line', label:'Plano Acumulado (m³)', data:chartRows.map(r=>r.planoAcc),
           borderColor:'#f0a500', backgroundColor:'transparent',
           borderWidth:2.5, tension:0.4, pointRadius:3, pointBackgroundColor:'#f0a500',
