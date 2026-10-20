@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acesso · Operação Centro Oeste</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0d2044,#1a3a6b);color:#1a2a44}
+.box{background:#fff;border-radius:14px;width:100%;max-width:400px;padding:30px 28px;box-shadow:0 20px 60px rgba(0,0,0,.4);border-top:5px solid #f0a500}
+.logo{display:block;height:44px;margin:0 auto 14px}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:26px;text-align:center;color:#0d2044;letter-spacing:.5px}
+.sub{text-align:center;font-size:13px;color:#667;margin-bottom:18px}
+.tabs{display:flex;margin-bottom:16px;border-bottom:2px solid #e3e8f0}
+.tabs button{flex:1;padding:10px;background:none;border:none;font:600 14px 'Barlow';color:#889;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button.on{color:#0d2044;border-color:#f0a500}
+label{display:block;font-size:12px;font-weight:600;color:#445;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;padding:11px 12px;border:1.5px solid #cfd7e6;border-radius:8px;font:15px 'Barlow'}
+input:focus{outline:none;border-color:#1a3a6b}
+.btn{width:100%;margin-top:18px;padding:12px;border:none;border-radius:8px;background:#f0a500;color:#0d2044;font:700 16px 'Barlow Condensed';letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.msg{margin-top:14px;padding:10px 12px;border-radius:8px;font-size:13px;display:none}
+.msg.err{display:block;background:#fdecec;color:#a12626}
+.msg.ok{display:block;background:#e8f6ee;color:#1d6b3e}
+.msg.info{display:block;background:#fff6e0;color:#8a5a00}
+.link{display:block;text-align:center;margin-top:12px;font-size:13px;color:#1a3a6b;cursor:pointer;background:none;border:none;width:100%}
+.hide{display:none}
+</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d2044">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centro Oeste">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+</head>
+<body>
+<div class="box">
+  <img class="logo" src="data:image/jpeg;base64,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" alt="INPASA">
+  <h1>OPERAÇÃO CENTRO OESTE</h1>
+  <p class="sub">Acesso restrito a usuários autorizados</p>
+
+  <div class="tabs">
+    <button id="tLogin" class="on" type="button">Entrar</button>
+    <button id="tReg" type="button">Solicitar acesso</button>
+  </div>
+
+  <form id="fLogin">
+    <label>E-mail</label><input id="lEmail" type="email" required autocomplete="username">
+    <label>Senha</label><input id="lPass" type="password" required autocomplete="current-password">
+    <button class="btn" type="submit">Entrar</button>
+    <button class="link" id="forgot" type="button">Esqueci minha senha</button>
+  </form>
+
+  <form id="fReg" class="hide">
+    <label>Nome completo</label><input id="rNome" required maxlength="80" autocomplete="name">
+    <label>E-mail</label><input id="rEmail" type="email" required autocomplete="username">
+    <label>Senha (mín. 6 caracteres)</label><input id="rPass" type="password" required minlength="6" autocomplete="new-password">
+    <button class="btn" type="submit">Solicitar acesso</button>
+  </form>
+
+  <div id="msg" class="msg"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app), db = getFirestore(app);
+const $ = (id) => document.getElementById(id);
+
+// destino pós-login: só arquivos locais simples (evita open redirect)
+let next = new URLSearchParams(location.search).get("next") || "index.html";
+if (!/^[A-Za-z0-9_\-]+\.html$/.test(next)) next = "index.html";
+
+function msg(text, type) { const m = $("msg"); m.textContent = text; m.className = "msg " + type; }
+function tab(reg) {
+  $("fLogin").classList.toggle("hide", reg); $("fReg").classList.toggle("hide", !reg);
+  $("tLogin").classList.toggle("on", !reg); $("tReg").classList.toggle("on", reg);
+  $("msg").className = "msg";
+}
+$("tLogin").onclick = () => tab(false);
+$("tReg").onclick = () => tab(true);
+
+const STATUS = {
+  pendente: ["Seu cadastro aguarda aprovação de um administrador.", "info"],
+  rejeitado: ["Sua solicitação de acesso foi recusada.", "err"],
+  bloqueado: ["Seu acesso está bloqueado. Fale com o administrador.", "err"],
+  "sem-cadastro": ["Cadastro não encontrado. Solicite acesso.", "err"],
+  erro: ["Erro ao verificar o acesso. Tente novamente.", "err"]
+};
+const q = new URLSearchParams(location.search).get("msg");
+if (q && STATUS[q]) msg(...STATUS[q]);
+
+function erroAuth(e) {
+  const c = e.code || "";
+  if (["auth/invalid-credential", "auth/wrong-password", "auth/user-not-found", "auth/invalid-email"].includes(c)) return "E-mail ou senha incorretos.";
+  if (c === "auth/email-already-in-use") return "Este e-mail já possui cadastro. Use a aba Entrar.";
+  if (c === "auth/weak-password") return "Senha muito fraca (mínimo 6 caracteres).";
+  if (c === "auth/too-many-requests") return "Muitas tentativas. Aguarde alguns minutos.";
+  return "Erro: " + (c || e.message);
+}
+
+$("fLogin").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const btn = ev.submitter; btn.disabled = true;
+  try {
+    const cred = await signInWithEmailAndPassword(auth, $("lEmail").value.trim(), $("lPass").value);
+    const snap = await getDoc(doc(db, "usuarios", cred.user.uid));
+    const st = snap.exists() ? snap.data().status : "sem-cadastro";
+    if (st !== "aprovado") { await signOut(auth); msg(...STATUS[st]); }
+    else location.replace(next);
+  } catch (e) { msg(erroAuth(e), "err"); }
+  btn.disabled = false;
+};
+
+$("fReg").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const btn = ev.submitter; btn.disabled = true;
+  try {
+    const email = $("rEmail").value.trim();
+    const cred = await createUserWithEmailAndPassword(auth, email, $("rPass").value);
+    await setDoc(doc(db, "usuarios", cred.user.uid), {
+      nome: $("rNome").value.trim(), email, status: "pendente", perfil: "usuario", criadoEm: serverTimestamp()
+    });
+    await signOut(auth);
+    $("fReg").reset(); tab(false);
+    msg("Solicitação enviada! Aguarde a aprovação de um administrador para entrar.", "ok");
+  } catch (e) { msg(erroAuth(e), "err"); }
+  btn.disabled = false;
+};
+
+$("forgot").onclick = async () => {
+  const email = $("lEmail").value.trim();
+  if (!email) return msg("Digite seu e-mail acima e clique novamente.", "info");
+  try { await sendPasswordResetEmail(auth, email); msg("Enviamos um link de redefinição para o seu e-mail.", "ok"); }
+  catch (e) { msg(erroAuth(e), "err"); }
+};
+</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
+</body>
+</html>

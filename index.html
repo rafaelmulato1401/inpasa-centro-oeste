@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" style="visibility:hidden">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -139,7 +139,18 @@
     .panel-body{padding:28px 16px 0;}
     .hero-content{padding:36px 20px;}
   }
+  .nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .nav-user{font-size:12px;color:rgba(255,255,255,.85)}
+  .nav-btn{font-size:12px;color:#fff;text-decoration:none;background:rgba(255,255,255,.12);border:none;padding:6px 11px;border-radius:6px;cursor:pointer;font-family:inherit}
+  .nav-btn:hover{background:rgba(240,165,0,.35)}
+  [hidden]{display:none!important}
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d2044">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Centro Oeste">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 </head>
 <body>
 
@@ -149,7 +160,12 @@
     <div class="nav-divider"></div>
     <div class="nav-title">OPERAÇÃO <span>CENTRO OESTE</span></div>
   </div>
-  <div class="nav-date" id="navDate"></div>
+  <div class="nav-right">
+    <div class="nav-date" id="navDate"></div>
+    <span class="nav-user" data-user-name></span>
+    <a class="nav-btn" href="admin.html" data-admin-only hidden>👥 Usuários</a>
+    <button class="nav-btn" data-logout type="button">Sair</button>
+  </div>
 </nav>
 
 <div class="panel-hero">
@@ -326,5 +342,7 @@
   const opts = { weekday:'long', day:'2-digit', month:'long', year:'numeric' };
   document.getElementById('navDate').textContent = d.toLocaleDateString('pt-BR', opts);
 </script>
+<script type="module" src="auth-guard.js"></script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));</script>
 </body>
 </html>
