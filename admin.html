@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-require-admin="true" style="visibility:hidden">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Usuários · Operação Centro Oeste</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:#eef2f8;color:#1a2a44;min-height:100vh}
+header{background:linear-gradient(135deg,#0d2044,#1a3a6b);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid #f0a500}
+header h1{font-family:'Barlow Condensed',sans-serif;font-size:22px;letter-spacing:.5px}
+header a,header button{color:#fff;text-decoration:none;font-size:13px;background:rgba(255,255,255,.12);border:none;padding:7px 12px;border-radius:6px;cursor:pointer;font-family:inherit;margin-left:8px}
+main{max-width:980px;margin:22px auto;padding:0 16px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters button{padding:8px 14px;border:1.5px solid #cfd7e6;background:#fff;border-radius:20px;font:600 13px 'Barlow';cursor:pointer;color:#445}
+.filters button.on{background:#0d2044;color:#fff;border-color:#0d2044}
+.card{background:#fff;border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(13,32,68,.08);border-left:4px solid #cfd7e6}
+.card.pendente{border-color:#f0a500}.card.aprovado{border-color:#2e9e5b}.card.rejeitado,.card.bloqueado{border-color:#c0392b}
+.info{flex:1;min-width:200px}
+.nome{font-weight:600}.email{font-size:13px;color:#667}
+.tag{font-size:11px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:#e3e8f0;color:#334}
+.tag.admin{background:#0d2044;color:#f0a500}
+.acts button{margin-left:6px;padding:7px 11px;border:none;border-radius:6px;font:600 12px 'Barlow';cursor:pointer}
+.ok{background:#2e9e5b;color:#fff}.no{background:#c0392b;color:#fff}.neu{background:#e3e8f0;color:#223}
+.empty{text-align:center;color:#889;padding:40px}
+</style>
+</head>
+<body>
+<header>
+  <h1>👥 GERENCIAR USUÁRIOS</h1>
+  <div><a href="index.html">← Painel</a><button data-logout>Sair</button></div>
+</header>
+<main>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+</main>
+
+<script type="module">
+import { ready, db } from "./auth-guard.js";
+import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const me = await ready;
+let users = [], filtro = "pendente";
+const FILTROS = [["pendente","Pendentes"],["aprovado","Aprovados"],["rejeitado","Rejeitados"],["bloqueado","Bloqueados"],["todos","Todos"]];
+
+// escapa texto vindo de usuários (evita XSS)
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function load() {
+  const snap = await getDocs(collection(db, "usuarios"));
+  users = snap.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  render();
+}
+
+function render() {
+  const cnt = (s) => s === "todos" ? users.length : users.filter((u) => u.status === s).length;
+  document.getElementById("filters").innerHTML = FILTROS.map(([k, l]) =>
+    `<button class="${k === filtro ? "on" : ""}" data-f="${k}">${l} (${cnt(k)})</button>`).join("");
+
+  const list = users.filter((u) => filtro === "todos" || u.status === filtro)
+    .sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+
+  document.getElementById("list").innerHTML = list.length ? list.map((u) => {
+    const self = u.uid === me.uid;
+    let acts = "";
+    if (!self) {
+      if (u.status === "pendente") acts = `<button class="ok" data-a="aprovado" data-u="${esc(u.uid)}">Aprovar</button><button class="no" data-a="rejeitado" data-u="${esc(u.uid)}">Recusar</button>`;
+      else if (u.status === "aprovado") acts = `<button class="neu" data-a="perfil" data-u="${esc(u.uid)}">${u.perfil === "admin" ? "Remover admin" : "Tornar admin"}</button><button class="no" data-a="bloqueado" data-u="${esc(u.uid)}">Bloquear</button>`;
+      else acts = `<button class="ok" data-a="aprovado" data-u="${esc(u.uid)}">Aprovar / reativar</button>`;
+    }
+    return `<div class="card ${esc(u.status)}">
+      <div class="info"><div class="nome">${esc(u.nome)} ${self ? "(você)" : ""}</div><div class="email">${esc(u.email)}</div></div>
+      <span class="tag ${u.perfil === "admin" ? "admin" : ""}">${esc(u.perfil)}</span>
+      <span class="tag">${esc(u.status)}</span>
+      <div class="acts">${acts}</div></div>`;
+  }).join("") : `<div class="empty">Nenhum usuário nesta lista.</div>`;
+}
+
+document.addEventListener("click", async (e) => {
+  const f = e.target.closest("[data-f]");
+  if (f) { filtro = f.dataset.f; return render(); }
+  const b = e.target.closest("[data-a]");
+  if (!b) return;
+  const u = users.find((x) => x.uid === b.dataset.u);
+  if (!u) return;
+  const a = b.dataset.a;
+  const data = a === "perfil" ? { perfil: u.perfil === "admin" ? "usuario" : "admin" } : { status: a };
+  if ((a === "bloqueado" || a === "rejeitado" || a === "perfil") && !confirm(`Confirmar a ação para ${u.nome}?`)) return;
+  b.disabled = true;
+  try { await updateDoc(doc(db, "usuarios", u.uid), data); Object.assign(u, data); render(); }
+  catch (err) { alert("Erro: " + err.message); b.disabled = false; }
+});
+
+load();
+</script>
+<script type="module" src="auth-guard.js"></script>
+</body>
+</html>
